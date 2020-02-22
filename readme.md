@@ -1,1 +1,1 @@
-# Rubato
+# Rubato by GlassBox Games
