@@ -25,12 +25,16 @@ public class PrototypeMode implements Screen {
   }
 
   /** The player entity */
-  Player player;
+  private Player player;
+  /** The player scale amount */
+  private static final String PLAYER_FILE = "adagio.png";
+  /** The player scale amount */
+  private static final float PLAYER_SCALE = -0.9f;
   /** Objects for rendering the player */
-  Texture playerTexture;
-  Sprite playerSprite;
+  private Texture playerTexture;
+  private Sprite playerSprite;
 
-  SpriteBatch batch;
+  private SpriteBatch batch;
 
   public void preLoadContent(AssetManager manager) {
 
@@ -71,7 +75,7 @@ public class PrototypeMode implements Screen {
       makePlayer();
       break;
     case PLAY:
-      //todo: move this code to play
+      // TODO: move this code to play
       InputController.getInstance().readInput();
       player.move((int) InputController.getInstance().getHorizontal());
       if (InputController.getInstance().getVertical() > 0.0f) {
@@ -104,7 +108,16 @@ public class PrototypeMode implements Screen {
     Gdx.gl.glClearColor(1, 1, 1, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
+
+    // Draw player
+    if (player.movingLeft()) {
+      playerSprite.setFlip(true,false);
+    }
+    else if (player.movingRight()) {
+      playerSprite.setFlip(false,false);
+    }
     playerSprite.draw(batch);
+
     batch.end();
   }
 
@@ -171,10 +184,10 @@ public class PrototypeMode implements Screen {
   // TODO: probably move to a different class
   public void makePlayer() {
     player = new Player(0, -400);
-    playerTexture = new Texture(Gdx.files.internal("adagio.png"));
+    playerTexture = new Texture(Gdx.files.internal(PLAYER_FILE));
     playerSprite = new Sprite(playerTexture);
     playerSprite.setPosition(player.getPosition().x, player.getPosition().y);
-    playerSprite.scale(-.9f);
+    playerSprite.scale(PLAYER_SCALE);
     batch = new SpriteBatch();
   }
 }

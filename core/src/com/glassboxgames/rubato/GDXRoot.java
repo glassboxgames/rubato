@@ -15,17 +15,6 @@ public class GDXRoot extends Game {
   /** Drawing context to display graphics (VIEW CLASS) */
   private GameCanvas canvas;
 
-  /** Player instance */
-  private Player player;
-  /** Sprite batch */
-  private SpriteBatch batch;
-  /** Player sprite */
-  private Sprite playerSprite;
-  /** The player image */
-  private static final String PLAYER_FILE = "../../assets/adagio.png";
-  /** The player texture */
-  private static Texture playerTexture;
-
   public GDXRoot() {}
 
   @Override
@@ -38,8 +27,6 @@ public class GDXRoot extends Game {
   @Override
   public void dispose() {
     // Unload all of the resources
-    batch.dispose();
-    playerTexture.dispose();
     super.dispose();
   }
 }
