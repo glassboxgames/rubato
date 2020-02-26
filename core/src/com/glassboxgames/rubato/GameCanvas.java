@@ -1,4 +1,6 @@
 package com.glassboxgames.rubato;
+package edu.cornell.gdiac.physics;
+
 
 /**
  * Class controlling all the draw methods for Rubato.
@@ -27,6 +29,7 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.*;
+
 
 /**
  * Primary view class for the game, abstracting the basic graphics calls.
