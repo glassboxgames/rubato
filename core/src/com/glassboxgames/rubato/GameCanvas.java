@@ -657,7 +657,7 @@ public class GameCanvas {
         // For now, it is better to set the affine transform directly.
         computeTransform(ox,oy,x,y,angle,sx,sy);
         spriteBatch.setColor(tint);
-        spriteBatch.draw(region, region.getRegionWidth(), region.getRegionHeight(), local);
+        spriteBatch.draw(region, region.getRegionWidth(), region.getRegionHeight(),local);
     }
 
     /**
