@@ -30,21 +30,8 @@ public class PrototypeMode implements Screen {
   /** Objects for rendering the player */
   private Texture playerTexture;
   private Sprite playerSprite;
-
+  /** Sprite batch for rendering */
   private SpriteBatch batch;
-
-  public void preLoadContent(AssetManager manager) {
-
-  }
-  
-  public void loadContent(AssetManager manager) {
-
-  }
-  
-  public void unloadContent(AssetManager manager) {
-
-  }
-
   /** Canvas on which to draw content */
   private GameCanvas canvas;
 
@@ -79,8 +66,8 @@ public class PrototypeMode implements Screen {
     case PLAY:
       input.readInput();
       player.setMove(input.getHorizontal());
+      player.setJump(input.didJump());
       player.update(delta);
-      System.out.println(player.pos);
       break;
     }
   }
