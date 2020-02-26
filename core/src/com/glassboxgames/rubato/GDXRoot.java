@@ -32,44 +32,9 @@ public class GDXRoot extends Game {
     @Override
     public void create() {
         canvas  = new GameCanvas();
-        player = new Player(0, -400);
+        PrototypeMode gamemode = new PrototypeMode(canvas);
+        setScreen(gamemode);
 
-        batch = new SpriteBatch();
-        playerTexture = new Texture(Gdx.files.internal("adagio.png"));
-        playerSprite = new Sprite(playerTexture);
-        playerSprite.setPosition(player.getX(), player.getY());
-        playerSprite.scale(-.9f);
-    }
-
-    public void update() {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            player.move(-1);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            player.move(1);
-        } else {
-            player.move(0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (!player.isJumping()) {
-                player.jump();
-            }
-        }
-        System.out.println(x + " " + y);
-
-        playerSprite.setPosition(player.getX(), player.getY());
-
-        /** TODO: CHECK FOR COLLISIONS **/
-    }
-
-    @Override
-    public void render() {
-        update();
-
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        playerSprite.draw(batch);
-        batch.end();
     }
 
     @Override
