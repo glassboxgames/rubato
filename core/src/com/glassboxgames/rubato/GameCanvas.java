@@ -1,5 +1,4 @@
 package com.glassboxgames.rubato;
-package edu.cornell.gdiac.physics;
 
 
 /**
