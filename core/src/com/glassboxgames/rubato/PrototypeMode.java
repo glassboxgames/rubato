@@ -22,12 +22,16 @@ public class PrototypeMode implements Screen {
   }
 
   /** The player entity */
-  Player player;
+  private Player player;
+  /** The player scale amount */
+  private static final String PLAYER_FILE = "adagio.png";
+  /** The player scale amount */
+  private static final float PLAYER_SCALE = -0.9f;
   /** Objects for rendering the player */
-  Texture playerTexture;
-  Sprite playerSprite;
+  private Texture playerTexture;
+  private Sprite playerSprite;
 
-  SpriteBatch batch;
+  private SpriteBatch batch;
 
   public void preLoadContent(AssetManager manager) {
 
@@ -74,7 +78,7 @@ public class PrototypeMode implements Screen {
       break;
     case PLAY:
       input.readInput();
-      player.move(input.getHorizontal());
+      player.setMove(input.getHorizontal());
       player.update(delta);
       System.out.println(player.pos);
       break;

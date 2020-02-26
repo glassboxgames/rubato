@@ -20,17 +20,10 @@ public class Player extends Entity {
   }
 
   /**
-   * Returns whether the player is jumping.
-   */
-  public boolean isJumping() {
-    return isJumping;
-  }
-
-  /**
    * Sets the player's jump state.
    */
-  public void setJump(boolean x) {
-    isJumping = x;
+  public void setJump(boolean jump) {
+    isJumping = jump;
   }
 
   /**
@@ -43,7 +36,7 @@ public class Player extends Entity {
   /**
    * Sets the player's horizontal movement.
    */
-  public void move(float input) {
+  public void setMove(float input) {
     vel.x = input;
     if (input < 0 && dir > 0) {
       dir = -1;
