@@ -55,7 +55,7 @@ public class GDXRoot extends Game {
                 player.jump();
             }
         }
-        System.out.println(player.getX() + " " + player.getY()); // for debugging
+        // System.out.println(player.getX() + " " + player.getY()); // for debugging
         playerSprite.setPosition(player.getX(), player.getY());
 
         /** TODO: CHECK FOR COLLISIONS */
@@ -67,8 +67,17 @@ public class GDXRoot extends Game {
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         canvas.begin();
-        canvas.draw(playerSprite,new Color(1f,1f,1f,1f),playerSprite.getOriginX(),playerSprite.getOriginY(),player.getX(),player.getY(),0,PLAYER_SCALE,PLAYER_SCALE);
+        // Draw player sprite
+        int xScale = 1;
+        if (player.moving() > 5 && player.moving() < 8) {
+            xScale = -1;
+        }
+        System.out.println(player.moving());
+        canvas.draw(playerSprite,new Color(1f,1f,1f,1f),playerSprite.getOriginX(),playerSprite.getOriginY(),player.getX(),player.getY(),0,PLAYER_SCALE*xScale,PLAYER_SCALE);
+
+
         canvas.end();
     }
 
