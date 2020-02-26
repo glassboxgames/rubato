@@ -13,8 +13,6 @@ import com.badlogic.gdx.graphics.glutils.*;
 
 public class GDXRoot extends Game {
     int x,y;
-    /** AssetManager to load game assets (textures, sounds, etc.) */
-    private AssetManager manager;
     /** Drawing context to display graphics (VIEW CLASS) */
     private GameCanvas canvas;
 
@@ -29,36 +27,27 @@ public class GDXRoot extends Game {
     /** The player texture */
     private static Texture playerTexture;
 
-    public GDXRoot() {
-        manager = new AssetManager();
-    }
-
-    public void PreLoadContent() {
-        manager.load(PLAYER_FILE, Texture.class);
-    }
-
-    public void LoadContent() {
-        playerTexture = manager.get(PLAYER_FILE, Texture.class);
-    }
+    public GDXRoot() { }
 
     @Override
     public void create() {
         canvas  = new GameCanvas();
-        player = new Player(20, 0);
+        player = new Player(0, -400);
 
         batch = new SpriteBatch();
         playerTexture = new Texture(Gdx.files.internal("adagio.png"));
         playerSprite = new Sprite(playerTexture);
-        playerSprite.setPosition(0, -100);
-        playerSprite.scale(-.8f);
-        update();
+        playerSprite.setPosition(player.getX(), player.getY());
+        playerSprite.scale(-.9f);
     }
 
     public void update() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            player.move("left");
+            player.move(-1);
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            player.move("right");
+            player.move(1);
+        } else {
+            player.move(0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (!player.isJumping()) {
@@ -67,11 +56,15 @@ public class GDXRoot extends Game {
         }
         System.out.println(x + " " + y);
 
+        playerSprite.setPosition(player.getX(), player.getY());
+
         /** TODO: CHECK FOR COLLISIONS **/
     }
 
     @Override
     public void render() {
+        update();
+
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
