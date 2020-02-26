@@ -22,7 +22,7 @@ public class GDXRoot extends Game {
     /** Player sprite */
     private Sprite playerSprite;
     /** The player sprite scale amount */
-    private static final float PLAYER_SCALE = -0.8f;
+    private static final float PLAYER_SCALE = 0.2f;
     /** The player image */
     private static final String PLAYER_FILE = "adagio.png";
     /** The player texture */
@@ -34,13 +34,12 @@ public class GDXRoot extends Game {
     public void create() {
         canvas  = new GameCanvas();
         // controller = new EntityController();
-        player = new Player(0, -400);
+        player = new Player(200, 100);
 
         batch = new SpriteBatch();
         playerTexture = new Texture(Gdx.files.internal(PLAYER_FILE));
         playerSprite = new Sprite(playerTexture);
         playerSprite.setPosition(player.getX(), player.getY());
-        playerSprite.scale(PLAYER_SCALE);
     }
 
     public void update() {
@@ -68,15 +67,15 @@ public class GDXRoot extends Game {
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        playerSprite.draw(batch);
-        batch.end();
+        canvas.begin();
+        canvas.draw(playerSprite,new Color(1f,1f,1f,1f),playerSprite.getOriginX(),playerSprite.getOriginY(),player.getX(),player.getY(),0,PLAYER_SCALE,PLAYER_SCALE);
+        canvas.end();
     }
 
     @Override
     public void dispose() {
         // Unload all of the resources
-        batch.dispose();
+        canvas.dispose();
         playerTexture.dispose();
         super.dispose();
     }

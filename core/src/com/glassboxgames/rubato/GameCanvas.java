@@ -1,6 +1,5 @@
 package com.glassboxgames.rubato;
 
-
 /**
  * Class controlling all the draw methods for Rubato.
  */
@@ -560,16 +559,6 @@ public class GameCanvas {
         // Unlike Lab 1, we can shortcut without a master drawing method
         spriteBatch.setColor(Color.WHITE);
         spriteBatch.draw(region, x,  y);
-    }
-
-    public void draw(TextureRegion region, float x, float y, float sx, float sy) {
-        if (active != DrawPass.STANDARD) {
-            Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
-            return;
-        }
-        // Unlike Lab 1, we can shortcut without a master drawing method
-        spriteBatch.setColor(Color.WHITE);
-        spriteBatch.draw(region, x,  y, sx, sy);
     }
 
     /**
