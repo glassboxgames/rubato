@@ -12,13 +12,24 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.*;
 
 public class GDXRoot extends Game {
+  /** AssetManager to load game assets (textures, sounds, etc.) */
+  private AssetManager manager;
   /** Drawing context to display graphics (VIEW CLASS) */
   private GameCanvas canvas;
+
+  public GDXRoot() {
+    // Start loading with the asset manager
+    manager = new AssetManager();
+
+    // Add font support to the asset manager
+    FileHandleResolver resolver = new InternalFileHandleResolver();
+  }
 
   @Override
   public void create() {
     canvas = new GameCanvas();
     PrototypeMode mode = new PrototypeMode(canvas);
+    mode.preLoadContent(manager);
     setScreen(mode);
   }
 }
