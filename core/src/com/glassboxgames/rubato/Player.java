@@ -27,9 +27,9 @@ public class Player extends Entity {
   /** How fast we change frames (one frame per 4 calls to update) */
   private static final float ANIMATION_SPEED = 0.25f;
 
-  /** Adagio's width, in pixels */
+  /** Adagio's default width, in pixels */
   public static final int   ADAGIO_WIDTH = 50;
-  /** Adagio's height, in pixels */
+  /** Adagio's default height, in pixels */
   public static final int   ADAGIO_HEIGHT = 100;
 
   /** Jump force */
@@ -124,6 +124,6 @@ public class Player extends Entity {
     animator.setFrame((int)animframe);
     // TODO: Fix heading
     // TODO: set origin height to ADAGIO_HEIGHT/2 and spawn Adagio at ADAGIO_HEIGHT/2 after implementing collision with ground
-    canvas.draw(animator, Color.WHITE, ADAGIO_WIDTH + dir*ADAGIO_WIDTH/2f, 0, pos.x + ADAGIO_WIDTH, pos.y, dir*ADAGIO_WIDTH, ADAGIO_HEIGHT);
+    canvas.draw(animator, Color.WHITE, ADAGIO_WIDTH + dir*ADAGIO_WIDTH/2f, 0, pos.x + ADAGIO_WIDTH, pos.y, dir*animator.getRegionWidth(), animator.getRegionHeight());
   }
 }

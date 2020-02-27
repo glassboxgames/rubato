@@ -28,11 +28,11 @@ public class PrototypeMode implements Screen {
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
-  private static String BACKGROUND_FILE = "sunset-forest-yellow.png";
+  private static String BACKGROUND_FILE = "Backgrounds/sunset-forest-yellow.png";
   /** The file for the idle picture */
-  private static final String ADAGIO_IDLE = "adagio.png";
+  private static final String ADAGIO_IDLE = "Adagio/wait-strip.png";
   /** The file for the walking filmstrip */
-  private static final String ADAGIO_WALK = "walk-strip50.png";
+  private static final String ADAGIO_WALK = "Adagio/walk-strip75.png";
 
   // Loaded assets
   /** The background image for the game */
