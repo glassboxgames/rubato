@@ -4,11 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * Primary controller class for the gameplay prototype.
@@ -26,12 +25,10 @@ public class PrototypeMode implements Screen {
   /** The player scale amount */
   private static final String PLAYER_FILE = "adagio.png";
   /** The player scale amount */
-  private static final float PLAYER_SCALE = -0.9f;
+  private static final float PLAYER_SCALE = 0.1f;
   /** Objects for rendering the player */
   private Texture playerTexture;
   private Sprite playerSprite;
-
-  private SpriteBatch batch;
 
   public void preLoadContent(AssetManager manager) {
 
@@ -74,7 +71,6 @@ public class PrototypeMode implements Screen {
       playerTexture = new Texture(Gdx.files.internal("adagio.png"));
       playerSprite = new Sprite(playerTexture);
       playerSprite.setSize((int)player.dim.x, (int)player.dim.y);
-      batch = new SpriteBatch();
       break;
     case PLAY:
       input.readInput();
@@ -100,11 +96,11 @@ public class PrototypeMode implements Screen {
   private void draw(float delta) {
     Gdx.gl.glClearColor(1, 1, 1, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-    batch.begin();
+    canvas.begin();
     playerSprite.setPosition(player.pos.x, player.pos.y);
     playerSprite.setFlip(player.getDirection() < 0, false);
-    playerSprite.draw(batch);
-    batch.end();
+    canvas.draw(playerSprite,Color.WHITE,playerSprite.getWidth()/2,playerSprite.getHeight()/2,player.pos.x,player.pos.y,0,PLAYER_SCALE,PLAYER_SCALE);
+    canvas.end();
   }
 
   /** 
@@ -163,7 +159,7 @@ public class PrototypeMode implements Screen {
     player = null;
     playerTexture = null;
     playerSprite = null;
-    batch = null;
+
     canvas = null;
   }
 }
