@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
+import com.glassboxgames.util.*;
 
 /**
  * Primary controller class for the gameplay prototype.
@@ -21,28 +23,63 @@ public class PrototypeMode implements Screen {
     PLAY,
   }
 
+  /** AssetManager to load game assets (textures, sounds, etc.) */
+  private AssetManager manager;
   /** The player entity */
   private Player player;
   /** The player scale amount */
   private static final String PLAYER_FILE = "adagio.png";
+
+  // GRAPHICS AND SOUND RESOURCES
+  /** The file for the background image to scroll */
+  private static String BKGD_FILE = "sunset-forest-ice.png";
+  private static final String ADAGIO_WALK = "walk-strip50.png";
   /** The player scale amount */
   private static final float PLAYER_SCALE = -0.9f;
   /** Objects for rendering the player */
   private Texture playerTexture;
   private Sprite playerSprite;
 
+  // Loaded assets
+  /** The background image for the game */
+  private Texture background;
+  /** Texture for all ships, as they look the same */
+  private Texture adagioWalkTexture;
+
+  /** Track all loaded assets (for unloading purposes) */
+  private Array<String> assets;
+
+
   private SpriteBatch batch;
 
   public void preLoadContent(AssetManager manager) {
-
+    manager.load(BKGD_FILE,Texture.class);
+    assets.add(BKGD_FILE);
+    manager.load(ADAGIO_WALK, Texture.class);
+    assets.add(ADAGIO_WALK);
   }
-  
+
+  private Texture createTexture(AssetManager manager, String file) {
+    if (manager.isLoaded(file)) {
+      Texture texture = manager.get(file, Texture.class);
+      texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+      return texture;
+    }
+    return null;
+  }
+
   public void loadContent(AssetManager manager) {
+      //background = createTexture(manager, BKGD_FILE);
+      adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
 
   }
   
   public void unloadContent(AssetManager manager) {
-
+    for(String s : assets) {
+      if (manager.isLoaded(s)) {
+        manager.unload(s);
+      }
+    }
   }
 
   /** Canvas on which to draw content */
@@ -58,6 +95,10 @@ public class PrototypeMode implements Screen {
    * @param canvas the canvas to draw on
    */
   public PrototypeMode(GameCanvas canvas) {
+    // Start loading with the asset manager
+    active = false;
+    manager = new AssetManager();
+    assets = new Array<String>();
     this.canvas = canvas;
     gameState = GameState.INTRO;
   }
@@ -66,6 +107,7 @@ public class PrototypeMode implements Screen {
    * TODO
    */
   private void update(float delta) {
+
     InputController input = InputController.getInstance();
     switch (gameState) {
     case INTRO:
@@ -74,9 +116,13 @@ public class PrototypeMode implements Screen {
       playerTexture = new Texture(Gdx.files.internal("adagio.png"));
       playerSprite = new Sprite(playerTexture);
       playerSprite.setSize((int)player.dim.x, (int)player.dim.y);
+      adagioWalkTexture = new Texture(Gdx.files.internal(ADAGIO_WALK));
+      background = new Texture(Gdx.files.internal(BKGD_FILE));
+      player.setTexture(adagioWalkTexture);
       batch = new SpriteBatch();
       break;
     case PLAY:
+      loadContent(manager);
       input.readInput();
       player.setMove(input.getHorizontal());
       player.update(delta);
@@ -98,13 +144,17 @@ public class PrototypeMode implements Screen {
    * @param delta
    */
   private void draw(float delta) {
-    Gdx.gl.glClearColor(1, 1, 1, 1);
+    canvas.begin();
+    canvas.drawBackground(background,0,-100);
+    player.draw(canvas);
+    canvas.end();
+    /*Gdx.gl.glClearColor(1, 1, 1, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
     playerSprite.setPosition(player.pos.x, player.pos.y);
     playerSprite.setFlip(player.getDirection() < 0, false);
     playerSprite.draw(batch);
-    batch.end();
+    batch.end();*/
   }
 
   /** 

@@ -1,6 +1,9 @@
 package com.glassboxgames.rubato;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.glassboxgames.util.*;
 
 /**
  * Class representing a main player character in Rubato.
@@ -9,6 +12,14 @@ public class Player extends Entity {
   private boolean isJumping;
   private boolean isGrounded;
   private int dir;
+  /** Current animation frame for this ship */
+  private float animeframe;
+
+  /** How fast we change frames (one frame per 4 calls to update) */
+  private static final float ANIMATION_SPEED = 0.25f;
+  /** The number of animation frames in our filmstrip */
+  private static final int   NUM_ANIM_FRAMES = 9;
+
 
   public Player(int x, int y) {
     pos = new Vector2(x, y);
@@ -17,6 +28,10 @@ public class Player extends Entity {
     dir = 1;
     isJumping = false;
     isGrounded = false;
+  }
+
+  public void setTexture(Texture texture) {
+    animator = new FilmStrip(texture,1,10,9);
   }
 
   /**
@@ -43,5 +58,35 @@ public class Player extends Entity {
     } else if (input > 0 && dir < 0) {
       dir = 1;
     }
+  }
+
+  /**
+   * Updates the animation frame and position of this ship.
+   *
+   * Notice how little this method does.  It does not actively fire the weapon.  It
+   * only manages the cooldown and indicates whether the weapon is currently firing.
+   * The result of weapon fire is managed by the GameplayController.
+   *
+   * @param delta Number of seconds since last animation frame
+   */
+  public void update(float delta) {
+    // Call superclass's update
+    super.update(delta);
+
+    // Increase animation frame, but only if trying to move
+    if (vel.x != 0.0f) {
+      animeframe += ANIMATION_SPEED;
+      if (animeframe >= NUM_ANIM_FRAMES) {
+        animeframe -= NUM_ANIM_FRAMES;
+      }
+    }
+  }
+
+  public void draw(GameCanvas canvas) {
+    float x = animator.getRegionWidth()/8.0f;
+    float y = animator.getRegionHeight()/8.0f;
+    System.out.println(animeframe);
+    animator.setFrame((int)animeframe);
+    canvas.draw(animator, Color.WHITE, x, y, pos.x, pos.y, 0.0f, 1.0f, 1.f);
   }
 }
