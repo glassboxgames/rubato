@@ -12,7 +12,7 @@ public class InputController {
   private boolean jumpPressed;
 
   /** How much did we move horizontally */
-  private float horizontal;
+  private int horizontal;
 
   /** The singleton instance of the input controller */
   private static InputController controller = null;
@@ -36,7 +36,7 @@ public class InputController {
   /**
    * Returns the horizontal movement input from the player.
    */
-  public float getHorizontal() {
+  public int getHorizontal() {
     return horizontal;
   }
 
@@ -77,12 +77,12 @@ public class InputController {
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
     jumpPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE);
 
-    horizontal = 0.0f;
+    horizontal = 0;
     if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-      horizontal += 1.0f;
+      horizontal += 1;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-      horizontal -= 1.0f;
+      horizontal -= 1;
     }
   }
 }

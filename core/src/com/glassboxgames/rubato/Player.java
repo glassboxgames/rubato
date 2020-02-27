@@ -21,11 +21,11 @@ public class Player extends Entity {
   private int dir;
   /** Current animation frame for Adagio */
   private float animframe;
+  /** The total number of animation frames in a movement filmstrip */
+  private int totalFrames;
 
   /** How fast we change frames (one frame per 4 calls to update) */
   private static final float ANIMATION_SPEED = 0.25f;
-  /** The number of animation frames in our walk filmstrip */
-  private static int totalFrames;
 
   /** Adagio's width, in pixels */
   public static final int   ADAGIO_WIDTH = 50;
@@ -61,14 +61,16 @@ public class Player extends Entity {
   /**
    * Sets the player's jump state.
    */
-  public void setJump(boolean jump) {
+  public boolean setJump(boolean jump) {
     if (jump) {
       if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
         jumpDuration++;
       } else if (pos.y <= 0) {
         jumpDuration = MIN_JUMP_DURATION;
       }
+      return true;
     }
+    return false;
   }
 
   /**
@@ -81,11 +83,13 @@ public class Player extends Entity {
   /**
    * Sets the player's horizontal movement intention.
    */
-  public void setMove(float input) {
+  public boolean setMove(float input) {
     vel.x = input * MAX_X_SPEED;
     if (input != 0) {
       dir = (int)input;
+      return true;
     }
+    return false;
   }
 
   @Override
@@ -107,7 +111,7 @@ public class Player extends Entity {
     if (vel.x != 0) {
       animframe += ANIMATION_SPEED;
       if (animframe >= totalFrames) {
-        animframe -= totalFrames;
+        animframe = 0;
       }
     }
   }
@@ -115,6 +119,7 @@ public class Player extends Entity {
   public void draw(GameCanvas canvas) {
     animator.setFrame((int)animframe);
     // TODO: Fix heading
-    canvas.draw(animator, Color.WHITE, 0, 0, pos.x, pos.y, ADAGIO_WIDTH, ADAGIO_HEIGHT);
+    // TODO: set origin height to ADAGIO_HEIGHT/2 and spawn Adagio at ADAGIO_HEIGHT/2 after implementing collision with ground
+    canvas.draw(animator, Color.WHITE, ADAGIO_WIDTH + dir*ADAGIO_WIDTH/2f, 0, pos.x + ADAGIO_WIDTH, pos.y, dir*ADAGIO_WIDTH, ADAGIO_HEIGHT);
   }
 }

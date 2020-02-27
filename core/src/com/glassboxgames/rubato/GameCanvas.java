@@ -416,16 +416,14 @@ public class GameCanvas {
    * To work properly, the image should be wide and high enough to fill the screen.
    *
    * @param image  Texture to draw as an overlay
-   * @param x      The x-coordinate of the bottom left corner
-   * @param y 	 The y-coordinate of the bottom left corner
    */
-  public void drawBackground(Texture image, float x, float y) {
+  public void drawBackground(Texture image) {
     if (active != DrawPass.STANDARD) {
       Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
       return;
     }
 
-    spriteBatch.draw(image, x, y);
+    spriteBatch.draw(image, 0, 0, getWidth(),getHeight());
   }
 
   /**

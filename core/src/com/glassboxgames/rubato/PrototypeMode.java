@@ -25,12 +25,12 @@ public class PrototypeMode implements Screen {
   private AssetManager manager;
   /** The player entity */
   private Player player;
-  /** The player scale amount */
-  private static final String ADAGIO_IDLE = "adagio.png";
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
-  private static String BACKGROUND_FILE = "sunset-forest-ice.png";
+  private static String BACKGROUND_FILE = "sunset-forest-yellow.png";
+  /** The file for the idle picture */
+  private static final String ADAGIO_IDLE = "adagio.png";
   /** The file for the walking filmstrip */
   private static final String ADAGIO_WALK = "walk-strip50.png";
 
@@ -75,8 +75,13 @@ public class PrototypeMode implements Screen {
   }
 
   public void loadContent(AssetManager manager) {
-    adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
-    adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
+    // TODO: Fix this bug
+    // background = createTexture(manager,BACKGROUND_FILE);
+    // adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
+    // adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
+    background = new Texture(Gdx.files.internal(BACKGROUND_FILE));
+    adagioIdleTexture = new Texture(Gdx.files.internal(ADAGIO_IDLE));
+    adagioWalkTexture = new Texture(Gdx.files.internal(ADAGIO_WALK));
   }
 
   public void unloadContent(AssetManager manager) {
@@ -108,17 +113,21 @@ public class PrototypeMode implements Screen {
     InputController input = InputController.getInstance();
     switch (gameState) {
     case INTRO:
+      loadContent(manager);
       gameState = GameState.PLAY;
-      background = new Texture(Gdx.files.internal(BACKGROUND_FILE));
-      adagioIdleTexture = new Texture(Gdx.files.internal(ADAGIO_IDLE));
-      adagioWalkTexture = new Texture(Gdx.files.internal(ADAGIO_WALK));
-      player = new Player(0,0);
+      player = new Player(Player.ADAGIO_WIDTH/2,0);
       player.setTexture(adagioIdleTexture,1,1,1);
       break;
     case PLAY:
-      loadContent(manager);
       input.readInput();
-      player.setMove(input.getHorizontal());
+      int movement = input.getHorizontal();
+      player.setMove(movement);
+      if (movement == 0) {
+        player.setTexture(adagioIdleTexture, 1, 1, 1);
+      }
+      else {
+        player.setTexture(adagioWalkTexture,1,10,10);
+      }
       player.setJump(input.didJump());
       player.update(delta);
       break;
@@ -139,7 +148,7 @@ public class PrototypeMode implements Screen {
    */
   private void draw(float delta) {
     canvas.begin();
-    canvas.drawBackground(background,0,-100);
+    canvas.drawBackground(background);
     player.draw(canvas);
     canvas.end();
   }
