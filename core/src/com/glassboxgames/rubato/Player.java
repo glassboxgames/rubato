@@ -1,6 +1,9 @@
 package com.glassboxgames.rubato;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.glassboxgames.util.*;
 
 /**
  * Class representing a main player character in Rubato.
@@ -16,6 +19,13 @@ public class Player extends Entity {
   private float jumpTime;
   /** Direction the player is facing (1 for right, -1 for left) */
   private int dir;
+  /** Current animation frame for this ship */
+  private float animFrame;
+
+  /** How fast we change frames (one frame per 4 calls to update) */
+  private static final float ANIMATION_SPEED = 0.25f;
+  /** The number of animation frames in our filmstrip */
+  private static final int NUM_ANIM_FRAMES = 9;
 
   /** Jump force */
   private static float JUMP_FORCE = 4f;
@@ -36,6 +46,10 @@ public class Player extends Entity {
     dim = new Vector2(50, 100);
     dir = 1;
     jumpDuration = 0;
+  }
+
+  public void setTexture(Texture texture) {
+    animator = new FilmStrip(texture, 1, 10, 9);
   }
 
   /**
@@ -82,5 +96,21 @@ public class Player extends Entity {
       vel.y = 0;
     }
     pos.add(vel);
+
+    if (vel.x != 0) {
+      animFrame += ANIMATION_SPEED;
+      if (animFrame >= NUM_ANIM_FRAMES) {
+        animFrame -= NUM_ANIM_FRAMES;
+      }
+    }
+  }
+
+  public void draw(GameCanvas canvas) {
+    float x = animator.getRegionWidth()/8.0f;
+    float y = animator.getRegionHeight()/8.0f;
+    System.out.println(animFrame);
+    animator.setFrame((int)animFrame);
+    // TODO: Fix heading
+    canvas.draw(animator, Color.WHITE, x, y, pos.x, pos.y, 0.0f, 1.0f, 1.f);
   }
 }
