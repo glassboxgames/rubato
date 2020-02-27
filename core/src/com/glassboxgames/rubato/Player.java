@@ -124,11 +124,11 @@ public class Player extends Entity {
     pos.add(vel);
   }
 
+  @Override
   public void draw(GameCanvas canvas) {
-    FilmStrip animator = getFilmStrip();
-    float w = animator.getRegionWidth();
-    float h = animator.getRegionHeight();
-    // TODO: set origin height to h/2 and spawn Adagio at h/2 after implementing collision with ground
-    canvas.draw(animator, Color.WHITE, w + dir * w / 2, 0, pos.x + w, pos.y, dir * w, h);
+    canvas.draw(getFilmStrip(), Color.WHITE,
+                dim.x * dir / 2, 0,
+                pos.x, pos.y,
+                dim.x * dir, dim.y);
   }
 }

@@ -150,7 +150,6 @@ public class PrototypeMode implements Screen {
         player.setTexture(adagioIdleTexture, 1, 1, 1);
       }
       player.update(delta);
-      System.out.println(player.pos);
       
       for (Enemy enemy : enemies) {
         enemy.update(delta);

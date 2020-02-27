@@ -1,7 +1,7 @@
 package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.glassboxgames.util.*;
 /**
@@ -13,6 +13,8 @@ public abstract class Entity {
 
   /** Position of the entity */
   public Vector2 pos;
+  /** Dimensions of the entity */
+  public Vector2 dim;
   /** Temporary vector for calculations */
   private Vector2 temp = new Vector2();
 
@@ -32,6 +34,7 @@ public abstract class Entity {
    */
   public Entity(float x, float y) {
     pos = new Vector2(x, y);
+    dim = new Vector2();
     animator = null;
     animFrame = 0;
     animSpeed = DEFAULT_ANIMATION_SPEED;
@@ -71,6 +74,7 @@ public abstract class Entity {
       animFrame = 0;
       totalFrames = size;
       animator = newAnimator;
+      dim.set(animator.getRegionWidth(), animator.getRegionHeight());
     }
   }
 
@@ -86,5 +90,12 @@ public abstract class Entity {
    */
   public FilmStrip getFilmStrip() {
     return animator;
+  }
+
+  /**
+   * Draws this entity to the given canvas.
+   */
+  public void draw(GameCanvas canvas) {
+    canvas.draw(getFilmStrip(), Color.WHITE, dim.x / 2, 0, pos.x + dim.x / 2, pos.y, dim.x, dim.y);
   }
 }
