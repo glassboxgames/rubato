@@ -1,17 +1,13 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.math.*;
 import com.glassboxgames.util.*;
 
 /**
  * Class representing a main player character in Rubato.
  */
 public class Player extends Entity {
-  /** How fast we change frames (one frame per 4 calls to update) */
-  private static final float ANIMATION_SPEED = 0.25f;
-
   /** Jump force */
   private static float JUMP_FORCE = 4f;
   /** Gravity */
@@ -48,8 +44,8 @@ public class Player extends Entity {
   /** Current attack cooldown, 0 if not attacking */
   private int attackCooldown;
 
-  public Player(float x, float y, float w, float h) {
-    super(x, y, w, h);
+  public Player(float x, float y) {
+    super(x, y);
     animFrame = 0;
     totalFrames = 0;
     vel = new Vector2(0, 0);
@@ -58,22 +54,6 @@ public class Player extends Entity {
     jumpDuration = 0;
     attackTime = 0;
     attackCooldown = 0;
-  }
-
-  /**
-   * Sets the player texture with filmstrip compatibility.
-   * @param texture texture to set
-   * @param rows number of rows in filmstrip
-   * @param cols number of columns in filmstrip
-   * @param size number of frames in filmstrip
-   */
-  public void setTexture(Texture texture, int rows, int cols, int size) {
-    FilmStrip newAnimator = new FilmStrip(texture, rows, cols, size);
-    if (animator == null || !texture.equals(animator.getTexture())) {
-      animFrame = 0;
-      totalFrames = size;
-      animator = newAnimator;
-    }
   }
 
   /**
@@ -122,6 +102,7 @@ public class Player extends Entity {
 
   @Override
   public void update(float delta) {
+    super.update(delta);
     if (attackTime < attackCooldown) {
       attackTime++;
     } else if (attackCooldown > 0) {
@@ -141,16 +122,10 @@ public class Player extends Entity {
       vel.y = 0;
     }
     pos.add(vel);
-
-    animFrame += ANIMATION_SPEED;
-    if (animFrame >= totalFrames) {
-      animFrame -= totalFrames;
-    }
   }
 
   public void draw(GameCanvas canvas) {
-    animator.setFrame((int)animFrame);
-    // TODO: Fix heading
+    FilmStrip animator = getFilmStrip();
     float w = animator.getRegionWidth();
     float h = animator.getRegionHeight();
     // TODO: set origin height to h/2 and spawn Adagio at h/2 after implementing collision with ground

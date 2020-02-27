@@ -27,6 +27,8 @@ public class PrototypeMode implements Screen {
   private static final String ADAGIO_IDLE = "Adagio/wait-strip.png";
   /** The file for the walking filmstrip */
   private static final String ADAGIO_WALK = "Adagio/walk-strip75.png";
+  /** The file for the enemy image */
+  private static final String ENEMY_FILE = "enemy.png";
 
   // Loaded assets
   /** The background image for the game */
@@ -37,8 +39,6 @@ public class PrototypeMode implements Screen {
   private Texture adagioWalkTexture;
   /** Texture for enemies */
   private Texture enemyTexture;
-  /** Sprite object for enemies */
-  private Sprite enemySprite;
 
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
@@ -62,6 +62,8 @@ public class PrototypeMode implements Screen {
     assets.add(ADAGIO_IDLE);
     manager.load(ADAGIO_WALK, Texture.class);
     assets.add(ADAGIO_WALK);
+    manager.load(ENEMY_FILE, Texture.class);
+    assets.add(ENEMY_FILE);
   }
 
   private Texture createTexture(AssetManager manager, String file) {
@@ -75,9 +77,10 @@ public class PrototypeMode implements Screen {
   }
 
   public void loadContent(AssetManager manager) {
-    background = createTexture(manager,BACKGROUND_FILE);
-    adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
-    adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
+    background = createTexture(manager, BACKGROUND_FILE);
+    adagioIdleTexture = createTexture(manager, ADAGIO_IDLE);
+    adagioWalkTexture = createTexture(manager, ADAGIO_WALK);
+    enemyTexture = createTexture(manager, ENEMY_FILE);
   }
 
   public void unloadContent(AssetManager manager) {
@@ -98,11 +101,6 @@ public class PrototypeMode implements Screen {
     assets = new Array<String>();
     canvas = gameCanvas;
     gameState = GameState.INTRO;
-    active = false;
-    enemyTexture = null;
-    enemySprite = null;
-    player = null;
-    enemies = null;
   }
 
   /**
@@ -110,20 +108,20 @@ public class PrototypeMode implements Screen {
    */
   private void update(float delta) {
     switch (gameState) {
-    case INTRO:
+    case INTRO: {
       loadContent(manager);
       preloadContent(manager);
       manager.finishLoading();
       loadContent(manager);
-      player = new Player(0, 0, 50, 100);
-      player.setTexture(adagioIdleTexture, 1, 1, 1);
-      enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
-      enemySprite = new Sprite(enemyTexture);
-      enemies = new Array<Enemy>();
-      enemies.add(new Enemy(200, 75, 100, 50));
+      player = new Player(50, 0);
+      player.setTexture(adagioIdleTexture);
+      Enemy enemy = new Enemy(600, 75);
+      enemy.setTexture(enemyTexture);
+      enemies = new Array<Enemy>(new Enemy[] {enemy});
       gameState = GameState.PLAY;
       break;
-    case PLAY:
+    }
+    case PLAY: {
       InputController input = InputController.getInstance();
       input.readInput();
 
@@ -152,6 +150,7 @@ public class PrototypeMode implements Screen {
         player.setTexture(adagioIdleTexture, 1, 1, 1);
       }
       player.update(delta);
+      System.out.println(player.pos);
       
       for (Enemy enemy : enemies) {
         enemy.update(delta);
@@ -164,6 +163,7 @@ public class PrototypeMode implements Screen {
         }
       }
       break;
+    }
     }
   }
 
@@ -182,10 +182,7 @@ public class PrototypeMode implements Screen {
     canvas.drawBackground(background);
     player.draw(canvas);
     for (Enemy enemy : enemies) {
-      // enemySprite.setPosition(enemy.pos.x, enemy.pos.y);
-      // enemySprite.setFlip(enemy.getDirection() < 0, false);
-      // enemySprite.setSize((int)enemy.dim.x, (int)enemy.dim.y);
-      // enemySprite.draw(batch);
+      enemy.draw(canvas);
     }
     canvas.end();
   }

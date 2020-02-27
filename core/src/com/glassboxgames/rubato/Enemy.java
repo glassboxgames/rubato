@@ -1,5 +1,8 @@
 package com.glassboxgames.rubato;
 
+import com.badlogic.gdx.graphics.*;
+import com.glassboxgames.util.*;
+
 /**
  * Class representing a simple path-following enemy in Rubato.
  */
@@ -7,9 +10,9 @@ public class Enemy extends Entity {
   /** Maximum health */
   private static float MAX_HEALTH = 10;
   /** Maximum speed */
-  private static float MAX_SPEED = 5;
+  private static float MAX_SPEED = 3;
   /** Movement range */
-  private static float MOVE_RANGE = 50;
+  private static float MOVE_RANGE = 200;
 
   /** Current health */
   private float health;
@@ -22,11 +25,9 @@ public class Enemy extends Entity {
    * Initializes an enemy with the specified parameters.
    * @param x x-coordinate
    * @param y y-coordinate
-   * @param w width
-   * @param h height
    */
-  public Enemy(float x, float y, float w, float h) {
-    super(x, y, w, h);
+  public Enemy(float x, float y) {
+    super(x, y);
     health = MAX_HEALTH;
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
@@ -49,5 +50,12 @@ public class Enemy extends Entity {
     }
     float speed = MAX_SPEED * dir * health / MAX_HEALTH;
     pos.x += speed;
+  }
+
+  public void draw(GameCanvas canvas) {
+    FilmStrip animator = getFilmStrip();
+    float w = animator.getRegionWidth();
+    float h = animator.getRegionHeight();
+    canvas.draw(animator, Color.WHITE, w + dir * w / 2, 0, pos.x + w, pos.y, dir * w, h);
   }
 }
