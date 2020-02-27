@@ -10,8 +10,6 @@ import com.glassboxgames.util.*;
 public abstract class Entity {
   /** Position of the entity */
   public Vector2 pos;
-  /** Velocity of the entity */
-  public Vector2 vel;
   /** Size of this entity */
   public Vector2 dim;
   /** Temporary vector for calculations */
@@ -27,10 +25,8 @@ public abstract class Entity {
    * Updates this entity.
    * @param delta time since the last update
    */
-  public void update(float delta) {
-    temp.set(vel).scl((int)(delta * VELOCITY_SCALE));
-    pos.add(temp);
-  }
+  public abstract void update(float delta);
+  
   public void setTexture(Texture texture) {
     animator = new FilmStrip(texture,1,1,1);
   }

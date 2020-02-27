@@ -9,47 +9,66 @@ import com.glassboxgames.util.*;
  * Class representing a main player character in Rubato.
  */
 public class Player extends Entity {
-  private boolean isJumping;
-  private boolean isGrounded;
+  /** Velocity of the player */
+  public Vector2 vel;
+  /** Temp vector for calculations */
+  private Vector2 temp = new Vector2();
+  /** Current total jump duration, can be extended */
+  private float jumpDuration;
+  /** Current jump time */
+  private float jumpTime;
+  /** Direction the player is facing (1 for right, -1 for left) */
   private int dir;
   /** Current animation frame for Adagio */
-  private float animeframe;
+  private float animframe;
 
   /** How fast we change frames (one frame per 4 calls to update) */
   private static final float ANIMATION_SPEED = 0.25f;
   /** The number of animation frames in our walk filmstrip */
   private static int totalFrames;
-  /** The number of animation frame rows */
-  private static int rowFrames;
-  /** The number of animation frame columns */
-  private static int colFrames;
 
   /** Adagio's width, in pixels */
   public static final int   ADAGIO_WIDTH = 50;
-  /** Adagio's width, in pixels */
+  /** Adagio's height, in pixels */
   public static final int   ADAGIO_HEIGHT = 100;
 
+  /** Jump force */
+  private static float JUMP_FORCE = 4f;
+  /** Gravity */
+  private static float GRAVITY = 1f;
+  /** Min jump duration */
+  private static float MIN_JUMP_DURATION = 5;
+  /** Max jump duration */
+  private static float MAX_JUMP_DURATION = 15;
+  /** Max vertical speed */
+  private static float MAX_Y_SPEED = 8;
+  /** Max horizontal speed */
+  private static float MAX_X_SPEED = 5;
+  
   public Player(int x, int y) {
     pos = new Vector2(x, y);
     vel = new Vector2(0, 0);
     dim = new Vector2(50, 100);
     dir = 1;
-    isJumping = false;
-    isGrounded = false;
+    jumpDuration = 0;
   }
 
   public void setTexture(Texture texture, int rows, int cols, int size) {
     animator = new FilmStrip(texture,rows,cols,size);
     totalFrames = size;
-    rowFrames = rows;
-    colFrames = cols;
   }
 
   /**
    * Sets the player's jump state.
    */
   public void setJump(boolean jump) {
-    isJumping = jump;
+    if (jump) {
+      if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
+        jumpDuration++;
+      } else if (pos.y <= 0) {
+        jumpDuration = MIN_JUMP_DURATION;
+      }
+    }
   }
 
   /**
@@ -60,41 +79,42 @@ public class Player extends Entity {
   }
 
   /**
-   * Sets the player's horizontal movement.
+   * Sets the player's horizontal movement intention.
    */
   public void setMove(float input) {
-    vel.x = input;
-    if (input < 0 && dir > 0) {
-      dir = -1;
-    } else if (input > 0 && dir < 0) {
-      dir = 1;
+    vel.x = input * MAX_X_SPEED;
+    if (input != 0) {
+      dir = (int)input;
     }
   }
 
-  /**
-   * Updates the animation frame and position of this ship.
-   *
-   * Notice how little this method does.  It does not actively fire the weapon.  It
-   * only manages the cooldown and indicates whether the weapon is currently firing.
-   * The result of weapon fire is managed by the GameplayController.
-   *
-   * @param delta Number of seconds since last animation frame
-   */
+  @Override
   public void update(float delta) {
-    // Call superclass's update
-    super.update(delta);
+    if (jumpTime < jumpDuration) {
+      vel.y += JUMP_FORCE;
+      jumpTime++;
+    } else {
+      jumpTime = jumpDuration = 0;
+    }
+    vel.y -= GRAVITY;
+    vel.y = Math.max(-MAX_Y_SPEED, Math.min(MAX_Y_SPEED, vel.y));
+    if (pos.y <= 0 && vel.y <= 0) {
+      vel.y = 0;
+    }
+    pos.add(vel);
 
     // Increase animation frame, but only if trying to move
-    if (vel.x != 0.0f) {
-      animeframe += ANIMATION_SPEED;
-      if (animeframe >= totalFrames) {
-        animeframe -= totalFrames;
+    if (vel.x != 0) {
+      animframe += ANIMATION_SPEED;
+      if (animframe >= totalFrames) {
+        animframe -= totalFrames;
       }
     }
   }
 
   public void draw(GameCanvas canvas) {
-    animator.setFrame((int)animeframe);
-    canvas.draw(animator, Color.WHITE, ADAGIO_WIDTH/2, ADAGIO_HEIGHT/2, pos.x, pos.y, ADAGIO_WIDTH, ADAGIO_HEIGHT);
+    animator.setFrame((int)animframe);
+    // TODO: Fix heading
+    canvas.draw(animator, Color.WHITE, 0, 0, pos.x, pos.y, ADAGIO_WIDTH, ADAGIO_HEIGHT);
   }
 }

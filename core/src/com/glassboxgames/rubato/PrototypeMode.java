@@ -30,7 +30,8 @@ public class PrototypeMode implements Screen {
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
-  private static String BKGD_FILE = "sunset-forest-ice.png";
+  private static String BACKGROUND_FILE = "sunset-forest-ice.png";
+  /** The file for the walking filmstrip */
   private static final String ADAGIO_WALK = "walk-strip50.png";
 
   // Loaded assets
@@ -41,12 +42,23 @@ public class PrototypeMode implements Screen {
   /** Texture for Adagio walking */
   private Texture adagioWalkTexture;
 
-  /** Track all loaded assets (for unloading purposes) */
+  /** Sprite for the player */
+  private Sprite playerSprite;
+
+  /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
-  public void preLoadContent(AssetManager manager) {
-    manager.load(BKGD_FILE,Texture.class);
-    assets.add(BKGD_FILE);
+  /** Canvas on which to draw content */
+  private GameCanvas canvas;
+
+  /** Current state of the game */
+  private GameState gameState;
+  /** Whether this game mode is active */
+  private boolean active;
+
+  public void preloadContent(AssetManager manager) {
+    manager.load(BACKGROUND_FILE, Texture.class);
+    assets.add(BACKGROUND_FILE);
     manager.load(ADAGIO_IDLE, Texture.class);
     assets.add(ADAGIO_IDLE);
     manager.load(ADAGIO_WALK, Texture.class);
@@ -63,26 +75,17 @@ public class PrototypeMode implements Screen {
   }
 
   public void loadContent(AssetManager manager) {
-      adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
-      adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
-
+    adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
+    adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
   }
 
   public void unloadContent(AssetManager manager) {
-    for(String s : assets) {
+    for (String s : assets) {
       if (manager.isLoaded(s)) {
         manager.unload(s);
       }
     }
   }
-
-  /** Canvas on which to draw content */
-  private GameCanvas canvas;
-
-  /** Current state of the game */
-  private GameState gameState;
-  /** Whether this game mode is active */
-  private boolean active;
 
   /**
    * Initialize an instance of this game mode.
@@ -106,16 +109,17 @@ public class PrototypeMode implements Screen {
     switch (gameState) {
     case INTRO:
       gameState = GameState.PLAY;
-      background = new Texture(Gdx.files.internal(BKGD_FILE));
+      background = new Texture(Gdx.files.internal(BACKGROUND_FILE));
       adagioIdleTexture = new Texture(Gdx.files.internal(ADAGIO_IDLE));
       adagioWalkTexture = new Texture(Gdx.files.internal(ADAGIO_WALK));
-      player = new Player(Player.ADAGIO_WIDTH/2, Player.ADAGIO_HEIGHT/2);
+      player = new Player(0,0);
       player.setTexture(adagioIdleTexture,1,1,1);
       break;
     case PLAY:
       loadContent(manager);
       input.readInput();
       player.setMove(input.getHorizontal());
+      player.setJump(input.didJump());
       player.update(delta);
       break;
     }
