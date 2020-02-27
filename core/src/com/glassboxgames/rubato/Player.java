@@ -54,8 +54,12 @@ public class Player extends Entity {
   }
 
   public void setTexture(Texture texture, int rows, int cols, int size) {
-    animator = new FilmStrip(texture,rows,cols,size);
-    totalFrames = size;
+    FilmStrip newAnimator = new FilmStrip(texture,rows,cols,size);
+    if (animator == null || !texture.equals(animator.getTexture())) {
+      animframe = 0;
+      totalFrames = size;
+      animator = newAnimator;
+    }
   }
 
   /**
