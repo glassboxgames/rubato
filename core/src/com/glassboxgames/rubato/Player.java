@@ -21,7 +21,7 @@ public class Player extends Entity {
   /** Max jump duration */
   private static int MAX_JUMP_DURATION = 15;
   /** Attack cooldown */
-  private static int ATTACK_COOLDOWN = 30;
+  private static int ATTACK_COOLDOWN = 45;
   
   /** Current animation frame */
   private float animFrame;
@@ -68,6 +68,13 @@ public class Player extends Entity {
   }
 
   /**
+   * Returns whether the player is jumping.
+   */
+  public boolean isJumping() {
+    return jumpDuration > 0;
+  }
+
+  /**
    * Tries to start a player attack.
    */
   public void tryAttack() {
@@ -80,7 +87,7 @@ public class Player extends Entity {
    * Returns whether the player is attacking.
    */
   public boolean isAttacking() {
-    return attackTime == 1;
+    return attackCooldown > 0;
   }
   
   /**

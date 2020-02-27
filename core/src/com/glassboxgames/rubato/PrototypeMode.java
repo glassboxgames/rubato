@@ -27,6 +27,10 @@ public class PrototypeMode implements Screen {
   private static final String ADAGIO_IDLE = "Adagio/wait-strip.png";
   /** The file for the walking filmstrip */
   private static final String ADAGIO_WALK = "Adagio/walk-strip75.png";
+  /** The file for the jumping filmstrip */
+  private static final String ADAGIO_JUMP = "Adagio/jump-strip75.png";
+  /** The file for the attacking filmstrip */
+  private static final String ADAGIO_ATTACK = "Adagio/tornado-strip150.png";
   /** The file for the enemy image */
   private static final String ENEMY_FILE = "enemy.png";
 
@@ -37,6 +41,10 @@ public class PrototypeMode implements Screen {
   private Texture adagioIdleTexture;
   /** Texture for Adagio walking */
   private Texture adagioWalkTexture;
+  /** Texture for Adagio jumping */
+  private Texture adagioJumpTexture;
+  /** Texture for Adagio attacking */
+  private Texture adagioAttackTexture;
   /** Texture for enemies */
   private Texture enemyTexture;
 
@@ -62,6 +70,10 @@ public class PrototypeMode implements Screen {
     assets.add(ADAGIO_IDLE);
     manager.load(ADAGIO_WALK, Texture.class);
     assets.add(ADAGIO_WALK);
+    manager.load(ADAGIO_JUMP, Texture.class);
+    assets.add(ADAGIO_JUMP);
+    manager.load(ADAGIO_ATTACK, Texture.class);
+    assets.add(ADAGIO_ATTACK);
     manager.load(ENEMY_FILE, Texture.class);
     assets.add(ENEMY_FILE);
   }
@@ -80,6 +92,8 @@ public class PrototypeMode implements Screen {
     background = createTexture(manager, BACKGROUND_FILE);
     adagioIdleTexture = createTexture(manager, ADAGIO_IDLE);
     adagioWalkTexture = createTexture(manager, ADAGIO_WALK);
+    adagioJumpTexture = createTexture(manager, ADAGIO_JUMP);
+    adagioAttackTexture = createTexture(manager, ADAGIO_ATTACK);
     enemyTexture = createTexture(manager, ENEMY_FILE);
   }
 
@@ -144,7 +158,11 @@ public class PrototypeMode implements Screen {
       if (input.didAttack()) {
         player.tryAttack();
       }
-      if (horizontal != 0) {
+      if (player.isAttacking()) {
+        player.setTexture(adagioAttackTexture, 1, 11, 11);
+      } else if (player.isJumping()) {
+        player.setTexture(adagioJumpTexture, 1, 9, 9);
+      } else if (horizontal != 0) {
         player.setTexture(adagioWalkTexture, 1, 10, 10);
       } else {
         player.setTexture(adagioIdleTexture, 1, 1, 1);
