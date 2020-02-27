@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 public class InputController {
+  /** Whether the exit button was pressed */
+  private boolean exitPressed;
   /** Whether the reset button was pressed */
   private boolean resetPressed;
   /** Whether the attack button was pressed */
@@ -34,10 +36,10 @@ public class InputController {
   private InputController() {}
 
   /**
-   * Returns the horizontal movement input from the player.
+   * Returns whether the player reset the game.
    */
-  public int getHorizontal() {
-    return horizontal;
+  public boolean didExit() {
+    return exitPressed;
   }
 
   /**
@@ -48,10 +50,10 @@ public class InputController {
   }
 
   /**
-   * Returns whether the player pressed attack.
+   * Returns the horizontal movement input from the player.
    */
-  public boolean didAttack() {
-    return attackPressed;
+  public int getHorizontal() {
+    return horizontal;
   }
 
   /**
@@ -59,6 +61,13 @@ public class InputController {
    */
   public boolean didJump() {
     return jumpPressed;
+  }
+
+  /**
+   * Returns whether the player pressed attack.
+   */
+  public boolean didAttack() {
+    return attackPressed;
   }
 
   /**
@@ -73,6 +82,7 @@ public class InputController {
    */
   private void readKeyboard() {
     // TODO: maybe secondary to allow gamepad override
+    exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyPressed(Input.Keys.R);
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
     jumpPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE);

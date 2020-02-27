@@ -68,20 +68,17 @@ public class PrototypeMode implements Screen {
   private Texture createTexture(AssetManager manager, String file) {
     if (manager.isLoaded(file)) {
       Texture texture = manager.get(file, Texture.class);
-      texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+      //texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
       return texture;
     }
-    return null;
+    // TODO: Fix this loadContent bug
+    return new Texture(Gdx.files.internal(file));
   }
 
   public void loadContent(AssetManager manager) {
-    // TODO: Fix this bug
-    // background = createTexture(manager,BACKGROUND_FILE);
-    // adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
-    // adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
-    background = new Texture(Gdx.files.internal(BACKGROUND_FILE));
-    adagioIdleTexture = new Texture(Gdx.files.internal(ADAGIO_IDLE));
-    adagioWalkTexture = new Texture(Gdx.files.internal(ADAGIO_WALK));
+    background = createTexture(manager,BACKGROUND_FILE);
+    adagioIdleTexture = createTexture(manager,ADAGIO_IDLE);
+    adagioWalkTexture = createTexture(manager,ADAGIO_WALK);
   }
 
   public void unloadContent(AssetManager manager) {
@@ -120,6 +117,16 @@ public class PrototypeMode implements Screen {
       break;
     case PLAY:
       input.readInput();
+      if (input.didExit()) {
+        // TODO fix this cleanup bug
+        Gdx.app.exit();
+        System.exit(0);
+        break;
+      }
+      if (input.didReset()) {
+        gameState = GameState.INTRO;
+        break;
+      }
       int movement = input.getHorizontal();
       player.setMove(movement);
       if (movement == 0) {
@@ -208,5 +215,6 @@ public class PrototypeMode implements Screen {
   public void dispose() {
     player = null;
     canvas = null;
+    unloadContent(manager);
   }
 }
