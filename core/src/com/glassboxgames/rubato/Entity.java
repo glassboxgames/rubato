@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.*;
 import com.glassboxgames.util.*;
 /**
- * Abstract class representing any entity (i.e. collision-experiencing object).
+ * Abstract class representing a rectangular entity (i.e. collision-experiencing object).
  */
 public abstract class Entity {
   /** Position of the entity */
@@ -21,6 +21,18 @@ public abstract class Entity {
   /** Scaling factor for velocity updates */
   private float VELOCITY_SCALE = 400;
 
+  /**
+   * Instantiates a new entity with the given parameters.
+   * @param x the x-coordinate
+   * @param y the y-coordinate
+   * @param w width
+   * @param h height
+   */
+  public Entity(float x, float y, float w, float h) {
+    pos = new Vector2(x, y);
+    dim = new Vector2(w, h);
+  }
+    
   /**
    * Updates this entity.
    * @param delta time since the last update

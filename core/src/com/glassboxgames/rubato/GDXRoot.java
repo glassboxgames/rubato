@@ -29,7 +29,6 @@ public class GDXRoot extends Game {
   public void create() {
     canvas = new GameCanvas();
     PrototypeMode mode = new PrototypeMode(canvas);
-    mode.preloadContent(manager);
     setScreen(mode);
   }
 }

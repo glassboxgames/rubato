@@ -1,14 +1,10 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.assets.*;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.utils.*;
 
 /**
  * Primary controller class for the gameplay prototype.
@@ -23,13 +19,11 @@ public class PrototypeMode implements Screen {
 
   /** AssetManager to load game assets (textures, sounds, etc.) */
   private AssetManager manager;
-  /** The player entity */
-  private Player player;
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
   private static String BACKGROUND_FILE = "Backgrounds/sunset-forest-yellow.png";
-  /** The file for the idle picture */
+  /** The file for the idle image */
   private static final String ADAGIO_IDLE = "Adagio/wait-strip.png";
   /** The file for the walking filmstrip */
   private static final String ADAGIO_WALK = "Adagio/walk-strip75.png";
@@ -41,20 +35,25 @@ public class PrototypeMode implements Screen {
   private Texture adagioIdleTexture;
   /** Texture for Adagio walking */
   private Texture adagioWalkTexture;
-
-  /** Sprite for the player */
-  private Sprite playerSprite;
+  /** Texture for enemies */
+  private Texture enemyTexture;
+  /** Sprite object for enemies */
+  private Sprite enemySprite;
 
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
   /** Canvas on which to draw content */
   private GameCanvas canvas;
-
   /** Current state of the game */
   private GameState gameState;
   /** Whether this game mode is active */
   private boolean active;
+
+  /** The player entity */
+  private Player player;
+  /** List of enemies */
+  private Array<Enemy> enemies;
 
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
@@ -93,30 +92,41 @@ public class PrototypeMode implements Screen {
    * Initialize an instance of this game mode.
    * @param canvas the canvas to draw on
    */
-  public PrototypeMode(GameCanvas canvas) {
+  public PrototypeMode(GameCanvas gameCanvas) {
     // Start loading with the asset manager
-    active = false;
     manager = new AssetManager();
-    assets = new Array();
-    this.canvas = canvas;
+    assets = new Array<String>();
+    canvas = gameCanvas;
     gameState = GameState.INTRO;
+    active = false;
+    enemyTexture = null;
+    enemySprite = null;
+    player = null;
+    enemies = null;
   }
 
   /**
    * TODO
    */
   private void update(float delta) {
-
-    InputController input = InputController.getInstance();
     switch (gameState) {
     case INTRO:
       loadContent(manager);
+      preloadContent(manager);
+      manager.finishLoading();
+      loadContent(manager);
+      player = new Player(0, 0, 50, 100);
+      player.setTexture(adagioIdleTexture, 1, 1, 1);
+      enemyTexture = new Texture(Gdx.files.internal("enemy.png"));
+      enemySprite = new Sprite(enemyTexture);
+      enemies = new Array<Enemy>();
+      enemies.add(new Enemy(200, 75, 100, 50));
       gameState = GameState.PLAY;
-      player = new Player(Player.ADAGIO_WIDTH/2,0);
-      player.setTexture(adagioIdleTexture,1,1,1);
       break;
     case PLAY:
+      InputController input = InputController.getInstance();
       input.readInput();
+
       if (input.didExit()) {
         // TODO fix this cleanup bug
         Gdx.app.exit();
@@ -127,16 +137,32 @@ public class PrototypeMode implements Screen {
         gameState = GameState.INTRO;
         break;
       }
-      int movement = input.getHorizontal();
-      player.setMove(movement);
-      if (movement == 0) {
+
+      float horizontal = input.getHorizontal();
+      player.tryMove(horizontal);
+      if (input.didJump()) {
+        player.tryJump();
+      }
+      if (input.didAttack()) {
+        player.tryAttack();
+      }
+      if (horizontal != 0) {
+        player.setTexture(adagioWalkTexture, 1, 10, 10);
+      } else {
         player.setTexture(adagioIdleTexture, 1, 1, 1);
       }
-      else {
-        player.setTexture(adagioWalkTexture,1,10,10);
-      }
-      player.setJump(input.didJump());
       player.update(delta);
+      
+      for (Enemy enemy : enemies) {
+        enemy.update(delta);
+        if (player.isAttacking()) {
+          System.out.println(enemy.pos.x - player.pos.x + " " + player.getDirection());
+          if ((enemy.pos.x - player.pos.x) * player.getDirection() < 100
+              && (Math.abs(enemy.pos.x - player.pos.x) < 50)) {
+            System.out.println("hit");
+          }
+        }
+      }
       break;
     }
   }
@@ -145,9 +171,7 @@ public class PrototypeMode implements Screen {
    * TODO: process a single frame
    * @param delta
    */
-  private void play(float delta) {
-
-  }
+  private void play(float delta) {}
 
   /**
    * TODO:
@@ -157,6 +181,12 @@ public class PrototypeMode implements Screen {
     canvas.begin();
     canvas.drawBackground(background);
     player.draw(canvas);
+    for (Enemy enemy : enemies) {
+      // enemySprite.setPosition(enemy.pos.x, enemy.pos.y);
+      // enemySprite.setFlip(enemy.getDirection() < 0, false);
+      // enemySprite.setSize((int)enemy.dim.x, (int)enemy.dim.y);
+      // enemySprite.draw(batch);
+    }
     canvas.end();
   }
 
@@ -168,7 +198,7 @@ public class PrototypeMode implements Screen {
     if (active) {
       update(delta);
       draw(delta);
-      // TODO: implement quiting after draw function in the future
+      // TODO: implement quitting after draw function in the future
     }
   }
 
@@ -177,23 +207,17 @@ public class PrototypeMode implements Screen {
    * @param width
    * @param height
    */
-  public void resize(int width, int height) {
-
-  }
+  public void resize(int width, int height) {}
 
   /**
    * TODO:
    */
-  public void pause() {
-
-  }
+  public void pause() {}
 
   /**
    * TODO:
    */
-  public void resume() {
-
-  }
+  public void resume() {}
 
   /**
    * TODO:
