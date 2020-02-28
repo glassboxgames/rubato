@@ -32,6 +32,8 @@ public class Enemy extends Entity {
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
     dir = 1;
+
+
   }
 
   /**
@@ -43,20 +45,20 @@ public class Enemy extends Entity {
   
   @Override
   public void update(float delta) {
-    if (pos.x >= maxX) {
+    if (getPos().x >= maxX) {
       dir = -1;
-    } else if (pos.x <= minX) {
+    } else if (getPos().x <= minX) {
       dir = 1;
     }
     float speed = MAX_SPEED * dir * health / MAX_HEALTH;
-    pos.x += speed;
+    getPos().x += speed;
   }
 
   @Override
   public void draw(GameCanvas canvas) {
     canvas.draw(getFilmStrip(), Color.WHITE,
                 dim.x * dir / 2, 0,
-                pos.x, pos.y,
+                getPos().x, getPos().y,
                 dim.x * dir, dim.y);
   }
 }

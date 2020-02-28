@@ -3,6 +3,8 @@ package com.glassboxgames.rubato;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.glassboxgames.util.*;
 /**
  * Abstract class representing a rectangular textured entity.
@@ -11,8 +13,6 @@ public abstract class Entity {
   /** Default animation speed */
   private static float DEFAULT_ANIMATION_SPEED = 0.25f;
 
-  /** Position of the entity */
-  public Vector2 pos;
   /** Dimensions of the entity */
   public Vector2 dim;
   /** Temporary vector for calculations */
@@ -27,18 +27,52 @@ public abstract class Entity {
   /** Total frames for current animation */
   private int totalFrames;
 
+  /** The body information of the current entity */
+  protected BodyDef bodyInfo;
+  /** The Fixture information of the current entity */
+  protected FixtureDef fixtureInfo;
+
+
+  /// Caching objects
+  /** A cache value for when the user wants to access the body position */
+  protected Vector2 positionCache = new Vector2();
+  /** A cache value for when the user wants to access the linear velocity */
+  protected Vector2 velocityCache = new Vector2();
+
+  /**
+   * Instantiates a new entity at position (0,0)
+   */
+  public Entity() {
+    this(0.0f, 0.0f);
+  }
+
   /**
    * Instantiates a new entity with the given parameters.
    * @param x the x-coordinate
    * @param y the y-coordinate
    */
   public Entity(float x, float y) {
-    pos = new Vector2(x, y);
+    Vector2 pos = new Vector2(x, y);
     dim = new Vector2();
     animator = null;
     animFrame = 0;
     animSpeed = DEFAULT_ANIMATION_SPEED;
     totalFrames = 0;
+
+    // Allocate body information
+    bodyInfo = new BodyDef();
+    bodyInfo.awake = true;
+    bodyInfo.active = true;
+    bodyInfo.allowSleep = true;
+    bodyInfo.gravityScale = 1.0f;
+    bodyInfo.position.set(pos);
+    bodyInfo.type = BodyDef.BodyType.DynamicBody;
+    bodyInfo.fixedRotation = false;
+    bodyInfo.position.set(pos);
+    bodyInfo.angle = 0;
+
+    // Initialize default fixture
+    fixtureInfo = new FixtureDef();
   }
     
   /**
@@ -92,10 +126,16 @@ public abstract class Entity {
     return animator;
   }
 
+  public Vector2 getPos() {
+    return positionCache.set(bodyInfo.position);
+  }
+  public Vector2 getVel() {
+    return velocityCache.set(bodyInfo.linearVelocity);
+  }
   /**
    * Draws this entity to the given canvas.
    */
-  public void draw(GameCanvas canvas) {
-    canvas.draw(getFilmStrip(), Color.WHITE, dim.x / 2, 0, pos.x + dim.x / 2, pos.y, dim.x, dim.y);
-  }
+  public abstract void draw(GameCanvas canvas);
+   //canvas.draw(getFilmStrip(), Color.WHITE, dim.x / 2, 0, pos.x + dim.x / 2, pos.y, dim.x, dim.y);
+
 }

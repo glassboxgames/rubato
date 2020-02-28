@@ -4,12 +4,34 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 
 /**
  * Primary controller class for the gameplay prototype.
  */
-public class PrototypeMode implements Screen {
+public class PrototypeMode implements Screen, ContactListener {
+  @Override
+  public void beginContact(Contact contact) {
+
+  }
+
+  @Override
+  public void endContact(Contact contact) {
+
+  }
+
+  @Override
+  public void preSolve(Contact contact, Manifold oldManifold) {
+
+  }
+
+  @Override
+  public void postSolve(Contact contact, ContactImpulse impulse) {
+
+  }
+
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -62,6 +84,8 @@ public class PrototypeMode implements Screen {
   private Player player;
   /** List of enemies */
   private Array<Enemy> enemies;
+  /** The world of the protoype level */
+  private World world;
 
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
@@ -107,7 +131,7 @@ public class PrototypeMode implements Screen {
 
   /**
    * Initialize an instance of this game mode.
-   * @param canvas the canvas to draw on
+   * @param gameCanvas the canvas to draw on
    */
   public PrototypeMode(GameCanvas gameCanvas) {
     // Start loading with the asset manager
@@ -115,6 +139,12 @@ public class PrototypeMode implements Screen {
     assets = new Array<String>();
     canvas = gameCanvas;
     gameState = GameState.INTRO;
+
+
+    // Initialize game world
+    Vector2 temp = new Vector2(10f, 10f);
+    world = new World(temp, false);
+
   }
 
   /**
@@ -129,16 +159,17 @@ public class PrototypeMode implements Screen {
       loadContent(manager);
       player = new Player(50, 0);
       player.setTexture(adagioIdleTexture);
+      player.activatePhysics(world);
       Enemy enemy = new Enemy(600, 75);
       enemy.setTexture(enemyTexture);
       enemies = new Array<Enemy>(new Enemy[] {enemy});
       gameState = GameState.PLAY;
+      //remove later
       break;
     }
     case PLAY: {
       InputController input = InputController.getInstance();
       input.readInput();
-
       if (input.didExit()) {
         // TODO fix this cleanup bug
         Gdx.app.exit();
@@ -151,12 +182,12 @@ public class PrototypeMode implements Screen {
       }
 
       float horizontal = input.getHorizontal();
-      player.tryMove(horizontal);
+      player.setMove(horizontal);
       if (input.didJump()) {
-        player.tryJump();
+        player.setJump();
       }
       if (input.didAttack()) {
-        player.tryAttack();
+        player.setAttack();
       }
       if (player.isAttacking()) {
         player.setTexture(adagioAttackTexture, 1, 11, 11);
@@ -168,17 +199,20 @@ public class PrototypeMode implements Screen {
         player.setTexture(adagioIdleTexture, 1, 1, 1);
       }
       player.update(delta);
-      
+
+      System.out.println("player body x: " + player.getPos().x + ", y: " + player.getPos().y);
+      System.out.println("player vel x: " + player.getVel().x + ", y: " + player.getPos().y);
       for (Enemy enemy : enemies) {
         enemy.update(delta);
         if (player.isAttacking()) {
-          System.out.println(enemy.pos.x - player.pos.x + " " + player.getDirection());
-          if ((enemy.pos.x - player.pos.x) * player.getDirection() < 100
-              && (Math.abs(enemy.pos.x - player.pos.x) < 50)) {
+          System.out.println(enemy.getPos().x - player.getPos().x + " " + player.getDirection());
+          if ((enemy.getPos().x - player.getPos().x) * player.getDirection() < 100
+              && (Math.abs(enemy.getPos().x - player.getPos().x) < 50)) {
             System.out.println("hit");
           }
         }
       }
+      world.step(1f / 60, 6, 2);
       break;
     }
     }
@@ -202,6 +236,11 @@ public class PrototypeMode implements Screen {
       enemy.draw(canvas);
     }
     canvas.end();
+
+    /** debug draw*/
+    canvas.beginDebug();
+    player.drawPhysics(canvas);
+    canvas.endDebug();
   }
 
   /**
