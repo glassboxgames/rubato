@@ -10,6 +10,9 @@ import com.glassboxgames.util.*;
  * Class representing a simple rectangular platform in Rubato.
  */
 public class Platform extends Entity {
+  /** Friction */
+  protected static float FRICTION = 0f;
+  
   /**
    * Initializes a platform with the specified parameters.
    * @param x x-coordinate
@@ -23,5 +26,6 @@ public class Platform extends Entity {
     shape.setAsBox(w / 2, h / 2);
     bodyDef.type = BodyDef.BodyType.StaticBody;
     fixtureDef.shape = shape;
+    fixtureDef.friction = FRICTION;
   }
 }

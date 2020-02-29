@@ -12,7 +12,7 @@ import com.glassboxgames.util.*;
 public abstract class Entity {
   /** Default animation speed */
   protected static float DEFAULT_ANIMATION_SPEED = 0.25f;
-
+  
   /** The body definition for this entity */
   protected BodyDef bodyDef;
   /** The fixture definition for this entity */
@@ -42,12 +42,12 @@ public abstract class Entity {
   public Entity(float x, float y) {
     bodyDef = new BodyDef();
     bodyDef.position.set(x, y);
+    bodyDef.active = true;
     bodyDef.awake = true;
     bodyDef.allowSleep = true;
     bodyDef.gravityScale = 1;
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
-
     fixtureDef = new FixtureDef();
 
     animator = null;

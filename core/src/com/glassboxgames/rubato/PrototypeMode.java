@@ -130,7 +130,7 @@ public class PrototypeMode implements Screen {
     gameState = GameState.INTRO;
 
     // Initialize game world
-    world = new World(new Vector2(0, -100), false);
+    world = new World(new Vector2(0, -15f), false);
   }
 
   /**
@@ -144,13 +144,14 @@ public class PrototypeMode implements Screen {
       manager.finishLoading();
       loadContent(manager);
       
-      player = new Player(100, 100, 50, 100);
+      player = new Player(100, 500, 50, 100);
       player.setTexture(adagioIdleTexture);
       player.activatePhysics(world);
 
       Platform platform = new Platform(0, 0, 1000, 50);
       platform.setTexture(platformTexture);
       platform.activatePhysics(world);
+      
       platforms = new Array<Platform>(new Platform[] {platform});
 
       Enemy enemy = new Enemy(600, 75, 200, 60);
@@ -193,18 +194,16 @@ public class PrototypeMode implements Screen {
         player.setTexture(adagioIdleTexture);
       }
       player.update(delta);
-      System.out.println(player.getPosition() + " " + player.getVelocity());
       for (Enemy enemy : enemies) {
         enemy.update(delta);
         if (player.isAttacking()) {
-          System.out.println(enemy.getPosition().x - player.getPosition().x + " " + player.getDirection());
           if ((enemy.getPosition().x - player.getPosition().x) * player.getDirection() < 100
               && (Math.abs(enemy.getPosition().x - player.getPosition().x) < 50)) {
             System.out.println("hit");
           }
         }
       }
-      world.step(1f / 60, 6, 2);
+      world.step(1 / 60f, 6, 2);
       break;
     }
     }

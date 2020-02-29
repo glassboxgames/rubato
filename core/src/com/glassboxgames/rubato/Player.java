@@ -12,14 +12,20 @@ import java.beans.VetoableChangeListener;
  * Class representing a main player character in Rubato.
  */
 public class Player extends Entity {
-  /** Jump force */
-  protected static float JUMP_FORCE = 4f;
-  /** Gravity */
-  protected static float GRAVITY = 1f;
-  /** Max vertical speed */
-  protected static float MAX_Y_SPEED = 8;
+  /** Density */
+  protected static float DENSITY = 1f;
+  /** Friction */
+  protected static float FRICTION = 0f;
+  /** Jump impulse */
+  protected static float JUMP_IMPULSE = 4f;
+  /** Movement impulse */
+  protected static float MOVE_FORCE = 2000f;
+  /** Horizontal damping */
+  protected static float MOVE_DAMPING = 10f;
   /** Max horizontal speed */
-  protected static float MAX_X_SPEED = 5;
+  protected static float MAX_X_SPEED = 5f;
+  /** Max vertical speed */
+  protected static float MAX_Y_SPEED = 8f;
   /** Min jump duration */
   protected static int MIN_JUMP_DURATION = 5;
   /** Max jump duration */
@@ -65,6 +71,8 @@ public class Player extends Entity {
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(w / 2, h / 2);
     fixtureDef.shape = shape;
+    fixtureDef.friction = FRICTION;
+    fixtureDef.density = DENSITY;
 
     animFrame = 0;
     totalFrames = 0;
@@ -121,6 +129,7 @@ public class Player extends Entity {
 
   /**
    * Tries to set the player's horizontal movement.
+   * @param input player input (1 for right, -1 for left, 0 for none)
    */
   public void tryMove(float input) {
     movement = input;
@@ -134,32 +143,25 @@ public class Player extends Entity {
   @Override
   public void update(float delta) {
     super.update(delta);
+
     if (attackTime < attackCooldown) {
       attackTime++;
     } else if (attackCooldown > 0) {
       attackTime = attackCooldown = 0;
     }
-    temp.set(getPosition());
-    temp.x += movement;
-    if (body != null) {
-      body.setTransform(temp, 0);
-    }
 
-    /* old jump + movement code
-    if (jumpTime < jumpDuration) {
-      vel.y += JUMP_FORCE;
-      jumpTime++;
+    System.out.println(body.
+
+    if (movement != 0) {
+      temp.set(MOVE_FORCE * movement, 0);
+      System.out.println(temp + " " + getPosition().x + " " + getVelocity().x);
+      body.applyForce(temp, getPosition(), true);
     } else {
-      jumpTime = jumpDuration = 0;
-    }
-
-    vel.y -= GRAVITY;
-    vel.y = Math.max(-MAX_Y_SPEED, Math.min(MAX_Y_SPEED, vel.y));
-    if (pos.y <= 0 && vel.y <= 0) {
-      vel.y = 0;
-    }
-    pos.add(vel);
-     */
+      // damping
+      // temp.set(-MOVE_DAMPING * getVelocity().x, 0);
+      // System.out.println(temp + " " + getPosition().x + " " + getVelocity().x);
+      // body.applyForce(temp, getPosition(), true);
+    } 
   }
   
   @Override
