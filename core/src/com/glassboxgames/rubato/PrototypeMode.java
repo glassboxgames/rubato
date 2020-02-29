@@ -143,9 +143,19 @@ public class PrototypeMode implements ContactListener, Screen {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    if (d1.equals(Player.SENSOR_NAME) && d2.equals(Platform.PLATFORM_NAME)
-        || d1.equals(Platform.PLATFORM_NAME) && d2.equals(Player.SENSOR_NAME)) {
+    if ((d1.equals(Player.SENSOR_NAME)
+         && (d2 instanceof Platform
+             || d2 instanceof Enemy && ((Enemy)d2).isSuspended()))
+        || (d2.equals(Player.SENSOR_NAME)
+            && (d1 instanceof Platform
+                || d1 instanceof Enemy && ((Enemy)d1).isSuspended()))) {
       player.setGrounded(true);
+    } else if (d1 instanceof Player && d2 instanceof Enemy
+               || d2 instanceof Player && d1 instanceof Enemy) {
+      Enemy enemy = d1 instanceof Enemy ? (Enemy)d1 : (Enemy)d2;
+      if (!enemy.isSuspended()) {
+        player = null;
+      }
     }
   }
   
@@ -155,8 +165,8 @@ public class PrototypeMode implements ContactListener, Screen {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    if (d1.equals(Player.SENSOR_NAME) && d2.equals(Platform.PLATFORM_NAME)
-        || d1.equals(Platform.PLATFORM_NAME) && d2.equals(Player.SENSOR_NAME)) {
+    if (d1.equals(Player.SENSOR_NAME) && d2 instanceof Platform
+        || d2.equals(Player.SENSOR_NAME) && d1 instanceof Platform) {
       player.setGrounded(false);
     }
   }
@@ -178,16 +188,16 @@ public class PrototypeMode implements ContactListener, Screen {
       manager.finishLoading();
       loadContent(manager);
       
-      player = new Player(100, 100, 50, 100);
+      player = new Player(1f, 1f, 0.5f, 1f);
       player.setTexture(adagioIdleTexture);
       player.activatePhysics(world);
 
-      Platform platform = new Platform(0, 0, 1000, 50);
+      Platform platform = new Platform(0f, 0f, 20f, 0.5f);
       platform.setTexture(platformTexture);
       platform.activatePhysics(world);
       platforms = new Array<Platform>(new Platform[] {platform});
 
-      Enemy enemy = new Enemy(400, 75, 200, 60);
+      Enemy enemy = new Enemy(4f, 0.75f, 2f, 0.6f);
       enemy.setTexture(enemyTexture);
       enemy.activatePhysics(world);
       enemies = new Array<Enemy>(new Enemy[] {enemy});
@@ -228,13 +238,19 @@ public class PrototypeMode implements ContactListener, Screen {
       }
       player.update(delta);
       for (Enemy enemy : enemies) {
-        enemy.update(delta);
-        if (player.isAttacking()) {
-          if ((enemy.getPosition().x - player.getPosition().x) * player.getDirection() < 100
-              && (Math.abs(enemy.getPosition().x - player.getPosition().x) < 50)) {
-            System.out.println("hit");
+        if (player.isHitboxActive() && !player.getEnemiesHit().contains(enemy, true)) {
+          // TODO make this not manual
+          Vector2 center = new Vector2(Player.ATTACK_POS).scl(player.getDirection(), 0).add(player.getPosition());
+          Circle circle = new Circle(center, Player.ATTACK_SIZE);
+          Vector2 dim = enemy.getDimensions();
+          Vector2 corner = new Vector2(dim).scl(-0.5f).add(enemy.getPosition());
+          Rectangle rectangle = new Rectangle(corner.x, corner.y, dim.x, dim.y);
+          if (Intersector.overlaps(circle, rectangle)) {
+            player.getEnemiesHit().add(enemy);
+            enemy.lowerHealth(Player.ATTACK_DAMAGE);
           }
         }
+        enemy.update(delta);
       }
       world.step(1 / 60f, 6, 2);
       break;
@@ -261,7 +277,8 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
-    player.draw(canvas);
+    if (player != null)
+      player.draw(canvas);
     canvas.end();
 
     canvas.beginDebug();
@@ -271,7 +288,8 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Platform platform : platforms) {
       platform.drawPhysics(canvas);
     }
-    player.drawPhysics(canvas);
+    if (player != null)
+      player.drawPhysics(canvas);
     canvas.endDebug();
   }
 

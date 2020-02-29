@@ -21,6 +21,8 @@ public abstract class Entity {
   protected Body body;
   /** The fixture for this entity */
   protected Fixture fixture;
+  /** The name of this entity's fixture */
+  protected String name;
   
   /** CURRENT image for this object. May change over time. */
   protected FilmStrip animator;
@@ -44,8 +46,18 @@ public abstract class Entity {
    * @param y y-coordinate
    */
   public Entity(float x, float y) {
+    this(x, y, null);
+  }
+  
+  /**
+   * Instantiates a new entity with the given parameters.
+   * @param x x-coordinate
+   * @param y y-coordinate
+   * @param n name for the base fixture
+   */
+  public Entity(float x, float y, String n) {
     bodyDef = new BodyDef();
-    bodyDef.position.set(x, y).scl(1 / Constants.PPM);
+    bodyDef.position.set(x, y);
     bodyDef.active = true;
     bodyDef.awake = true;
     bodyDef.allowSleep = true;
@@ -53,7 +65,7 @@ public abstract class Entity {
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
     fixtureDef = new FixtureDef();
-
+    name = n;
     animator = null;
     animFrame = 0;
     animSpeed = 0;
@@ -83,6 +95,7 @@ public abstract class Entity {
     body = world.createBody(bodyDef);
     if (body != null) {
       fixture = body.createFixture(fixtureDef);
+      fixture.setUserData(this);
       return true;
     }
     return false;
@@ -114,6 +127,7 @@ public abstract class Entity {
    * @param rows number of rows in filmstrip
    * @param cols number of columns in filmstrip
    * @param size number of frames in filmstrip
+   * @param speed frame speed multiplier
    */
   public void setTexture(Texture texture, int rows, int cols, int size, float speed) {
     FilmStrip newAnimator = new FilmStrip(texture, rows, cols, size);
@@ -163,6 +177,7 @@ public abstract class Entity {
                          Constants.PPM, Constants.PPM);
       break;
     case Circle:
+      System.out.println("debug " + getPosition());
       canvas.drawPhysics((CircleShape)shape, Color.RED,
                          getPosition().x, getPosition().y,
                          Constants.PPM, Constants.PPM);

@@ -911,16 +911,4 @@ public class GameCanvas {
     debugRender.setColor(color);
     debugRender.ellipse(x0-w, y0-h, 2*w, 2*h, 12);
   }
-
-  /**
-   * Compute the affine transform (and store it in local) for this image.
-   *
-   * @param ox 	The x-coordinate of texture origin (in pixels)
-   * @param oy 	The y-coordinate of texture origin (in pixels)
-   * @param x 	The x-coordinate of the texture origin (on screen)
-   * @param y 	The y-coordinate of the texture origin (on screen)
-   * @param angle The rotation angle (in degrees) about the origin.
-   * @param sx 	The x-axis scaling factor
-   * @param sy 	The y-axis scaling factor
-   */
 }

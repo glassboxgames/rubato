@@ -4,6 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.*;
 import com.glassboxgames.util.*;
 
 import java.beans.VetoableChangeListener;
@@ -30,16 +31,24 @@ public class Player extends Entity {
   protected static final int MIN_JUMP_DURATION = 3;
   /** Max jump duration */
   protected static final int MAX_JUMP_DURATION = 10;
-  /** Attack duration */
-  protected static final int ATTACK_DURATION = 30;
+  /** Attack hitbox position, relative to center */
+  protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
+  /** Attack hitbox radius */
+  protected static final float ATTACK_SIZE = 0.45f;
+  /** Attack hitbox start frame */
+  protected static final int ATTACK_START = 5;
+  /** Attack hitbox end frame */
+  protected static final int ATTACK_END = 20;
   /** Attack cooldown */
-  protected static final int ATTACK_COOLDOWN = 60;
+  protected static final int ATTACK_COOLDOWN = 28;
+  /** Attack damage */
+  protected static final float ATTACK_DAMAGE = 3f;
   /** Ground sensor height */
   protected static final float SENSOR_HEIGHT = 0.05f;
   /** Name of the player */
   protected static final String PLAYER_NAME = "Player";
   /** Name of the ground sensor */
-  protected static final String SENSOR_NAME = "GroundSensor";
+  protected static final String SENSOR_NAME = "PlayerGroundSensor";
   
   /** Current animation frame */
   protected float animFrame;
@@ -52,6 +61,8 @@ public class Player extends Entity {
   /** Current horizontal movement of the character (from the input) */
   protected float movement;
 
+  /** Ground sensor relative position */
+  protected Vector2 sensorPos;
   /** Ground sensor fixture definition */
   protected FixtureDef sensorDef;
   /** Ground sensor fixture */
@@ -69,8 +80,9 @@ public class Player extends Entity {
   protected int attackTime;
   /** Current attack cooldown, 0 if not attacking */
   protected int attackCooldown;
-  /** Current attack hitbox, if it exists */
-  public Hitbox hitbox;
+
+  /** Enemies that have been hit by the current active attack */
+  protected Array<Enemy> enemiesHit;
 
   /**
    * Instantiates a player with the given parameters.
@@ -80,16 +92,19 @@ public class Player extends Entity {
    * @param h height
    */
   public Player(float x, float y, float w, float h) {
-    super(x, y);
-    dim = new Vector2(w / Constants.PPM, h / Constants.PPM);
+    super(x, y, PLAYER_NAME);
+    dim = new Vector2(w, h);
+
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(dim.x / 2, dim.y / 2);
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
     fixtureDef.density = DENSITY;
-    sensorDef = new FixtureDef();
+
     PolygonShape sensorShape = new PolygonShape();
-    sensorShape.setAsBox(dim.x / 2, SENSOR_HEIGHT, temp.set(dim).scl(-0.5f), 0);
+    sensorPos = new Vector2(0, -dim.y / 2 + SENSOR_HEIGHT);
+    sensorShape.setAsBox(dim.x / 2, SENSOR_HEIGHT, sensorPos, 0);
+    sensorDef = new FixtureDef();
     sensorDef.isSensor = true;
     sensorDef.shape = sensorShape;
     
@@ -100,6 +115,7 @@ public class Player extends Entity {
     jumpDuration = 0;
     attackTime = 0;
     attackCooldown = 0;
+    enemiesHit = new Array<Enemy>();
   }
 
   @Override
@@ -107,7 +123,6 @@ public class Player extends Entity {
     if (!super.activatePhysics(world)) {
       return false;
     }
-    fixture.setUserData(PLAYER_NAME);
     sensorFixture = body.createFixture(sensorDef);
     sensorFixture.setUserData(SENSOR_NAME);
     return true;
@@ -147,7 +162,6 @@ public class Player extends Entity {
    * Sets the player's grounded state.
    */
   public void setGrounded(boolean value) {
-    System.out.println(value);
     isGrounded = value;
   }
   
@@ -155,7 +169,21 @@ public class Player extends Entity {
    * Returns whether the player is mid-attack.
    */
   public boolean isAttacking() {
-    return attackCooldown > 0 && attackTime < ATTACK_DURATION;
+    return attackCooldown > 0;
+  }
+
+  /**
+   * Returns whether the player's attack hitbox is active.
+   */
+  public boolean isHitboxActive() {
+    return attackTime >= ATTACK_START && attackTime < ATTACK_END;
+  }
+
+  /**
+   * Returns the array of enemies hit by the current attack.
+   */
+  public Array<Enemy> getEnemiesHit() {
+    return enemiesHit;
   }
   
   /**
@@ -186,6 +214,7 @@ public class Player extends Entity {
       attackTime++;
     } else if (attackCooldown > 0) {
       attackTime = attackCooldown = 0;
+      enemiesHit.clear();
     }
 
     if (movement != 0) {
@@ -222,11 +251,20 @@ public class Player extends Entity {
 
   @Override
   public void drawPhysics(GameCanvas canvas) {
+    Vector2 pos = getPosition();
     canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
-                       getPosition().x, getPosition().y, 0,
+                       pos.x, pos.y, 0,
                        Constants.PPM, Constants.PPM);
     canvas.drawPhysics((PolygonShape)sensorFixture.getShape(), Color.RED,
-                       getPosition().x + dim.x / 2, getPosition().y, 0,
+                       pos.x, pos.y, 0,
                        Constants.PPM, Constants.PPM);
+    if (isHitboxActive()) {
+      CircleShape shape = new CircleShape();
+      shape.setPosition(getPosition().add(temp.set(ATTACK_POS).scl(dir, 1)));
+      shape.setRadius(ATTACK_SIZE);
+      canvas.drawPhysics(shape, Color.RED,
+                         shape.getPosition().x, shape.getPosition().y,
+                         Constants.PPM, Constants.PPM);
+    }
   }
 }

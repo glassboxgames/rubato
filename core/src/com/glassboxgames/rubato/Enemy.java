@@ -11,29 +11,35 @@ import com.glassboxgames.util.*;
  */
 public class Enemy extends Entity {
   /** Maximum health */
-  private static float MAX_HEALTH = 10;
+  protected static final float MAX_HEALTH = 10;
   /** Maximum speed */
-  private static float MAX_SPEED = 3;
+  protected static final float MAX_SPEED = 3;
   /** Movement range */
-  private static float MOVE_RANGE = 200;
+  protected static final float MOVE_RANGE = 200;
+  /** Enemy name */
+  protected static final String ENEMY_NAME = "Enemy";
 
+  /** Enemy dimensions */
+  protected Vector2 dim;
   /** Current health */
-  private float health;
+  protected float health;
   /** Movement limits */
-  private float minX, maxX;
+  protected float minX, maxX;
   /** Current direction */
-  private int dir;
+  protected int dir;
 
   /** Represents how much the enemy has been slowed */
-  private float timeslowfactor;
+  protected float timeslowfactor;
   /** Represent the previous position of the enemy */
-  private Vector2 prevPosition;
+  protected Vector2 prevPosition;
   /** Represent the previous velocity of the enemy */
-  private Vector2 prevVelocity;
-  /** Represent cache for prevPosition Calculation */
-  private Vector2 prevPosCache = new Vector2(0,0);
-  /** Represent cache for prevVelocity Calculation */
-  private Vector2 prevVelCache = new Vector2(0,0);
+  protected Vector2 prevVelocity;
+  /** Cache for prevPosition Calculation */
+  protected Vector2 prevPosCache = new Vector2(0, 0);
+  /** Cache for prevVelocity Calculation */
+  protected Vector2 prevVelCache = new Vector2(0, 0);
+  /** Cache for dimensions */
+  protected Vector2 dimCache = new Vector2(0, 0);
 
   /**
    * Initializes an enemy with the specified parameters.
@@ -43,10 +49,12 @@ public class Enemy extends Entity {
    * @param h height
    */
   public Enemy(float x, float y, float w, float h) {
-    super(x, y);
+    super(x, y, ENEMY_NAME);
+    dim = new Vector2(w, h);
+
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(w / 2 / Constants.PPM, h / 2 / Constants.PPM);
-    bodyDef.gravityScale = 0;
+    shape.setAsBox(dim.x / 2, dim.y / 2);
+    bodyDef.type = BodyDef.BodyType.StaticBody;
     fixtureDef.shape = shape;
 
     health = MAX_HEALTH;
@@ -66,21 +74,43 @@ public class Enemy extends Entity {
     return dir;
   }
 
-  /** Returns the time slow factor of the enemy. 1 being normal speed and 0 being frozen in time
-   *
-   * @return the current time slow factor of the enemy
+  /**
+   * Returns a copy of the dimension vector.
+   */
+  public Vector2 getDimensions() {
+    return dimCache.set(dim);
+  }
+
+  /**
+   * Damage this enemy by the given amount.
+   * @param damage damage value
+   */
+  public void lowerHealth(float damage) {
+    health = Math.max(0, health - damage);
+  }
+
+  /**
+   * Returns whether this enemy is suspended (dead).
+   */
+  public boolean isSuspended() {
+    return health == 0;
+  }
+
+  /**
+   * Returns the time slow factor of the enemy. (1 is normal speed, 0 is frozen)
    */
   public float getTimeSlowFactor() {
     return timeslowfactor;
   }
 
-  /** Sets the time slow factor for the enemy. 1 being normal speed and 0 being frozen in time.
-   *
-   * @param tsf the time slow factor to set to this enemy
+  /**
+   * Sets the time slow factor for the enemy.
+   * @param tsf the time slow factor to set
    */
   public void setTimeSlowFactor(float tsf) {
     timeslowfactor = tsf;
   }
+  
   @Override
   public void update(float delta) {
     if (getPosition().x >= maxX) {
@@ -92,13 +122,10 @@ public class Enemy extends Entity {
     temp.set(getPosition());
     temp.x += movement;
     body.setTransform(temp, 0);
-
     timeslow(delta);
-    System.out.println("velocity of enemy" + body.getLinearVelocity());
   }
 
   public void timeslow(float delta) {
-
     prevPosCache.x = prevPosition.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
     prevPosCache.y = prevPosition.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
     prevVelCache.x = prevVelocity.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
@@ -109,8 +136,8 @@ public class Enemy extends Entity {
 
     body.setTransform(prevPosCache, body.getAngle());
     body.setLinearVelocity(prevVelCache);
-
   }
+
   @Override
   public void draw(GameCanvas canvas) {
     float w = animator.getWidth();
