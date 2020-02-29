@@ -6,6 +6,8 @@ import com.badlogic.gdx.Input;
 public class InputController {
   /** Whether the exit button was pressed */
   private boolean exitPressed;
+  /** Whether the reset button was pressed in the previous frame */
+  private boolean wasReset;
   /** Whether the reset button was pressed */
   private boolean resetPressed;
   /** Whether the attack button was pressed */
@@ -46,7 +48,7 @@ public class InputController {
    * Returns whether the player reset the game.
    */
   public boolean didReset() {
-    return resetPressed;
+    return resetPressed && !wasReset;
   }
 
   /**
@@ -82,6 +84,8 @@ public class InputController {
    */
   private void readKeyboard() {
     // TODO: maybe secondary to allow gamepad override
+    wasReset = resetPressed;
+
     exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyPressed(Input.Keys.R);
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);

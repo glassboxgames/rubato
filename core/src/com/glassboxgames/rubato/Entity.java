@@ -87,7 +87,15 @@ public abstract class Entity {
     }
     return false;
   }
-  
+  public void deactivatePhysics(World world) {
+    if (body != null) {
+      // Snapshot the values
+      //if we need to save the body info, we can do it here if we want
+      world.destroyBody(body);
+      body = null;
+      bodyDef.active = false;
+    }
+  }
   /**
    * Updates this entity's animation frame.
    * @param delta time since the last update

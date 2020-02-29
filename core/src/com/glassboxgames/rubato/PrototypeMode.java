@@ -205,7 +205,7 @@ public class PrototypeMode implements ContactListener, Screen {
         break;
       }
       if (input.didReset()) {
-        gameState = GameState.INTRO;
+        reset();
         break;
       }
 
@@ -325,5 +325,24 @@ public class PrototypeMode implements ContactListener, Screen {
     player = null;
     canvas = null;
     unloadContent(manager);
+  }
+  /**
+   * Manages reseting the world
+   */
+  public void reset() {
+    gameState = GameState.INTRO;
+    for (Platform plf: platforms) {
+      plf.deactivatePhysics(world);
+    }
+    for (Enemy e: enemies) {
+      e.deactivatePhysics(world);
+    }
+    player.deactivatePhysics(world);
+
+    platforms.clear();
+    enemies.clear();
+    //world.dispose(); I think we need to reset the world but it crashes whenever we do.
+    world = new World(new Vector2(0, GRAVITY), false);
+    world.setContactListener(this);
   }
 }
