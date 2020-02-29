@@ -23,7 +23,7 @@ public class Platform extends Entity {
   public Platform(float x, float y, float w, float h) {
     super(x, y);
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(w / 2, h / 2);
+    shape.setAsBox(w / 2 / Constants.PPM, h / 2 / Constants.PPM);
     bodyDef.type = BodyDef.BodyType.StaticBody;
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;

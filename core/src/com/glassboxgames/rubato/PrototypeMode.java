@@ -57,12 +57,20 @@ public class PrototypeMode implements Screen {
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
+
+  /** Pixels to meters conversion factor */
+  private static float PIXELS_PER_METER = 100f;
+  /** Gravity **/
+  private static float GRAVITY = -15f;
+  
   /** Canvas on which to draw content */
   private GameCanvas canvas;
   /** Current state of the game */
   private GameState gameState;
   /** Whether this game mode is active */
   private boolean active;
+  /** The Box2D world */
+  private World world;
 
   /** The player entity */
   private Player player;
@@ -70,8 +78,6 @@ public class PrototypeMode implements Screen {
   private Array<Platform> platforms;
   /** The list of enemies */
   private Array<Enemy> enemies;
-  /** The Box2D world */
-  private World world;
 
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
@@ -130,7 +136,7 @@ public class PrototypeMode implements Screen {
     gameState = GameState.INTRO;
 
     // Initialize game world
-    world = new World(new Vector2(0, -15f), false);
+    world = new World(new Vector2(0, GRAVITY), false);
   }
 
   /**
@@ -144,17 +150,16 @@ public class PrototypeMode implements Screen {
       manager.finishLoading();
       loadContent(manager);
       
-      player = new Player(100, 500, 50, 100);
+      player = new Player(100, 100, 50, 100);
       player.setTexture(adagioIdleTexture);
       player.activatePhysics(world);
 
       Platform platform = new Platform(0, 0, 1000, 50);
       platform.setTexture(platformTexture);
       platform.activatePhysics(world);
-      
       platforms = new Array<Platform>(new Platform[] {platform});
 
-      Enemy enemy = new Enemy(600, 75, 200, 60);
+      Enemy enemy = new Enemy(400, 75, 200, 60);
       enemy.setTexture(enemyTexture);
       enemy.activatePhysics(world);
       enemies = new Array<Enemy>(new Enemy[] {enemy});

@@ -33,6 +33,10 @@ public abstract class Entity {
 
   /** Temp vector for calculations */
   protected Vector2 temp = new Vector2();
+  /** Cache for position vector */
+  private Vector2 posCache = new Vector2();
+  /** Cache for velocity vector */
+  private Vector2 velCache = new Vector2();
 
   /**
    * Instantiates a new entity with the given parameters.
@@ -41,7 +45,7 @@ public abstract class Entity {
    */
   public Entity(float x, float y) {
     bodyDef = new BodyDef();
-    bodyDef.position.set(x, y);
+    bodyDef.position.set(x, y).scl(1 / Constants.PPM);
     bodyDef.active = true;
     bodyDef.awake = true;
     bodyDef.allowSleep = true;
@@ -60,14 +64,16 @@ public abstract class Entity {
    * Returns the position vector. Always returns a copy the same vector.
    */
   public Vector2 getPosition() {
-    return temp.set(body == null ? bodyDef.position : body.getPosition());
+    return posCache.set(body == null ?
+                        bodyDef.position : body.getPosition());
   }
 
   /**
    * Returns the velocity vector. Always returns a copy in the same vector.
    */
   public Vector2 getVelocity() {
-    return temp.set(body == null ? bodyDef.linearVelocity : body.getLinearVelocity());
+    return velCache.set(body == null ?
+                        bodyDef.linearVelocity : body.getLinearVelocity());
   }
 
   /**
@@ -142,7 +148,7 @@ public abstract class Entity {
     float h = animator.getHeight();
     canvas.draw(animator, Color.WHITE,
                 w / 2, h / 2,
-                getPosition().x, getPosition().y,
+                getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
                 w, h);
   }
 
@@ -151,14 +157,16 @@ public abstract class Entity {
    */
   public void drawPhysics(GameCanvas canvas) {
     Shape shape = fixture.getShape();
-    float x = getPosition().x;
-    float y = getPosition().y;
     switch (shape.getType()) {
     case Polygon:
-      canvas.drawPhysics((PolygonShape)shape, Color.RED, x, y);
+      canvas.drawPhysics((PolygonShape)shape, Color.RED,
+                         getPosition().x, getPosition().y, 0,
+                         Constants.PPM, Constants.PPM);
       break;
     case Circle:
-      canvas.drawPhysics((CircleShape)shape, Color.RED, x, y);
+      canvas.drawPhysics((CircleShape)shape, Color.RED,
+                         getPosition().x, getPosition().y,
+                         Constants.PPM, Constants.PPM);
       break;
     }
   }

@@ -19,11 +19,11 @@ public class Player extends Entity {
   /** Jump impulse */
   protected static float JUMP_IMPULSE = 4f;
   /** Movement impulse */
-  protected static float MOVE_FORCE = 2000f;
+  protected static float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
-  protected static float MOVE_DAMPING = 10f;
+  protected static float MOVE_DAMPING = 5f;
   /** Max horizontal speed */
-  protected static float MAX_X_SPEED = 5f;
+  protected static float MAX_X_SPEED = 3.5f;
   /** Max vertical speed */
   protected static float MAX_Y_SPEED = 8f;
   /** Min jump duration */
@@ -69,7 +69,7 @@ public class Player extends Entity {
   public Player(float x, float y, float w, float h) {
     super(x, y);
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(w / 2, h / 2);
+    shape.setAsBox(w / 2 / Constants.PPM, h / 2 / Constants.PPM);
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
     fixtureDef.density = DENSITY;
@@ -87,6 +87,7 @@ public class Player extends Entity {
    * Tries to start a player jump or extend an existing jump.
    */
   public void tryJump() {
+    // TODO fix
     if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
       jumpDuration++;
     } else if (getPosition().y <= 0) {
@@ -150,18 +151,21 @@ public class Player extends Entity {
       attackTime = attackCooldown = 0;
     }
 
-    System.out.println(body.
-
     if (movement != 0) {
-      temp.set(MOVE_FORCE * movement, 0);
-      System.out.println(temp + " " + getPosition().x + " " + getVelocity().x);
-      body.applyForce(temp, getPosition(), true);
+      temp.set(MOVE_IMPULSE * movement, 0);
+      System.out.println("first: " + temp + " " + getPosition() + " " + getVelocity());
+      body.applyLinearImpulse(temp, getPosition(), true);
+      System.out.println("second: " + temp + " " + getPosition() + " " + getVelocity());
     } else {
       // damping
-      // temp.set(-MOVE_DAMPING * getVelocity().x, 0);
-      // System.out.println(temp + " " + getPosition().x + " " + getVelocity().x);
-      // body.applyForce(temp, getPosition(), true);
-    } 
+      temp.set(-MOVE_DAMPING * getVelocity().x, 0);
+      System.out.println(temp + " " + getPosition() + " " + getVelocity());
+      body.applyForce(temp, getPosition(), true);
+    }
+
+    float vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
+    float vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
+    body.setLinearVelocity(vx, vy);
   }
   
   @Override
@@ -170,7 +174,7 @@ public class Player extends Entity {
     float h = animator.getHeight();
     canvas.draw(animator, Color.WHITE,
                 dir * w / 2, h / 2,
-                getPosition().x, getPosition().y,
+                getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
                 dir * w, h);
   }
 }

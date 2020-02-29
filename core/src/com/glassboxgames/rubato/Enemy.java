@@ -34,7 +34,7 @@ public class Enemy extends Entity {
   public Enemy(float x, float y, float w, float h) {
     super(x, y);
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(w / 2, h / 2);
+    shape.setAsBox(w / 2 / Constants.PPM, h / 2 / Constants.PPM);
     bodyDef.gravityScale = 0;
     fixtureDef.shape = shape;
 
@@ -70,7 +70,7 @@ public class Enemy extends Entity {
     float h = animator.getHeight();
     canvas.draw(animator, Color.WHITE,
                 dir * w / 2, h / 2,
-                getPosition().x, getPosition().y,
+                getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
                 dir * w, h);
   }
 }
