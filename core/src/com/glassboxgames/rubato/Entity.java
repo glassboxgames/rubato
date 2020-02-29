@@ -81,7 +81,6 @@ public abstract class Entity {
    */
   public boolean activatePhysics(World world) {
     body = world.createBody(bodyDef);
-    body.setUserData(this);
     if (body != null) {
       fixture = body.createFixture(fixtureDef);
       return true;

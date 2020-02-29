@@ -4,14 +4,14 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 
 /**
  * Primary controller class for the gameplay prototype.
  */
-public class PrototypeMode implements Screen {
+public class PrototypeMode implements ContactListener, Screen {
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -57,11 +57,8 @@ public class PrototypeMode implements Screen {
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
-
-  /** Pixels to meters conversion factor */
-  private static float PIXELS_PER_METER = 100f;
   /** Gravity **/
-  private static float GRAVITY = -15f;
+  private static float GRAVITY = -25f;
   
   /** Canvas on which to draw content */
   private GameCanvas canvas;
@@ -78,6 +75,22 @@ public class PrototypeMode implements Screen {
   private Array<Platform> platforms;
   /** The list of enemies */
   private Array<Enemy> enemies;
+
+  /**
+   * Instantiate a PrototypeMode.
+   * @param gameCanvas the canvas to draw on
+   */
+  public PrototypeMode(GameCanvas gameCanvas) {
+    // Start loading with the asset manager
+    manager = new AssetManager();
+    assets = new Array<String>();
+    canvas = gameCanvas;
+    gameState = GameState.INTRO;
+
+    // Initialize game world
+    world = new World(new Vector2(0, GRAVITY), false);
+    world.setContactListener(this);
+  }
 
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
@@ -124,20 +137,35 @@ public class PrototypeMode implements Screen {
     }
   }
 
-  /**
-   * Initialize an instance of this game mode.
-   * @param gameCanvas the canvas to draw on
-   */
-  public PrototypeMode(GameCanvas gameCanvas) {
-    // Start loading with the asset manager
-    manager = new AssetManager();
-    assets = new Array<String>();
-    canvas = gameCanvas;
-    gameState = GameState.INTRO;
-
-    // Initialize game world
-    world = new World(new Vector2(0, GRAVITY), false);
+  @Override
+  public void beginContact(Contact contact) {
+    Fixture f1 = contact.getFixtureA();
+    Fixture f2 = contact.getFixtureB();
+    Object d1 = f1.getUserData();
+    Object d2 = f2.getUserData();
+    if (d1.equals(Player.SENSOR_NAME) && d2.equals(Platform.PLATFORM_NAME)
+        || d1.equals(Platform.PLATFORM_NAME) && d2.equals(Player.SENSOR_NAME)) {
+      player.setGrounded(true);
+    }
   }
+  
+  @Override
+  public void endContact(Contact contact) {
+    Fixture f1 = contact.getFixtureA();
+    Fixture f2 = contact.getFixtureB();
+    Object d1 = f1.getUserData();
+    Object d2 = f2.getUserData();
+    if (d1.equals(Player.SENSOR_NAME) && d2.equals(Platform.PLATFORM_NAME)
+        || d1.equals(Platform.PLATFORM_NAME) && d2.equals(Player.SENSOR_NAME)) {
+      player.setGrounded(false);
+    }
+  }
+
+  @Override
+  public void preSolve(Contact contact, Manifold manifold) {}
+
+  @Override
+  public void postSolve(Contact contact, ContactImpulse impulse) {}
 
   /**
    * TODO

@@ -11,7 +11,9 @@ import com.glassboxgames.util.*;
  */
 public class Platform extends Entity {
   /** Friction */
-  protected static float FRICTION = 0f;
+  protected static final float FRICTION = 0f;
+  /** Platform name */
+  protected static final String PLATFORM_NAME = "Platform";
   
   /**
    * Initializes a platform with the specified parameters.
@@ -27,5 +29,14 @@ public class Platform extends Entity {
     bodyDef.type = BodyDef.BodyType.StaticBody;
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
+  }
+
+  @Override
+  public boolean activatePhysics(World world) {
+    if (!super.activatePhysics(world)) {
+      return false;
+    }
+    fixture.setUserData(PLATFORM_NAME);
+    return true;
   }
 }

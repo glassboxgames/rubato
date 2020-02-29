@@ -1,6 +1,6 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.Game;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
@@ -13,27 +13,33 @@ import java.beans.VetoableChangeListener;
  */
 public class Player extends Entity {
   /** Density */
-  protected static float DENSITY = 1f;
+  protected static final float DENSITY = 1f;
   /** Friction */
-  protected static float FRICTION = 0f;
+  protected static final float FRICTION = 0f;
   /** Jump impulse */
-  protected static float JUMP_IMPULSE = 4f;
+  protected static final float JUMP_IMPULSE = 2f;
   /** Movement impulse */
-  protected static float MOVE_IMPULSE = 1f;
+  protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
-  protected static float MOVE_DAMPING = 5f;
+  protected static final float MOVE_DAMPING = 5f;
   /** Max horizontal speed */
-  protected static float MAX_X_SPEED = 3.5f;
+  protected static final float MAX_X_SPEED = 3.5f;
   /** Max vertical speed */
-  protected static float MAX_Y_SPEED = 8f;
+  protected static final float MAX_Y_SPEED = 8f;
   /** Min jump duration */
-  protected static int MIN_JUMP_DURATION = 5;
+  protected static final int MIN_JUMP_DURATION = 3;
   /** Max jump duration */
-  protected static int MAX_JUMP_DURATION = 15;
+  protected static final int MAX_JUMP_DURATION = 10;
   /** Attack duration */
-  protected static int ATTACK_DURATION = 30;
+  protected static final int ATTACK_DURATION = 30;
   /** Attack cooldown */
-  protected static int ATTACK_COOLDOWN = 60;
+  protected static final int ATTACK_COOLDOWN = 60;
+  /** Ground sensor height */
+  protected static final float SENSOR_HEIGHT = 0.05f;
+  /** Name of the player */
+  protected static final String PLAYER_NAME = "Player";
+  /** Name of the ground sensor */
+  protected static final String SENSOR_NAME = "GroundSensor";
   
   /** Current animation frame */
   protected float animFrame;
@@ -41,11 +47,18 @@ public class Player extends Entity {
   protected int totalFrames;
   /** Direction the player is facing (1 for right, -1 for left) */
   protected int dir;
+  /** Player dimensions */
+  protected Vector2 dim;
   /** Current horizontal movement of the character (from the input) */
   protected float movement;
 
-  /** Is the player currently jumping */
-  protected boolean isJumping;
+  /** Ground sensor fixture definition */
+  protected FixtureDef sensorDef;
+  /** Ground sensor fixture */
+  protected Fixture sensorFixture;
+
+  /** Whether the player is currently on a platform */
+  protected boolean isGrounded;
   /** Current frame count since jump input */
   protected int jumpTime;
   /** Current total jump duration, can be extended; 0 if not jumping */
@@ -68,12 +81,18 @@ public class Player extends Entity {
    */
   public Player(float x, float y, float w, float h) {
     super(x, y);
+    dim = new Vector2(w / Constants.PPM, h / Constants.PPM);
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(w / 2 / Constants.PPM, h / 2 / Constants.PPM);
+    shape.setAsBox(dim.x / 2, dim.y / 2);
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
     fixtureDef.density = DENSITY;
-
+    sensorDef = new FixtureDef();
+    PolygonShape sensorShape = new PolygonShape();
+    sensorShape.setAsBox(dim.x / 2, SENSOR_HEIGHT, temp.set(dim).scl(-0.5f), 0);
+    sensorDef.isSensor = true;
+    sensorDef.shape = sensorShape;
+    
     animFrame = 0;
     totalFrames = 0;
     dir = 1;
@@ -83,23 +102,26 @@ public class Player extends Entity {
     attackCooldown = 0;
   }
 
+  @Override
+  public boolean activatePhysics(World world) {
+    if (!super.activatePhysics(world)) {
+      return false;
+    }
+    fixture.setUserData(PLAYER_NAME);
+    sensorFixture = body.createFixture(sensorDef);
+    sensorFixture.setUserData(SENSOR_NAME);
+    return true;
+  }
+
   /**
    * Tries to start a player jump or extend an existing jump.
    */
   public void tryJump() {
-    // TODO fix
     if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
       jumpDuration++;
-    } else if (getPosition().y <= 0) {
+    } else if (isGrounded) {
       jumpDuration = MIN_JUMP_DURATION;
     }
-  }
-
-  /**
-   * Returns whether the player is jumping.
-   */
-  public boolean isJumping() {
-    return jumpDuration > 0;
   }
 
   /**
@@ -114,6 +136,21 @@ public class Player extends Entity {
     return false;
   }
 
+  /**
+   * Returns whether the player is standing on a platform.
+   */
+  public boolean isGrounded() {
+    return isGrounded;
+  }
+
+  /**
+   * Sets the player's grounded state.
+   */
+  public void setGrounded(boolean value) {
+    System.out.println(value);
+    isGrounded = value;
+  }
+  
   /**
    * Returns whether the player is mid-attack.
    */
@@ -153,16 +190,21 @@ public class Player extends Entity {
 
     if (movement != 0) {
       temp.set(MOVE_IMPULSE * movement, 0);
-      System.out.println("first: " + temp + " " + getPosition() + " " + getVelocity());
       body.applyLinearImpulse(temp, getPosition(), true);
-      System.out.println("second: " + temp + " " + getPosition() + " " + getVelocity());
     } else {
       // damping
       temp.set(-MOVE_DAMPING * getVelocity().x, 0);
-      System.out.println(temp + " " + getPosition() + " " + getVelocity());
       body.applyForce(temp, getPosition(), true);
     }
 
+    if (jumpTime < jumpDuration) {
+      jumpTime++;
+      temp.set(0, JUMP_IMPULSE);
+      body.applyLinearImpulse(temp, getPosition(), true);
+    } else if (jumpDuration > 0) {
+      jumpTime = jumpDuration = 0;
+    }
+    
     float vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
     float vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
     body.setLinearVelocity(vx, vy);
@@ -176,5 +218,15 @@ public class Player extends Entity {
                 dir * w / 2, h / 2,
                 getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
                 dir * w, h);
+  }
+
+  @Override
+  public void drawPhysics(GameCanvas canvas) {
+    canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
+                       getPosition().x, getPosition().y, 0,
+                       Constants.PPM, Constants.PPM);
+    canvas.drawPhysics((PolygonShape)sensorFixture.getShape(), Color.RED,
+                       getPosition().x + dim.x / 2, getPosition().y, 0,
+                       Constants.PPM, Constants.PPM);
   }
 }
