@@ -24,6 +24,17 @@ public class Enemy extends Entity {
   /** Current direction */
   private int dir;
 
+  /** Represents how much the enemy has been slowed */
+  private float timeslowfactor;
+  /** Represent the previous position of the enemy */
+  private Vector2 prevPosition;
+  /** Represent the previous velocity of the enemy */
+  private Vector2 prevVelocity;
+  /** Represent cache for prevPosition Calculation */
+  private Vector2 prevPosCache = new Vector2(0,0);
+  /** Represent cache for prevVelocity Calculation */
+  private Vector2 prevVelCache = new Vector2(0,0);
+
   /**
    * Initializes an enemy with the specified parameters.
    * @param x x-coordinate
@@ -42,6 +53,10 @@ public class Enemy extends Entity {
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
     dir = 1;
+
+    timeslowfactor = 0.0f;
+    prevPosition = getPosition();
+    prevVelocity = getVelocity();
   }
 
   /**
@@ -50,7 +65,22 @@ public class Enemy extends Entity {
   public int getDirection() {
     return dir;
   }
-  
+
+  /** Returns the time slow factor of the enemy. 1 being normal speed and 0 being frozen in time
+   *
+   * @return the current time slow factor of the enemy
+   */
+  public float getTimeSlowFactor() {
+    return timeslowfactor;
+  }
+
+  /** Sets the time slow factor for the enemy. 1 being normal speed and 0 being frozen in time.
+   *
+   * @param tsf the time slow factor to set to this enemy
+   */
+  public void setTimeSlowFactor(float tsf) {
+    timeslowfactor = tsf;
+  }
   @Override
   public void update(float delta) {
     if (getPosition().x >= maxX) {
@@ -62,8 +92,25 @@ public class Enemy extends Entity {
     temp.set(getPosition());
     temp.x += movement;
     body.setTransform(temp, 0);
+
+    timeslow(delta);
+    System.out.println("velocity of enemy" + body.getLinearVelocity());
   }
 
+  public void timeslow(float delta) {
+
+    prevPosCache.x = prevPosition.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
+    prevPosCache.y = prevPosition.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
+    prevVelCache.x = prevVelocity.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
+    prevVelCache.y = prevVelocity.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
+
+    prevPosition = prevPosCache;
+    prevVelocity = prevVelCache;
+
+    body.setTransform(prevPosCache, body.getAngle());
+    body.setLinearVelocity(prevVelCache);
+
+  }
   @Override
   public void draw(GameCanvas canvas) {
     float w = animator.getWidth();
