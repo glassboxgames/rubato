@@ -11,27 +11,7 @@ import com.badlogic.gdx.utils.*;
 /**
  * Primary controller class for the gameplay prototype.
  */
-public class PrototypeMode implements Screen, ContactListener {
-  @Override
-  public void beginContact(Contact contact) {
-
-  }
-
-  @Override
-  public void endContact(Contact contact) {
-
-  }
-
-  @Override
-  public void preSolve(Contact contact, Manifold oldManifold) {
-
-  }
-
-  @Override
-  public void postSolve(Contact contact, ContactImpulse impulse) {
-
-  }
-
+public class PrototypeMode implements Screen {
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -55,6 +35,8 @@ public class PrototypeMode implements Screen, ContactListener {
   private static final String ADAGIO_ATTACK = "Adagio/tornado-strip150.png";
   /** The file for the enemy image */
   private static final String ENEMY_FILE = "enemy.png";
+  /** The file for the platform tile */
+  private static final String PLATFORM_FILE = "Tilesets/Grass/edge-n.png";
 
   // Loaded assets
   /** The background image for the game */
@@ -69,6 +51,8 @@ public class PrototypeMode implements Screen, ContactListener {
   private Texture adagioAttackTexture;
   /** Texture for enemies */
   private Texture enemyTexture;
+  /** Texture for platforms */
+  private Texture platformTexture;
 
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
@@ -82,9 +66,11 @@ public class PrototypeMode implements Screen, ContactListener {
 
   /** The player entity */
   private Player player;
-  /** List of enemies */
+  /** The list of platforms */
+  private Array<Platform> platforms;
+  /** The list of enemies */
   private Array<Enemy> enemies;
-  /** The world of the protoype level */
+  /** The Box2D world */
   private World world;
 
   public void preloadContent(AssetManager manager) {
@@ -100,6 +86,8 @@ public class PrototypeMode implements Screen, ContactListener {
     assets.add(ADAGIO_ATTACK);
     manager.load(ENEMY_FILE, Texture.class);
     assets.add(ENEMY_FILE);
+    manager.load(PLATFORM_FILE, Texture.class);
+    assets.add(PLATFORM_FILE);
   }
 
   private Texture createTexture(AssetManager manager, String file) {
@@ -119,6 +107,7 @@ public class PrototypeMode implements Screen, ContactListener {
     adagioJumpTexture = createTexture(manager, ADAGIO_JUMP);
     adagioAttackTexture = createTexture(manager, ADAGIO_ATTACK);
     enemyTexture = createTexture(manager, ENEMY_FILE);
+    platformTexture = createTexture(manager, PLATFORM_FILE);
   }
 
   public void unloadContent(AssetManager manager) {
@@ -140,11 +129,8 @@ public class PrototypeMode implements Screen, ContactListener {
     canvas = gameCanvas;
     gameState = GameState.INTRO;
 
-
     // Initialize game world
-    Vector2 temp = new Vector2(10f, 10f);
-    world = new World(temp, false);
-
+    world = new World(new Vector2(0, -100), false);
   }
 
   /**
@@ -157,14 +143,22 @@ public class PrototypeMode implements Screen, ContactListener {
       preloadContent(manager);
       manager.finishLoading();
       loadContent(manager);
-      player = new Player(50, 0);
+      
+      player = new Player(100, 100, 50, 100);
       player.setTexture(adagioIdleTexture);
       player.activatePhysics(world);
-      Enemy enemy = new Enemy(600, 75);
+
+      Platform platform = new Platform(0, 0, 1000, 50);
+      platform.setTexture(platformTexture);
+      platform.activatePhysics(world);
+      platforms = new Array<Platform>(new Platform[] {platform});
+
+      Enemy enemy = new Enemy(600, 75, 200, 60);
       enemy.setTexture(enemyTexture);
+      enemy.activatePhysics(world);
       enemies = new Array<Enemy>(new Enemy[] {enemy});
+
       gameState = GameState.PLAY;
-      //remove later
       break;
     }
     case PLAY: {
@@ -182,32 +176,30 @@ public class PrototypeMode implements Screen, ContactListener {
       }
 
       float horizontal = input.getHorizontal();
-      player.setMove(horizontal);
+      player.tryMove(horizontal);
       if (input.didJump()) {
-        player.setJump();
+        player.tryJump();
       }
       if (input.didAttack()) {
-        player.setAttack();
+        player.tryAttack();
       }
       if (player.isAttacking()) {
-        player.setTexture(adagioAttackTexture, 1, 11, 11);
-      } else if (player.isJumping()) {
-        player.setTexture(adagioJumpTexture, 1, 9, 9);
+        player.setTexture(adagioAttackTexture, 1, 11, 11, 0.4f);
+      // } else if (player.getPosition().y > 0) {
+      //   player.setTexture(adagioJumpTexture, 1, 9, 9, 0.05f);
       } else if (horizontal != 0) {
-        player.setTexture(adagioWalkTexture, 1, 10, 10);
+        player.setTexture(adagioWalkTexture, 1, 10, 10, 0.25f);
       } else {
-        player.setTexture(adagioIdleTexture, 1, 1, 1);
+        player.setTexture(adagioIdleTexture);
       }
       player.update(delta);
-
-      System.out.println("player body x: " + player.getPos().x + ", y: " + player.getPos().y);
-      System.out.println("player vel x: " + player.getVel().x + ", y: " + player.getPos().y);
+      System.out.println(player.getPosition() + " " + player.getVelocity());
       for (Enemy enemy : enemies) {
         enemy.update(delta);
         if (player.isAttacking()) {
-          System.out.println(enemy.getPos().x - player.getPos().x + " " + player.getDirection());
-          if ((enemy.getPos().x - player.getPos().x) * player.getDirection() < 100
-              && (Math.abs(enemy.getPos().x - player.getPos().x) < 50)) {
+          System.out.println(enemy.getPosition().x - player.getPosition().x + " " + player.getDirection());
+          if ((enemy.getPosition().x - player.getPosition().x) * player.getDirection() < 100
+              && (Math.abs(enemy.getPosition().x - player.getPosition().x) < 50)) {
             System.out.println("hit");
           }
         }
@@ -231,14 +223,22 @@ public class PrototypeMode implements Screen, ContactListener {
   private void draw(float delta) {
     canvas.begin();
     canvas.drawBackground(background);
-    player.draw(canvas);
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
+    for (Platform platform : platforms) {
+      platform.draw(canvas);
+    }
+    player.draw(canvas);
     canvas.end();
 
-    /** debug draw*/
     canvas.beginDebug();
+    for (Enemy enemy : enemies) {
+      enemy.drawPhysics(canvas);
+    }
+    for (Platform platform : platforms) {
+      platform.drawPhysics(canvas);
+    }
     player.drawPhysics(canvas);
     canvas.endDebug();
   }

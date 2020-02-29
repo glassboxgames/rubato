@@ -1,6 +1,9 @@
 package com.glassboxgames.rubato;
 
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.physics.box2d.*;
 import com.glassboxgames.util.*;
 
 /**
@@ -25,15 +28,20 @@ public class Enemy extends Entity {
    * Initializes an enemy with the specified parameters.
    * @param x x-coordinate
    * @param y y-coordinate
+   * @param w width
+   * @param h height
    */
-  public Enemy(float x, float y) {
+  public Enemy(float x, float y, float w, float h) {
     super(x, y);
+    PolygonShape shape = new PolygonShape();
+    shape.setAsBox(w / 2, h / 2);
+    bodyDef.gravityScale = 0;
+    fixtureDef.shape = shape;
+
     health = MAX_HEALTH;
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
     dir = 1;
-
-
   }
 
   /**
@@ -45,20 +53,24 @@ public class Enemy extends Entity {
   
   @Override
   public void update(float delta) {
-    if (getPos().x >= maxX) {
+    if (getPosition().x >= maxX) {
       dir = -1;
-    } else if (getPos().x <= minX) {
+    } else if (getPosition().x <= minX) {
       dir = 1;
     }
-    float speed = MAX_SPEED * dir * health / MAX_HEALTH;
-    getPos().x += speed;
+    float movement = MAX_SPEED * dir * health / MAX_HEALTH;
+    temp.set(getPosition());
+    temp.x += movement;
+    body.setTransform(temp, 0);
   }
 
   @Override
   public void draw(GameCanvas canvas) {
-    canvas.draw(getFilmStrip(), Color.WHITE,
-                dim.x * dir / 2, 0,
-                getPos().x, getPos().y,
-                dim.x * dir, dim.y);
+    float w = animator.getWidth();
+    float h = animator.getHeight();
+    canvas.draw(animator, Color.WHITE,
+                dir * w / 2, h / 2,
+                getPosition().x, getPosition().y,
+                dir * w, h);
   }
 }

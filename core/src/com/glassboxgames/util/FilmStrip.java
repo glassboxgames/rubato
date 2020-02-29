@@ -103,6 +103,20 @@ public class FilmStrip extends TextureRegion {
 	public int getFrame() {
 		return frame;
 	}
+
+  /**
+   * Returns the width of a single frame.
+   */
+  public int getWidth() {
+    return rwidth;
+  }
+
+  /**
+   * Returns the height of a single frame.
+   */
+  public int getHeight() {
+    return rheight;
+  }
 	
 	/**
 	 * Sets the active frame as the given index.

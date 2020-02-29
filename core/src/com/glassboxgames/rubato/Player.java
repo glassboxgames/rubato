@@ -13,54 +13,59 @@ import java.beans.VetoableChangeListener;
  */
 public class Player extends Entity {
   /** Jump force */
-  private static float JUMP_FORCE = 4f;
+  protected static float JUMP_FORCE = 4f;
   /** Gravity */
-  private static float GRAVITY = 1f;
+  protected static float GRAVITY = 1f;
   /** Max vertical speed */
-  private static float MAX_Y_SPEED = 8;
+  protected static float MAX_Y_SPEED = 8;
   /** Max horizontal speed */
-  private static float MAX_X_SPEED = 5;
+  protected static float MAX_X_SPEED = 5;
   /** Min jump duration */
-  private static int MIN_JUMP_DURATION = 5;
+  protected static int MIN_JUMP_DURATION = 5;
   /** Max jump duration */
-  private static int MAX_JUMP_DURATION = 15;
+  protected static int MAX_JUMP_DURATION = 15;
+  /** Attack duration */
+  protected static int ATTACK_DURATION = 30;
   /** Attack cooldown */
-  private static int ATTACK_COOLDOWN = 45;
+  protected static int ATTACK_COOLDOWN = 60;
   
   /** Current animation frame */
-  private float animFrame;
+  protected float animFrame;
   /** Current animation filmstrip length */
-  private int totalFrames;
+  protected int totalFrames;
   /** Direction the player is facing (1 for right, -1 for left) */
-  private int dir;
-  /** Current Horizontal movement of the character (from the input) */
-  private float movement;
+  protected int dir;
+  /** Current horizontal movement of the character (from the input) */
+  protected float movement;
 
   /** Is the player currently jumping */
-  private boolean isJumping;
+  protected boolean isJumping;
   /** Current frame count since jump input */
-  private int jumpTime;
+  protected int jumpTime;
   /** Current total jump duration, can be extended; 0 if not jumping */
-  private int jumpDuration;
+  protected int jumpDuration;
   /** Is the player currently attacking */
-  private boolean isAttacking;
+  protected boolean isAttacking;
   /** Current frame count since attack input */
-  private int attackTime;
+  protected int attackTime;
   /** Current attack cooldown, 0 if not attacking */
-  private int attackCooldown;
+  protected int attackCooldown;
+  /** Current attack hitbox, if it exists */
+  public Hitbox hitbox;
 
-  /** Shape of the current player */
-  private PolygonShape shape;
-  /** Body of the current player */
-  private Body body;
-  /** Fixture of the current player */
-  private Fixture fixture;
-
-  /** Temp vector for calculations */
-  private Vector2 temp = new Vector2();
-
-  public Player(float x, float y) {
+  /**
+   * Instantiates a player with the given parameters.
+   * @param x x-coordinate
+   * @param y y-coordinate
+   * @param w width
+   * @param h height
+   */
+  public Player(float x, float y, float w, float h) {
     super(x, y);
+    PolygonShape shape = new PolygonShape();
+    shape.setAsBox(w / 2, h / 2);
+    fixtureDef.shape = shape;
+
     animFrame = 0;
     totalFrames = 0;
     dir = 1;
@@ -68,37 +73,15 @@ public class Player extends Entity {
     jumpDuration = 0;
     attackTime = 0;
     attackCooldown = 0;
-
-
-
-  }
-  public boolean activatePhysics(World world) {
-
-    bodyInfo.type = BodyDef.BodyType.DynamicBody;
-    bodyInfo.active = true;
-    bodyInfo.fixedRotation = true;
-    body = world.createBody(bodyInfo);
-    body.setUserData(this);
-
-    if (body != null) {
-      shape = new PolygonShape();
-      shape.setAsBox(30,80, getPos(), 0);
-      fixtureInfo = new FixtureDef();
-      fixtureInfo.shape = shape;
-      fixture = body.createFixture(fixtureInfo);
-      return true;
-    }
-    bodyInfo.active = false;
-    return false;
   }
 
   /**
    * Tries to start a player jump or extend an existing jump.
    */
-  public void setJump() {
+  public void tryJump() {
     if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
       jumpDuration++;
-    } else if (getPos().y <= 0) {
+    } else if (getPosition().y <= 0) {
       jumpDuration = MIN_JUMP_DURATION;
     }
   }
@@ -112,18 +95,21 @@ public class Player extends Entity {
 
   /**
    * Tries to start a player attack.
+   * @return whether an attack was started successfully
    */
-  public void setAttack() {
+  public boolean tryAttack() {
     if (attackCooldown == 0) {
       attackCooldown = ATTACK_COOLDOWN;
+      return true;
     }
+    return false;
   }
 
   /**
-   * Returns whether the player is attacking.
+   * Returns whether the player is mid-attack.
    */
   public boolean isAttacking() {
-    return attackCooldown > 0;
+    return attackCooldown > 0 && attackTime < ATTACK_DURATION;
   }
   
   /**
@@ -133,16 +119,10 @@ public class Player extends Entity {
     return dir;
   }
 
-  public Vector2 getPos() {
-    return (body == null ? super.getPos() : body.getPosition());
-  }
-  public Vector2 getVel() {
-    return (body == null ? super.getVel() : body.getLinearVelocity());
-  }
   /**
    * Tries to set the player's horizontal movement.
    */
-  public void setMove(float input) {
+  public void tryMove(float input) {
     movement = input;
     if (input > 0) {
       dir = 1;
@@ -159,11 +139,13 @@ public class Player extends Entity {
     } else if (attackCooldown > 0) {
       attackTime = attackCooldown = 0;
     }
-    Vector2 temp = new Vector2(movement+body.getPosition().x,body.getPosition().y);
-    body.setTransform(temp, 0);
+    temp.set(getPosition());
+    temp.x += movement;
+    if (body != null) {
+      body.setTransform(temp, 0);
+    }
 
-
-    /** old jump + movement code
+    /* old jump + movement code
     if (jumpTime < jumpDuration) {
       vel.y += JUMP_FORCE;
       jumpTime++;
@@ -179,15 +161,14 @@ public class Player extends Entity {
     pos.add(vel);
      */
   }
-
+  
   @Override
   public void draw(GameCanvas canvas) {
-    canvas.draw(getFilmStrip(), Color.WHITE,
-                dim.x * dir / 2, 0,
-                getPos().x, getPos().y,
-                dim.x * dir, dim.y);
-  }
-  public void drawPhysics(GameCanvas canvas) {
-    canvas.drawPhysics((PolygonShape) fixture.getShape(), Color.RED, getPos().x,getPos().y) ;
+    float w = animator.getWidth();
+    float h = animator.getHeight();
+    canvas.draw(animator, Color.WHITE,
+                dir * w / 2, h / 2,
+                getPosition().x, getPosition().y,
+                dir * w, h);
   }
 }
