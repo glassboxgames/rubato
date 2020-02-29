@@ -13,10 +13,11 @@ public class Enemy extends Entity {
   /** Maximum health */
   private static float MAX_HEALTH = 10;
   /** Maximum speed */
-  private static float MAX_SPEED = 3;
+  private static float MAX_SPEED = 0.1f;
   /** Movement range */
-  private static float MOVE_RANGE = 200;
-
+  private static float MOVE_RANGE = 0.1f;
+  /** The name of the enemy */
+  protected static final String ENEMY_NAME = "otabur";
   /** Current health */
   private float health;
   /** Movement limits */
@@ -54,7 +55,7 @@ public class Enemy extends Entity {
     maxX = x + MOVE_RANGE;
     dir = 1;
 
-    timeslowfactor = 0.0f;
+    timeslowfactor = 1.0f;
     prevPosition = getPosition();
     prevVelocity = getVelocity();
   }
@@ -88,21 +89,25 @@ public class Enemy extends Entity {
     } else if (getPosition().x <= minX) {
       dir = 1;
     }
-    float movement = MAX_SPEED * dir * health / MAX_HEALTH;
+    float movement = MAX_SPEED * dir;
     temp.set(getPosition());
     temp.x += movement;
-    body.setTransform(temp, 0);
-
+    body.setTransform(temp, body.getAngle());
     timeslow(delta);
-    System.out.println("velocity of enemy" + body.getLinearVelocity());
   }
-
+  public boolean activatePhysics(World world) {
+    if (!super.activatePhysics(world)) {
+      return false;
+    }
+    fixture.setUserData(ENEMY_NAME);
+    return true;
+  }
   public void timeslow(float delta) {
 
     prevPosCache.x = prevPosition.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
     prevPosCache.y = prevPosition.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
-    prevVelCache.x = prevVelocity.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
-    prevVelCache.y = prevVelocity.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
+    prevVelCache.x = prevVelocity.x*(1-timeslowfactor)+getVelocity().x*timeslowfactor;
+    prevVelCache.y = prevVelocity.y*(1-timeslowfactor)+getVelocity().y*timeslowfactor;
 
     prevPosition = prevPosCache;
     prevVelocity = prevVelCache;
