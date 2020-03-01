@@ -127,6 +127,6 @@ Thumbs.db
 /ios-moe/xcode/native/
 
 # JAR
-resources/*
+core/resources/
 desktop/out/
 out/

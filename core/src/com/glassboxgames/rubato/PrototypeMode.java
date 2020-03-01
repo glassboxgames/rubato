@@ -200,7 +200,7 @@ public class PrototypeMode implements ContactListener, Screen {
       manager.finishLoading();
       loadContent(manager);
 
-      Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+      canvas.setFullscreen(true,false);
       
       player = new Player(1f, 1f, 0.5f, 1f);
       player.setTexture(adagioIdleTexture);
