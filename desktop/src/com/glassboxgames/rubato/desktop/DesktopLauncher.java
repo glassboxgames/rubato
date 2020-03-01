@@ -7,8 +7,10 @@ import com.glassboxgames.rubato.GDXRoot;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.forceExit = false;
 		config.setFromDisplayMode(LwjglApplicationConfiguration.getDesktopDisplayMode());
+		config.forceExit = false;
+		config.fullscreen = true;
+		config.vSyncEnabled = true;
 		new LwjglApplication(new GDXRoot(), config);
 	}
 }

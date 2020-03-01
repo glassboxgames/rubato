@@ -30,7 +30,7 @@ public class Player extends Entity {
   /** Min jump duration */
   protected static final int MIN_JUMP_DURATION = 2;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 7;
+  protected static final int MAX_JUMP_DURATION = 8;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */

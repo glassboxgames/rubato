@@ -7,12 +7,13 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 /**
  * Primary controller class for the gameplay prototype.
  */
 public class PrototypeMode implements ContactListener, Screen {
-  private boolean debug = true;
+  private boolean debug = false;
 
   public enum GameState {
     /** Before the game has started */
@@ -198,6 +199,8 @@ public class PrototypeMode implements ContactListener, Screen {
       preloadContent(manager);
       manager.finishLoading();
       loadContent(manager);
+
+      Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
       
       player = new Player(1f, 1f, 0.5f, 1f);
       player.setTexture(adagioIdleTexture);
