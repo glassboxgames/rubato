@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 public class InputController {
+  /** Whether the debug code was entered */
+  private boolean debug;
+
   /** Whether the exit button was pressed */
   private boolean exitPressed;
   /** Whether the reset button was pressed in the previous frame */
@@ -33,12 +36,16 @@ public class InputController {
 
   /**
    * Create a new input controller. Only used to create the singleton.
-   * @see getInstance
    */
   private InputController() {}
 
   /**
-   * Returns whether the player reset the game.
+   * Returns whether the debug code was entered.
+   */
+  public boolean didDebug() { return debug; }
+
+  /**
+   * Returns whether the player exit the game.
    */
   public boolean didExit() {
     return exitPressed;
@@ -76,6 +83,7 @@ public class InputController {
    * Reads the input from the player.
    */
   public void readInput() {
+
     readKeyboard();
   }
 
@@ -83,6 +91,8 @@ public class InputController {
    * Reads the input from the player's keyboard.
    */
   private void readKeyboard() {
+    debug = Gdx.input.isKeyJustPressed(Input.Keys.SLASH);
+
     // TODO: maybe secondary to allow gamepad override
     wasReset = resetPressed;
 

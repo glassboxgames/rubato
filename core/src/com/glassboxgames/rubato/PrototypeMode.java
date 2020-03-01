@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.*;
  * Primary controller class for the gameplay prototype.
  */
 public class PrototypeMode implements ContactListener, Screen {
+  private boolean debug = false;
+
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -83,7 +85,7 @@ public class PrototypeMode implements ContactListener, Screen {
   public PrototypeMode(GameCanvas gameCanvas) {
     // Start loading with the asset manager
     manager = new AssetManager();
-    assets = new Array<String>();
+    assets = new Array();
     canvas = gameCanvas;
     gameState = GameState.INTRO;
 
@@ -227,6 +229,9 @@ public class PrototypeMode implements ContactListener, Screen {
         reset();
         break;
       }
+      if (input.didDebug()) {
+        debug = !debug;
+      }
 
       if (player != null) {
         float horizontal = input.getHorizontal();
@@ -290,23 +295,25 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
-    // for (Platform platform : platforms) {
-    //   platform.draw(canvas);
-    // }
+    for (Platform platform : platforms) {
+      // platform.draw(canvas);
+    }
     if (player != null)
       player.draw(canvas);
     canvas.end();
 
-    // canvas.beginDebug();
-    // for (Enemy enemy : enemies) {
-    //   enemy.drawPhysics(canvas);
-    // }
-    // for (Platform platform : platforms) {
-    //   platform.drawPhysics(canvas);
-    // }
-    // if (player != null)
-    //   player.drawPhysics(canvas);
-    // canvas.endDebug();
+    if (debug) {
+      canvas.beginDebug();
+      for (Enemy enemy : enemies) {
+        enemy.drawPhysics(canvas);
+      }
+      for (Platform platform : platforms) {
+        platform.drawPhysics(canvas);
+      }
+      if (player != null)
+        player.drawPhysics(canvas);
+      canvas.endDebug();
+    }
   }
 
   /**
