@@ -38,7 +38,7 @@ public class Player extends Entity {
   /** Attack hitbox start frame */
   protected static final int ATTACK_START = 5;
   /** Attack hitbox end frame */
-  protected static final int ATTACK_END = 20;
+  protected static final int ATTACK_END = 25;
   /** Attack cooldown */
   protected static final int ATTACK_COOLDOWN = 28;
   /** Attack damage */
@@ -197,10 +197,12 @@ public class Player extends Entity {
    */
   public void tryMove(float input) {
     movement = input;
-    if (input > 0) {
-      dir = 1;
-    } else if (input < 0) {
-      dir = -1;
+    if (!isHitboxActive()) {
+      if (input > 0) {
+        dir = 1;
+      } else if (input < 0) {
+        dir = -1;
+      }
     }
   }
 

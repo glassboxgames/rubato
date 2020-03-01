@@ -13,7 +13,7 @@ public class Enemy extends Entity {
   /** Maximum health */
   protected static final float MAX_HEALTH = 10;
   /** Maximum speed */
-  protected static final float MAX_SPEED = 0.07f;
+  protected static final float MAX_SPEED = 3f;
   /** Movement range */
   protected static final float MOVE_RANGE = 2f;
   /** Friction */
@@ -52,7 +52,7 @@ public class Enemy extends Entity {
 
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(dim.x / 2, dim.y / 2);
-    bodyDef.type = BodyDef.BodyType.StaticBody;
+    bodyDef.type = BodyDef.BodyType.KinematicBody;
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
 
@@ -102,7 +102,7 @@ public class Enemy extends Entity {
     } else if (getPosition().x <= minX) {
       dir = 1;
     }
-    body.setTransform(getPosition().add(MAX_SPEED * dir, 0), body.getAngle());
+    body.setLinearVelocity(MAX_SPEED * dir, 0);
     timeslow(delta);
   }
 

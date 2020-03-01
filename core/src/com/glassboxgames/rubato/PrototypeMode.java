@@ -263,7 +263,7 @@ public class PrototypeMode implements ContactListener, Screen {
         }
         enemy.update(delta);
       }
-      world.step(1 / 60f, 6, 2);
+      world.step(1 / 60f, 8, 3);
       break;
     }
     }
