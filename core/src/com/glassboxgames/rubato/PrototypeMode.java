@@ -58,7 +58,7 @@ public class PrototypeMode implements ContactListener, Screen {
   private Array<String> assets;
 
   /** Gravity **/
-  private static float GRAVITY = -25f;
+  private static float GRAVITY = -40f;
   
   /** Canvas on which to draw content */
   private GameCanvas canvas;
@@ -297,16 +297,16 @@ public class PrototypeMode implements ContactListener, Screen {
       player.draw(canvas);
     canvas.end();
 
-    // canvas.beginDebug();
-    // for (Enemy enemy : enemies) {
-    //   enemy.drawPhysics(canvas);
-    // }
-    // for (Platform platform : platforms) {
-    //   platform.drawPhysics(canvas);
-    // }
-    // if (player != null)
-    //   player.drawPhysics(canvas);
-    // canvas.endDebug();
+    canvas.beginDebug();
+    for (Enemy enemy : enemies) {
+      enemy.drawPhysics(canvas);
+    }
+    for (Platform platform : platforms) {
+      platform.drawPhysics(canvas);
+    }
+    if (player != null)
+      player.drawPhysics(canvas);
+    canvas.endDebug();
   }
 
   /**

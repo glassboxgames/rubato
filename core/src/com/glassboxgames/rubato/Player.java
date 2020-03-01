@@ -26,11 +26,11 @@ public class Player extends Entity {
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 3.5f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 10f;
+  protected static final float MAX_Y_SPEED = 7f;
   /** Min jump duration */
-  protected static final int MIN_JUMP_DURATION = 3;
+  protected static final int MIN_JUMP_DURATION = 5;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 20;
+  protected static final int MAX_JUMP_DURATION = 15;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -71,9 +71,9 @@ public class Player extends Entity {
   /** Whether the player is currently on a platform */
   protected boolean isGrounded;
   /** Current frame count since jump input */
-  protected float jumpTime;
+  protected int jumpTime;
   /** Current total jump duration, can be extended; 0 if not jumping */
-  protected float jumpDuration;
+  protected int jumpDuration;
   /** Is the player currently attacking */
   protected boolean isAttacking;
   /** Current frame count since attack input */
@@ -133,8 +133,7 @@ public class Player extends Entity {
    */
   public void tryJump() {
     if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
-      jumpDuration += 0.5f;
-      System.out.println(jumpDuration);
+      jumpDuration++;
     } else if (isGrounded) {
       jumpDuration = MIN_JUMP_DURATION;
     }
