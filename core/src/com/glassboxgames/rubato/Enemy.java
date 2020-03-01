@@ -25,8 +25,6 @@ public class Enemy extends Entity {
   protected float health;
   /** Movement limits */
   protected float minX, maxX;
-  /** Current direction */
-  protected int dir;
 
   /** Represent the previous position of the enemy */
   protected Vector2 prevPosition;
@@ -120,13 +118,4 @@ public class Enemy extends Entity {
     body.setLinearVelocity(prevVelCache);
   }
 
-  @Override
-  public void draw(GameCanvas canvas) {
-    float w = animator.getWidth();
-    float h = animator.getHeight();
-    canvas.draw(animator, Color.WHITE,
-                dir * w / 2, h / 2,
-                getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
-                dir * w, h);
-  }
 }

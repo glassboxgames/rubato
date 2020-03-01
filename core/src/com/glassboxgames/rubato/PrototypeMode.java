@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.*;
  * Primary controller class for the gameplay prototype.
  */
 public class PrototypeMode implements ContactListener, Screen {
+  private boolean debug = true;
+
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -58,7 +60,7 @@ public class PrototypeMode implements ContactListener, Screen {
   private Array<String> assets;
 
   /** Gravity **/
-  private static float GRAVITY = -40f;
+  private static float GRAVITY = -50f;
   
   /** Canvas on which to draw content */
   private GameCanvas canvas;
@@ -83,7 +85,7 @@ public class PrototypeMode implements ContactListener, Screen {
   public PrototypeMode(GameCanvas gameCanvas) {
     // Start loading with the asset manager
     manager = new AssetManager();
-    assets = new Array<String>();
+    assets = new Array();
     canvas = gameCanvas;
     gameState = GameState.INTRO;
 
@@ -201,15 +203,15 @@ public class PrototypeMode implements ContactListener, Screen {
       player.setTexture(adagioIdleTexture);
       player.activatePhysics(world);
 
-      Platform platform = new Platform(0f, -0.25f, 20f, 0.5f);
+      Platform platform = new Platform(0f, -0.25f, 40f, 0.5f);
       platform.setTexture(platformTexture);
       platform.activatePhysics(world);
-      platforms = new Array<Platform>(new Platform[] {platform});
+      platforms = new Array(new Platform[] {platform});
 
       Enemy enemy = new Enemy(6f, 1.5f, 1.5f, 0.6f);
       enemy.setTexture(enemyTexture);
       enemy.activatePhysics(world);
-      enemies = new Array<Enemy>(new Enemy[] {enemy});
+      enemies = new Array(new Enemy[] {enemy});
 
       gameState = GameState.PLAY;
       break;
@@ -227,6 +229,9 @@ public class PrototypeMode implements ContactListener, Screen {
         reset();
         break;
       }
+      if (input.didDebug()) {
+        debug = !debug;
+      }
 
       if (player != null) {
         float horizontal = input.getHorizontal();
@@ -239,8 +244,8 @@ public class PrototypeMode implements ContactListener, Screen {
         }
         if (player.isAttacking()) {
           player.setTexture(adagioAttackTexture, 1, 11, 11, 0.4f);
-          // } else if (player.getPosition().y > 0) {
-          //   player.setTexture(adagioJumpTexture, 1, 9, 9, 0.05f);
+        } else if (!player.isGrounded()) {
+           player.setTexture(adagioJumpTexture, 1, 9, 9, 0.004f*player.getJumpDuration());
         } else if (horizontal != 0) {
           player.setTexture(adagioWalkTexture, 1, 10, 10, 0.25f);
         } else {
@@ -290,23 +295,26 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
-    // for (Platform platform : platforms) {
-    //   platform.draw(canvas);
-    // }
+    for (Platform platform : platforms) {
+      // platform.draw(canvas);
+    }
     if (player != null)
       player.draw(canvas);
     canvas.end();
 
-    canvas.beginDebug();
-    for (Enemy enemy : enemies) {
-      enemy.drawPhysics(canvas);
+    if (debug) {
+      canvas.beginDebug();
+      for (Enemy enemy : enemies) {
+        enemy.drawPhysics(canvas);
+      }
+      for (Platform platform : platforms) {
+        platform.drawPhysics(canvas);
+      }
+      if (player != null) {
+        player.drawPhysics(canvas);
+      }
+      canvas.endDebug();
     }
-    for (Platform platform : platforms) {
-      platform.drawPhysics(canvas);
-    }
-    if (player != null)
-      player.drawPhysics(canvas);
-    canvas.endDebug();
   }
 
   /**
