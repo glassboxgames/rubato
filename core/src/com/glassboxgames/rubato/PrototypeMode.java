@@ -149,7 +149,9 @@ public class PrototypeMode implements ContactListener, Screen {
         || (d2.equals(Player.SENSOR_NAME)
             && (d1 instanceof Platform
                 || d1 instanceof Enemy && ((Enemy)d1).isSuspended()))) {
-      player.setGrounded(true);
+      if (player != null) {
+        player.setGrounded(true);
+      }
     } else if (d1 instanceof Player && d2 instanceof Enemy
                || d2 instanceof Player && d1 instanceof Enemy) {
       Enemy enemy = d1 instanceof Enemy ? (Enemy)d1 : (Enemy)d2;
@@ -167,7 +169,9 @@ public class PrototypeMode implements ContactListener, Screen {
     Object d2 = f2.getUserData();
     if (d1.equals(Player.SENSOR_NAME) && d2 instanceof Platform
         || d2.equals(Player.SENSOR_NAME) && d1 instanceof Platform) {
-      player.setGrounded(false);
+      if (player != null) {
+        player.setGrounded(false);
+      }
     }
   }
 
@@ -197,7 +201,7 @@ public class PrototypeMode implements ContactListener, Screen {
       platform.activatePhysics(world);
       platforms = new Array<Platform>(new Platform[] {platform});
 
-      Enemy enemy = new Enemy(4f, 0.75f, 2f, 0.6f);
+      Enemy enemy = new Enemy(6f, 0.75f, 2f, 0.6f);
       enemy.setTexture(enemyTexture);
       enemy.activatePhysics(world);
       enemies = new Array<Enemy>(new Enemy[] {enemy});
@@ -215,32 +219,39 @@ public class PrototypeMode implements ContactListener, Screen {
         break;
       }
       if (input.didReset()) {
-        gameState = GameState.INTRO;
+        reset();
         break;
       }
 
-      float horizontal = input.getHorizontal();
-      player.tryMove(horizontal);
-      if (input.didJump()) {
-        player.tryJump();
+      if (player != null) {
+        float horizontal = input.getHorizontal();
+        player.tryMove(horizontal);
+        if (input.didJump()) {
+          player.tryJump();
+        }
+        if (input.didAttack()) {
+          player.tryAttack();
+        }
+        if (player.isAttacking()) {
+          player.setTexture(adagioAttackTexture, 1, 11, 11, 0.4f);
+          // } else if (player.getPosition().y > 0) {
+          //   player.setTexture(adagioJumpTexture, 1, 9, 9, 0.05f);
+        } else if (horizontal != 0) {
+          player.setTexture(adagioWalkTexture, 1, 10, 10, 0.25f);
+        } else {
+          player.setTexture(adagioIdleTexture);
+        }
+        player.update(delta);
       }
-      if (input.didAttack()) {
-        player.tryAttack();
-      }
-      if (player.isAttacking()) {
-        player.setTexture(adagioAttackTexture, 1, 11, 11, 0.4f);
-      // } else if (player.getPosition().y > 0) {
-      //   player.setTexture(adagioJumpTexture, 1, 9, 9, 0.05f);
-      } else if (horizontal != 0) {
-        player.setTexture(adagioWalkTexture, 1, 10, 10, 0.25f);
-      } else {
-        player.setTexture(adagioIdleTexture);
-      }
-      player.update(delta);
+      
       for (Enemy enemy : enemies) {
-        if (player.isHitboxActive() && !player.getEnemiesHit().contains(enemy, true)) {
+        if (player != null
+            && player.isHitboxActive()
+            && !player.getEnemiesHit().contains(enemy, true)) {
           // TODO make this not manual
-          Vector2 center = new Vector2(Player.ATTACK_POS).scl(player.getDirection(), 0).add(player.getPosition());
+          Vector2 center = new Vector2(Player.ATTACK_POS)
+            .scl(player.getDirection(), 0)
+            .add(player.getPosition());
           Circle circle = new Circle(center, Player.ATTACK_SIZE);
           Vector2 dim = enemy.getDimensions();
           Vector2 corner = new Vector2(dim).scl(-0.5f).add(enemy.getPosition());
@@ -343,5 +354,26 @@ public class PrototypeMode implements ContactListener, Screen {
     player = null;
     canvas = null;
     unloadContent(manager);
+  }
+  /**
+   * Manages reseting the world
+   */
+  public void reset() {
+    for (Platform platform : platforms) {
+      platform.deactivatePhysics(world);
+    }
+    for (Enemy enemy : enemies) {
+      enemy.deactivatePhysics(world);
+    }
+    if (player != null) {
+      player.deactivatePhysics(world);
+    }
+
+    platforms.clear();
+    enemies.clear();
+    //world.dispose(); I think we need to reset the world but it crashes whenever we do.
+    world = new World(new Vector2(0, GRAVITY), false);
+    world.setContactListener(this);
+    gameState = GameState.INTRO;
   }
 }

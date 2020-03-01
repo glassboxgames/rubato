@@ -21,8 +21,6 @@ public abstract class Entity {
   protected Body body;
   /** The fixture for this entity */
   protected Fixture fixture;
-  /** The name of this entity's fixture */
-  protected String name;
   
   /** CURRENT image for this object. May change over time. */
   protected FilmStrip animator;
@@ -46,16 +44,6 @@ public abstract class Entity {
    * @param y y-coordinate
    */
   public Entity(float x, float y) {
-    this(x, y, null);
-  }
-  
-  /**
-   * Instantiates a new entity with the given parameters.
-   * @param x x-coordinate
-   * @param y y-coordinate
-   * @param n name for the base fixture
-   */
-  public Entity(float x, float y, String n) {
     bodyDef = new BodyDef();
     bodyDef.position.set(x, y);
     bodyDef.active = true;
@@ -65,7 +53,6 @@ public abstract class Entity {
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
     fixtureDef = new FixtureDef();
-    name = n;
     animator = null;
     animFrame = 0;
     animSpeed = 0;
@@ -100,7 +87,16 @@ public abstract class Entity {
     }
     return false;
   }
-  
+
+  public void deactivatePhysics(World world) {
+    if (body != null) {
+      // if we need to save the body info, we can do it here if we want
+      world.destroyBody(body);
+      body = null;
+      bodyDef.active = false;
+    }
+  }
+
   /**
    * Updates this entity's animation frame.
    * @param delta time since the last update

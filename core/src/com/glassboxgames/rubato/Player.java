@@ -45,8 +45,6 @@ public class Player extends Entity {
   protected static final float ATTACK_DAMAGE = 3f;
   /** Ground sensor height */
   protected static final float SENSOR_HEIGHT = 0.05f;
-  /** Name of the player */
-  protected static final String PLAYER_NAME = "Player";
   /** Name of the ground sensor */
   protected static final String SENSOR_NAME = "PlayerGroundSensor";
   
@@ -92,7 +90,7 @@ public class Player extends Entity {
    * @param h height
    */
   public Player(float x, float y, float w, float h) {
-    super(x, y, PLAYER_NAME);
+    super(x, y);
     dim = new Vector2(w, h);
 
     PolygonShape shape = new PolygonShape();

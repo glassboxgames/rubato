@@ -13,11 +13,11 @@ public class Enemy extends Entity {
   /** Maximum health */
   protected static final float MAX_HEALTH = 10;
   /** Maximum speed */
-  protected static final float MAX_SPEED = 3;
+  protected static final float MAX_SPEED = 0.07f;
   /** Movement range */
-  protected static final float MOVE_RANGE = 200;
-  /** Enemy name */
-  protected static final String ENEMY_NAME = "Enemy";
+  protected static final float MOVE_RANGE = 2f;
+  /** Friction */
+  protected static final float FRICTION = 0f;
 
   /** Enemy dimensions */
   protected Vector2 dim;
@@ -28,8 +28,6 @@ public class Enemy extends Entity {
   /** Current direction */
   protected int dir;
 
-  /** Represents how much the enemy has been slowed */
-  protected float timeslowfactor;
   /** Represent the previous position of the enemy */
   protected Vector2 prevPosition;
   /** Represent the previous velocity of the enemy */
@@ -49,20 +47,20 @@ public class Enemy extends Entity {
    * @param h height
    */
   public Enemy(float x, float y, float w, float h) {
-    super(x, y, ENEMY_NAME);
+    super(x, y);
     dim = new Vector2(w, h);
 
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(dim.x / 2, dim.y / 2);
     bodyDef.type = BodyDef.BodyType.StaticBody;
     fixtureDef.shape = shape;
+    fixtureDef.friction = FRICTION;
 
     health = MAX_HEALTH;
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
     dir = 1;
 
-    timeslowfactor = 0.0f;
     prevPosition = getPosition();
     prevVelocity = getVelocity();
   }
@@ -96,40 +94,24 @@ public class Enemy extends Entity {
     return health == 0;
   }
 
-  /**
-   * Returns the time slow factor of the enemy. (1 is normal speed, 0 is frozen)
-   */
-  public float getTimeSlowFactor() {
-    return timeslowfactor;
-  }
-
-  /**
-   * Sets the time slow factor for the enemy.
-   * @param tsf the time slow factor to set
-   */
-  public void setTimeSlowFactor(float tsf) {
-    timeslowfactor = tsf;
-  }
-  
   @Override
   public void update(float delta) {
+    super.update(delta);
     if (getPosition().x >= maxX) {
       dir = -1;
     } else if (getPosition().x <= minX) {
       dir = 1;
     }
-    float movement = MAX_SPEED * dir * health / MAX_HEALTH;
-    temp.set(getPosition());
-    temp.x += movement;
-    body.setTransform(temp, 0);
+    body.setTransform(getPosition().add(MAX_SPEED * dir, 0), body.getAngle());
     timeslow(delta);
   }
 
   public void timeslow(float delta) {
-    prevPosCache.x = prevPosition.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
-    prevPosCache.y = prevPosition.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
-    prevVelCache.x = prevVelocity.x*(1-timeslowfactor)+getPosition().x*timeslowfactor;
-    prevVelCache.y = prevVelocity.y*(1-timeslowfactor)+getPosition().y*timeslowfactor;
+    float tsf = health / MAX_HEALTH;
+    prevPosCache.x = prevPosition.x * (1 - tsf) + getPosition().x * tsf;
+    prevPosCache.y = prevPosition.y * (1 - tsf) + getPosition().y * tsf;
+    prevVelCache.x = prevVelocity.x * (1 - tsf) + getVelocity().x * tsf;
+    prevVelCache.y = prevVelocity.y * (1 - tsf) + getVelocity().y * tsf;
 
     prevPosition = prevPosCache;
     prevVelocity = prevVelCache;

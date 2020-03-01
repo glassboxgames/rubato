@@ -8,7 +8,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.forceExit = false;
-		// config.setFromDisplayMode(LwjglApplicationConfiguration.getDesktopDisplayMode());
+		config.setFromDisplayMode(LwjglApplicationConfiguration.getDesktopDisplayMode());
 		new LwjglApplication(new GDXRoot(), config);
 	}
 }

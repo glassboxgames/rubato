@@ -12,8 +12,6 @@ import com.glassboxgames.util.*;
 public class Platform extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
-  /** Platform name */
-  protected static final String PLATFORM_NAME = "Platform";
   
   /**
    * Initializes a platform with the specified parameters.
@@ -23,7 +21,7 @@ public class Platform extends Entity {
    * @param h height
    */
   public Platform(float x, float y, float w, float h) {
-    super(x, y, PLATFORM_NAME);
+    super(x, y);
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(w / 2, h / 2);
     bodyDef.type = BodyDef.BodyType.StaticBody;
