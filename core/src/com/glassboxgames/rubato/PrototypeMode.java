@@ -204,12 +204,12 @@ public class PrototypeMode implements ContactListener, Screen {
       Platform platform = new Platform(0f, -0.25f, 20f, 0.5f);
       platform.setTexture(platformTexture);
       platform.activatePhysics(world);
-      platforms = new Array<Platform>(new Platform[] {platform});
+      platforms = new Array(new Platform[] {platform});
 
       Enemy enemy = new Enemy(6f, 1.5f, 1.5f, 0.6f);
       enemy.setTexture(enemyTexture);
       enemy.activatePhysics(world);
-      enemies = new Array<Enemy>(new Enemy[] {enemy});
+      enemies = new Array(new Enemy[] {enemy});
 
       gameState = GameState.PLAY;
       break;
@@ -239,8 +239,8 @@ public class PrototypeMode implements ContactListener, Screen {
         }
         if (player.isAttacking()) {
           player.setTexture(adagioAttackTexture, 1, 11, 11, 0.4f);
-          // } else if (player.getPosition().y > 0) {
-          //   player.setTexture(adagioJumpTexture, 1, 9, 9, 0.05f);
+        } else if (!player.isGrounded()) {
+           player.setTexture(adagioJumpTexture, 1, 9, 9, 0.004f*player.getJumpDuration());
         } else if (horizontal != 0) {
           player.setTexture(adagioWalkTexture, 1, 10, 10, 0.25f);
         } else {

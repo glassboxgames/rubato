@@ -30,6 +30,8 @@ public abstract class Entity {
   protected float animSpeed;
   /** Total frames for current animation */
   protected int totalFrames;
+  /** Direction the entity is facing (1 for right, -1 for left) */
+  protected int dir;
 
   /** Temp vector for calculations */
   protected Vector2 temp = new Vector2();
@@ -126,12 +128,11 @@ public abstract class Entity {
    * @param speed frame speed multiplier
    */
   public void setTexture(Texture texture, int rows, int cols, int size, float speed) {
-    FilmStrip newAnimator = new FilmStrip(texture, rows, cols, size);
     if (animator == null || !texture.equals(animator.getTexture())) {
       animFrame = 0;
       animSpeed = speed;
       totalFrames = size;
-      animator = newAnimator;
+      animator = new FilmStrip(texture, rows, cols, size);
     }
   }
 
@@ -156,9 +157,9 @@ public abstract class Entity {
     float w = animator.getWidth();
     float h = animator.getHeight();
     canvas.draw(animator, Color.WHITE,
-                w / 2, h / 2,
+                dir * w / 2, h / 2,
                 getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
-                w, h);
+                dir * w, h);
   }
 
   /**

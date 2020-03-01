@@ -30,7 +30,7 @@ public class Player extends Entity {
   /** Min jump duration */
   protected static final int MIN_JUMP_DURATION = 3;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 20;
+  protected static final int MAX_JUMP_DURATION = 6;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -54,8 +54,6 @@ public class Player extends Entity {
   protected float animFrame;
   /** Current animation filmstrip length */
   protected int totalFrames;
-  /** Direction the player is facing (1 for right, -1 for left) */
-  protected int dir;
   /** Player dimensions */
   protected Vector2 dim;
   /** Current horizontal movement of the character (from the input) */
@@ -115,7 +113,7 @@ public class Player extends Entity {
     jumpDuration = 0;
     attackTime = 0;
     attackCooldown = 0;
-    enemiesHit = new Array<Enemy>();
+    enemiesHit = new Array();
   }
 
   @Override
@@ -134,7 +132,6 @@ public class Player extends Entity {
   public void tryJump() {
     if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
       jumpDuration += 0.5f;
-      System.out.println(jumpDuration);
     } else if (isGrounded) {
       jumpDuration = MIN_JUMP_DURATION;
     }
@@ -150,6 +147,13 @@ public class Player extends Entity {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Gets player's jump duration
+   */
+  public float getJumpDuration() {
+    return jumpDuration;
   }
 
   /**
@@ -240,16 +244,6 @@ public class Player extends Entity {
     float vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
     float vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
     body.setLinearVelocity(vx, vy);
-  }
-  
-  @Override
-  public void draw(GameCanvas canvas) {
-    float w = animator.getWidth();
-    float h = animator.getHeight();
-    canvas.draw(animator, Color.WHITE,
-                dir * w / 2, h / 2,
-                getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
-                dir * w, h);
   }
 
   @Override
