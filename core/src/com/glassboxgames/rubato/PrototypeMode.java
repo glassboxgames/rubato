@@ -127,6 +127,7 @@ public class PrototypeMode implements ContactListener, Screen {
     adagioAttackTexture = createTexture(manager, ADAGIO_ATTACK);
     enemyTexture = createTexture(manager, ENEMY_FILE);
     platformTexture = createTexture(manager, PLATFORM_FILE);
+    platformTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
   }
 
   public void unloadContent(AssetManager manager) {
@@ -167,8 +168,12 @@ public class PrototypeMode implements ContactListener, Screen {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    if (d1.equals(Player.SENSOR_NAME) && d2 instanceof Platform
-        || d2.equals(Player.SENSOR_NAME) && d1 instanceof Platform) {
+    if ((d1.equals(Player.SENSOR_NAME)
+         && (d2 instanceof Platform
+             || d2 instanceof Enemy && ((Enemy)d2).isSuspended()))
+        || (d2.equals(Player.SENSOR_NAME)
+            && (d1 instanceof Platform
+                || d1 instanceof Enemy && ((Enemy)d1).isSuspended()))) {
       if (player != null) {
         player.setGrounded(false);
       }
@@ -196,12 +201,12 @@ public class PrototypeMode implements ContactListener, Screen {
       player.setTexture(adagioIdleTexture);
       player.activatePhysics(world);
 
-      Platform platform = new Platform(0f, 0f, 20f, 0.5f);
+      Platform platform = new Platform(0f, -0.25f, 20f, 0.5f);
       platform.setTexture(platformTexture);
       platform.activatePhysics(world);
       platforms = new Array<Platform>(new Platform[] {platform});
 
-      Enemy enemy = new Enemy(6f, 0.75f, 2f, 0.6f);
+      Enemy enemy = new Enemy(6f, 1.5f, 1.5f, 0.6f);
       enemy.setTexture(enemyTexture);
       enemy.activatePhysics(world);
       enemies = new Array<Enemy>(new Enemy[] {enemy});
@@ -285,23 +290,23 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
-    for (Platform platform : platforms) {
-      platform.draw(canvas);
-    }
+    // for (Platform platform : platforms) {
+    //   platform.draw(canvas);
+    // }
     if (player != null)
       player.draw(canvas);
     canvas.end();
 
-    canvas.beginDebug();
-    for (Enemy enemy : enemies) {
-      enemy.drawPhysics(canvas);
-    }
-    for (Platform platform : platforms) {
-      platform.drawPhysics(canvas);
-    }
-    if (player != null)
-      player.drawPhysics(canvas);
-    canvas.endDebug();
+    // canvas.beginDebug();
+    // for (Enemy enemy : enemies) {
+    //   enemy.drawPhysics(canvas);
+    // }
+    // for (Platform platform : platforms) {
+    //   platform.drawPhysics(canvas);
+    // }
+    // if (player != null)
+    //   player.drawPhysics(canvas);
+    // canvas.endDebug();
   }
 
   /**

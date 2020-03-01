@@ -18,7 +18,7 @@ public class Player extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
   /** Jump impulse */
-  protected static final float JUMP_IMPULSE = 2f;
+  protected static final float JUMP_IMPULSE = 1f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
@@ -26,11 +26,11 @@ public class Player extends Entity {
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 3.5f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 8f;
+  protected static final float MAX_Y_SPEED = 10f;
   /** Min jump duration */
   protected static final int MIN_JUMP_DURATION = 3;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 10;
+  protected static final int MAX_JUMP_DURATION = 20;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -39,8 +39,10 @@ public class Player extends Entity {
   protected static final int ATTACK_START = 5;
   /** Attack hitbox end frame */
   protected static final int ATTACK_END = 25;
+  /** Attack animation end frame */
+  protected static final int ATTACK_ANIMATION_END = 28;
   /** Attack cooldown */
-  protected static final int ATTACK_COOLDOWN = 28;
+  protected static final int ATTACK_COOLDOWN = 45;
   /** Attack damage */
   protected static final float ATTACK_DAMAGE = 3f;
   /** Ground sensor height */
@@ -69,9 +71,9 @@ public class Player extends Entity {
   /** Whether the player is currently on a platform */
   protected boolean isGrounded;
   /** Current frame count since jump input */
-  protected int jumpTime;
+  protected float jumpTime;
   /** Current total jump duration, can be extended; 0 if not jumping */
-  protected int jumpDuration;
+  protected float jumpDuration;
   /** Is the player currently attacking */
   protected boolean isAttacking;
   /** Current frame count since attack input */
@@ -131,7 +133,8 @@ public class Player extends Entity {
    */
   public void tryJump() {
     if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
-      jumpDuration++;
+      jumpDuration += 0.5f;
+      System.out.println(jumpDuration);
     } else if (isGrounded) {
       jumpDuration = MIN_JUMP_DURATION;
     }
@@ -164,10 +167,10 @@ public class Player extends Entity {
   }
   
   /**
-   * Returns whether the player is mid-attack.
+   * Returns whether the player is mid-attack-animation.
    */
   public boolean isAttacking() {
-    return attackCooldown > 0;
+    return attackCooldown > 0 && attackTime < ATTACK_ANIMATION_END;
   }
 
   /**

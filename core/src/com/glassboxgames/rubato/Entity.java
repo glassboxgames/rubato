@@ -22,7 +22,7 @@ public abstract class Entity {
   /** The fixture for this entity */
   protected Fixture fixture;
   
-  /** CURRENT image for this object. May change over time. */
+  /** Current filmstrip for this object. May change over time. */
   protected FilmStrip animator;
   /** Current animation frame */
   protected float animFrame;
@@ -173,7 +173,6 @@ public abstract class Entity {
                          Constants.PPM, Constants.PPM);
       break;
     case Circle:
-      System.out.println("debug " + getPosition());
       canvas.drawPhysics((CircleShape)shape, Color.RED,
                          getPosition().x, getPosition().y,
                          Constants.PPM, Constants.PPM);

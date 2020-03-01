@@ -135,5 +135,4 @@ public class FilmStrip extends TextureRegion {
 		int y = (frame / cols)*rheight;
 		setRegion(x,y,rwidth,rheight);
 	}
-
 }
