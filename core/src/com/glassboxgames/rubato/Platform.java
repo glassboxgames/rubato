@@ -21,7 +21,7 @@ public class Platform extends Entity {
    * @param h height
    */
   public Platform(float x, float y, float w, float h) {
-    super(x, y);
+    super(x, y, 1);
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(w / 2, h / 2);
     bodyDef.type = BodyDef.BodyType.StaticBody;

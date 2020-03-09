@@ -18,7 +18,7 @@ public class Player extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
   /** Jump force */
-  protected static final float JUMP_IMPULSE = 1.5f;
+  protected static final float JUMP_IMPULSE = 1f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
@@ -26,11 +26,11 @@ public class Player extends Entity {
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 3.5f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 12f;
+  protected static final float MAX_Y_SPEED = 11f;
   /** Min jump duration */
-  protected static final int MIN_JUMP_DURATION = 2;
+  protected static final int MIN_JUMP_DURATION = 5;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 8;
+  protected static final int MAX_JUMP_DURATION = 10;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -39,21 +39,22 @@ public class Player extends Entity {
   protected static final int ATTACK_START = 5;
   /** Attack hitbox end frame */
   protected static final int ATTACK_END = 25;
-  /** Attack animation end frame */
-  protected static final int ATTACK_ANIMATION_END = 28;
-  /** Attack cooldown */
-  protected static final int ATTACK_COOLDOWN = 45;
   /** Attack damage */
   protected static final float ATTACK_DAMAGE = 3f;
   /** Ground sensor height */
   protected static final float SENSOR_HEIGHT = 0.05f;
   /** Name of the ground sensor */
   protected static final String SENSOR_NAME = "PlayerGroundSensor";
-  
-  /** Current animation frame */
-  protected float animFrame;
-  /** Current animation filmstrip length */
-  protected int totalFrames;
+
+  /** Player state constants */
+  public static final int NUM_STATES = 6;
+  public static final int STATE_IDLE = 0;
+  public static final int STATE_WALK = 1;
+  public static final int STATE_FALL = 2;
+  public static final int STATE_JUMP = 3;
+  public static final int STATE_GND_ATTACK = 4;
+  public static final int STATE_AIR_ATTACK = 5;
+
   /** Player dimensions */
   protected Vector2 dim;
   /** Current horizontal movement of the character (from the input) */
@@ -67,17 +68,11 @@ public class Player extends Entity {
   protected Fixture sensorFixture;
 
   /** Whether the player is currently on a platform */
-  protected boolean isGrounded;
-  /** Current frame count since jump input */
+  protected boolean grounded;
+  /** Current jump length so far */
   protected int jumpTime;
-  /** Current total jump duration, can be extended; 0 if not jumping */
+  /** How long the player held jump */
   protected int jumpDuration;
-  /** Is the player currently attacking */
-  protected boolean isAttacking;
-  /** Current frame count since attack input */
-  protected int attackTime;
-  /** Current attack cooldown, 0 if not attacking */
-  protected int attackCooldown;
 
   /** Enemies that have been hit by the current active attack */
   protected Array<Enemy> enemiesHit;
@@ -88,9 +83,10 @@ public class Player extends Entity {
    * @param y y-coordinate
    * @param w width
    * @param h height
+   * @param numStates number of entity states
    */
-  public Player(float x, float y, float w, float h) {
-    super(x, y);
+  public Player(float x, float y, float w, float h, int numStates) {
+    super(x, y, numStates);
     dim = new Vector2(w, h);
 
     PolygonShape shape = new PolygonShape();
@@ -105,14 +101,10 @@ public class Player extends Entity {
     sensorDef = new FixtureDef();
     sensorDef.isSensor = true;
     sensorDef.shape = sensorShape;
-    
-    animFrame = 0;
-    totalFrames = 0;
-    dir = 1;
+
     jumpTime = 0;
     jumpDuration = 0;
-    attackTime = 0;
-    attackCooldown = 0;
+    dir = 1;
     enemiesHit = new Array();
   }
 
@@ -130,58 +122,51 @@ public class Player extends Entity {
    * Tries to start a player jump or extend an existing jump.
    */
   public void tryJump() {
-    if (jumpDuration > 0 && jumpDuration < MAX_JUMP_DURATION) {
-      jumpDuration++;
-    } else if (isGrounded) {
+    if (isGrounded() && !isAttacking()) {
+      setState(STATE_JUMP);
       jumpDuration = MIN_JUMP_DURATION;
+    } else if (stateIndex == STATE_JUMP && jumpDuration < MAX_JUMP_DURATION) {
+      jumpDuration++;
     }
   }
 
   /**
    * Tries to start a player attack.
-   * @return whether an attack was started successfully
    */
-  public boolean tryAttack() {
-    if (attackCooldown == 0) {
-      attackCooldown = ATTACK_COOLDOWN;
-      return true;
+  public void tryAttack() {
+    if (!isAttacking()) {
+      setState(isGrounded() ? STATE_GND_ATTACK : STATE_AIR_ATTACK);
     }
-    return false;
-  }
-
-  /**
-   * Gets player's jump duration
-   */
-  public float getJumpDuration() {
-    return jumpDuration;
   }
 
   /**
    * Returns whether the player is standing on a platform.
    */
   public boolean isGrounded() {
-    return isGrounded;
+    return grounded;
   }
 
   /**
    * Sets the player's grounded state.
    */
   public void setGrounded(boolean value) {
-    isGrounded = value;
+    grounded = value;
   }
   
   /**
    * Returns whether the player is mid-attack-animation.
    */
   public boolean isAttacking() {
-    return attackCooldown > 0 && attackTime < ATTACK_ANIMATION_END;
+    return stateIndex == STATE_GND_ATTACK || stateIndex == STATE_AIR_ATTACK;
   }
 
   /**
    * Returns whether the player's attack hitbox is active.
    */
   public boolean isHitboxActive() {
-    return attackTime >= ATTACK_START && attackTime < ATTACK_END;
+    return isAttacking()
+      && getState().activeTime >= ATTACK_START
+      && getState().activeTime < ATTACK_END;
   }
 
   /**
@@ -204,7 +189,7 @@ public class Player extends Entity {
    */
   public void tryMove(float input) {
     movement = input;
-    if (!isHitboxActive()) {
+    if (!isAttacking()) {
       if (input > 0) {
         dir = 1;
       } else if (input < 0) {
@@ -214,15 +199,50 @@ public class Player extends Entity {
   }
 
   @Override
+  public void advanceState() {
+    switch (stateIndex) {
+    case STATE_GND_ATTACK:
+      if (getState().done) {
+        enemiesHit.clear();
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+      }
+      break;
+    case STATE_AIR_ATTACK:
+      if (isGrounded()) {
+        enemiesHit.clear();
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+      } else if (getState().done) {
+        enemiesHit.clear();
+        setState(STATE_FALL);
+      }
+      break;
+    case STATE_JUMP:
+      if (jumpTime >= jumpDuration) {
+        setState(STATE_FALL);
+        jumpTime = jumpDuration = 0;
+      }
+      break;
+    case STATE_FALL:
+      if (isGrounded()) {
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+      }
+      break;
+    case STATE_WALK:
+      if (movement == 0) {
+        setState(STATE_IDLE);
+      }
+      break;
+    case STATE_IDLE:
+      if (movement != 0) {
+        setState(STATE_WALK);
+      }
+      break;
+    }
+  }
+
+  @Override
   public void update(float delta) {
     super.update(delta);
-
-    if (attackTime < attackCooldown) {
-      attackTime++;
-    } else if (attackCooldown > 0) {
-      attackTime = attackCooldown = 0;
-      enemiesHit.clear();
-    }
 
     if (movement != 0) {
       temp.set(MOVE_IMPULSE * movement, 0);
@@ -234,12 +254,10 @@ public class Player extends Entity {
     }
 
     if (jumpTime < jumpDuration) {
-      jumpTime++;
       temp.set(0, JUMP_IMPULSE);
       body.applyLinearImpulse(temp, getPosition(), true);
-    } else if (jumpDuration > 0) {
-      jumpTime = jumpDuration = 0;
-    }
+      jumpTime++;
+    } 
     
     float vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
     float vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));

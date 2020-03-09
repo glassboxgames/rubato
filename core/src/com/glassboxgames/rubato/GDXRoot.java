@@ -28,6 +28,7 @@ public class GDXRoot extends Game {
   @Override
   public void create() {
     canvas = new GameCanvas();
+    canvas.setFullscreen(true, false);
     PrototypeMode mode = new PrototypeMode(canvas);
     setScreen(mode);
   }

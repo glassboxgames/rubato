@@ -29,13 +29,13 @@ public class PrototypeMode implements ContactListener, Screen {
   /** The file for the background image to scroll */
   private static String BACKGROUND_FILE = "Backgrounds/sunset-forest-yellow.png";
   /** The file for the idle image */
-  private static final String ADAGIO_IDLE = "Adagio/wait-strip.png";
+  private static final String ADAGIO_IDLE = "Adagio/00 Filmstrips/wait-strip.png";
   /** The file for the walking filmstrip */
-  private static final String ADAGIO_WALK = "Adagio/walk-strip75.png";
+  private static final String ADAGIO_WALK = "Adagio/00 Filmstrips/walk-strip75.png";
   /** The file for the jumping filmstrip */
-  private static final String ADAGIO_JUMP = "Adagio/jump-strip75.png";
+  private static final String ADAGIO_JUMP = "Adagio/00 Filmstrips/jump-strip75.png";
   /** The file for the attacking filmstrip */
-  private static final String ADAGIO_ATTACK = "Adagio/tornado-strip150.png";
+  private static final String ADAGIO_ATTACK = "Adagio/00 Filmstrips/tornado-strip150.png";
   /** The file for the enemy image */
   private static final String ENEMY_FILE = "enemy.png";
   /** The file for the platform tile */
@@ -200,19 +200,22 @@ public class PrototypeMode implements ContactListener, Screen {
       manager.finishLoading();
       loadContent(manager);
 
-      canvas.setFullscreen(true,false);
-      
-      player = new Player(1f, 1f, 0.5f, 1f);
-      player.setTexture(adagioIdleTexture);
+      player = new Player(1f, 1f, 0.5f, 1f, Player.NUM_STATES);
+      player.initState(Player.STATE_IDLE, adagioIdleTexture);
+      player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
+      player.initState(Player.STATE_FALL, adagioIdleTexture);
+      player.initState(Player.STATE_JUMP, adagioJumpTexture, 1, 9, 9, 0.25f, false);
+      player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.activatePhysics(world);
 
       Platform platform = new Platform(0f, -0.25f, 40f, 0.5f);
-      platform.setTexture(platformTexture);
+      platform.initState(0, platformTexture);
       platform.activatePhysics(world);
       platforms = new Array(new Platform[] {platform});
 
       Enemy enemy = new Enemy(6f, 1.5f, 1.5f, 0.6f);
-      enemy.setTexture(enemyTexture);
+      enemy.initState(0, enemyTexture);
       enemy.activatePhysics(world);
       enemies = new Array(new Enemy[] {enemy});
 
@@ -244,15 +247,6 @@ public class PrototypeMode implements ContactListener, Screen {
         }
         if (input.didAttack()) {
           player.tryAttack();
-        }
-        if (player.isAttacking()) {
-          player.setTexture(adagioAttackTexture, 1, 11, 11, 0.4f);
-        } else if (!player.isGrounded()) {
-           player.setTexture(adagioJumpTexture, 1, 9, 9, 0.004f*player.getJumpDuration());
-        } else if (horizontal != 0) {
-          player.setTexture(adagioWalkTexture, 1, 10, 10, 0.25f);
-        } else {
-          player.setTexture(adagioIdleTexture);
         }
         player.update(delta);
       }

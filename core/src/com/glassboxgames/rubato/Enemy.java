@@ -45,7 +45,7 @@ public class Enemy extends Entity {
    * @param h height
    */
   public Enemy(float x, float y, float w, float h) {
-    super(x, y);
+    super(x, y, 1);
     dim = new Vector2(w, h);
 
     PolygonShape shape = new PolygonShape();
