@@ -147,22 +147,9 @@ public class PrototypeMode implements ContactListener, Screen {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    if ((d1.equals(Player.SENSOR_NAME)
-         && (d2 instanceof Platform
-             || d2 instanceof Enemy && ((Enemy)d2).isSuspended()))
-        || (d2.equals(Player.SENSOR_NAME)
-            && (d1 instanceof Platform
-                || d1 instanceof Enemy && ((Enemy)d1).isSuspended()))) {
-      if (player != null) {
-        player.setGrounded(true);
-      }
-    } else if (d1 instanceof Player && d2 instanceof Enemy
-               || d2 instanceof Player && d1 instanceof Enemy) {
-      Enemy enemy = d1 instanceof Enemy ? (Enemy)d1 : (Enemy)d2;
-      if (!enemy.isSuspended()) {
-        player = null;
-      }
-    }
+    CollisionController cc = CollisionController.getInstance();
+
+    cc.startCollision(d1, d2);
   }
   
   @Override
@@ -171,16 +158,9 @@ public class PrototypeMode implements ContactListener, Screen {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    if ((d1.equals(Player.SENSOR_NAME)
-         && (d2 instanceof Platform
-             || d2 instanceof Enemy && ((Enemy)d2).isSuspended()))
-        || (d2.equals(Player.SENSOR_NAME)
-            && (d1 instanceof Platform
-                || d1 instanceof Enemy && ((Enemy)d1).isSuspended()))) {
-      if (player != null) {
-        player.setGrounded(false);
-      }
-    }
+    CollisionController cc = CollisionController.getInstance();
+
+    cc.endCollision(d1, d2);
   }
 
   @Override
@@ -249,6 +229,10 @@ public class PrototypeMode implements ContactListener, Screen {
           player.tryAttack();
         }
         player.update(delta);
+
+        if (!player.isAlive()) {
+          killPlayer();
+        }
       }
       
       for (Enemy enemy : enemies) {
@@ -364,6 +348,13 @@ public class PrototypeMode implements ContactListener, Screen {
     player = null;
     canvas = null;
     unloadContent(manager);
+  }
+
+  /**
+   * What happens when the player dies (can handle post death animation etc.)
+   */
+  public void killPlayer() {
+    player = null;
   }
   /**
    * Manages reseting the world
