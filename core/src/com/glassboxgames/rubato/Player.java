@@ -66,6 +66,8 @@ public class Player extends Entity {
   /** Ground sensor fixture */
   protected Fixture sensorFixture;
 
+  /** Whether the player is currently alive */
+  protected boolean isAlive;
   /** Whether the player is currently on a platform */
   protected boolean isGrounded;
   /** Current frame count since jump input */
@@ -81,6 +83,7 @@ public class Player extends Entity {
 
   /** Enemies that have been hit by the current active attack */
   protected Array<Enemy> enemiesHit;
+
 
   /**
    * Instantiates a player with the given parameters.
@@ -114,6 +117,7 @@ public class Player extends Entity {
     attackTime = 0;
     attackCooldown = 0;
     enemiesHit = new Array();
+    isAlive = true;
   }
 
   @Override
@@ -156,6 +160,15 @@ public class Player extends Entity {
     return jumpDuration;
   }
 
+  /**
+   * Returns whether the player is alive currently
+   */
+  public boolean isAlive() { return isAlive; }
+
+  /**
+   * set the player's alive state
+   */
+  public void setAlive(boolean value) {isAlive = value; }
   /**
    * Returns whether the player is standing on a platform.
    */
