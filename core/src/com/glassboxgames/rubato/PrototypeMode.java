@@ -188,7 +188,7 @@ public class PrototypeMode implements ContactListener, Screen {
       player.activatePhysics(world);
       player.setAlive(true);
 
-      Platform platform = new Platform(0f, -0.25f, 40f, 0.5f);
+      Platform platform = new Platform(0f, 0f, 40f, 0.5f, 0.5f, 0.5f);
       platform.initState(0, platformTexture);
       platform.activatePhysics(world);
       platforms = new Array(new Platform[] {platform});
@@ -269,11 +269,13 @@ public class PrototypeMode implements ContactListener, Screen {
   private void draw(float delta) {
     canvas.begin();
     canvas.drawBackground(background);
+    canvas.end();
+    canvas.begin(Constants.PPM, Constants.PPM);
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
     for (Platform platform : platforms) {
-      // platform.draw(canvas);
+      platform.draw(canvas);
     }
     if (player.isAlive()) {
       player.draw(canvas);
@@ -281,7 +283,7 @@ public class PrototypeMode implements ContactListener, Screen {
     canvas.end();
 
     if (debug) {
-      canvas.beginDebug();
+      canvas.beginDebug(Constants.PPM, Constants.PPM);
       for (Enemy enemy : enemies) {
         enemy.drawPhysics(canvas);
       }

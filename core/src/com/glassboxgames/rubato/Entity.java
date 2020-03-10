@@ -204,12 +204,12 @@ public abstract class Entity {
    * Draws this entity to the given canvas.
    */
   public void draw(GameCanvas canvas) {
-    FilmStrip filmStrip = states.get(stateIndex).filmStrip;
-    float w = filmStrip.getWidth();
-    float h = filmStrip.getHeight();
+    FilmStrip filmStrip = getState().filmStrip;
+    float w = filmStrip.getWidth() / Constants.PPM;
+    float h = filmStrip.getHeight() / Constants.PPM;
     canvas.draw(filmStrip, Color.WHITE,
                 dir * w / 2, h / 2,
-                getPosition().x * Constants.PPM, getPosition().y * Constants.PPM,
+                getPosition().x, getPosition().y,
                 dir * w, h);
   }
 
@@ -221,13 +221,11 @@ public abstract class Entity {
     switch (shape.getType()) {
     case Polygon:
       canvas.drawPhysics((PolygonShape)shape, Color.RED,
-                         getPosition().x, getPosition().y, 0,
-                         Constants.PPM, Constants.PPM);
+                         getPosition().x, getPosition().y, 0);
       break;
     case Circle:
       canvas.drawPhysics((CircleShape)shape, Color.RED,
-                         getPosition().x, getPosition().y,
-                         Constants.PPM, Constants.PPM);
+                         getPosition().x, getPosition().y);
       break;
     }
   }

@@ -340,6 +340,24 @@ public class GameCanvas {
     active = DrawPass.STANDARD;
   }
 
+	/**
+	 * Start a standard drawing sequence.
+	 *
+	 * Nothing is flushed to the graphics card until the method end() is called.
+	 *
+	 * @param sx the amount to scale the x-axis
+	 * @param sy the amount to scale the y-axis
+	 */
+  public void begin(float sx, float sy) {
+		global.idt();
+		global.scl(sx,sy,1.0f);
+    global.mulLeft(camera.combined);
+		spriteBatch.setProjectionMatrix(global);
+		
+    spriteBatch.begin();
+    active = DrawPass.STANDARD;
+  }
+
   /**
    * Ends a drawing sequence, flushing textures to the graphics card.
    */
@@ -364,7 +382,7 @@ public class GameCanvas {
       return;
     }
 
-    spriteBatch.draw(image, 0, 0, getWidth(),getHeight());
+    spriteBatch.draw(image, 0, 0, getWidth(), getHeight());
   }
 
   /**
@@ -467,6 +485,24 @@ public class GameCanvas {
     debugRender.circle(0, 0, 10);
     debugRender.end();
 
+    debugRender.begin(ShapeRenderer.ShapeType.Line);
+    active = DrawPass.DEBUG;
+  }
+
+	/**
+	 * Start the debug drawing sequence.
+	 *
+	 * Nothing is flushed to the graphics card until the method end() is called.
+	 *
+	 * @param sx the amount to scale the x-axis
+	 * @param sy the amount to scale the y-axis
+	 */    
+  public void beginDebug(float sx, float sy) {
+		global.idt();
+		global.scl(sx,sy,1.0f);
+    global.mulLeft(camera.combined);
+    debugRender.setProjectionMatrix(global);
+		
     debugRender.begin(ShapeRenderer.ShapeType.Line);
     active = DrawPass.DEBUG;
   }

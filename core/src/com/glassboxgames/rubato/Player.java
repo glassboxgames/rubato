@@ -16,19 +16,19 @@ public class Player extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
   /** Jump force */
-  protected static final float JUMP_IMPULSE = 1f;
+  protected static final float JUMP_IMPULSE = 0.5f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
   protected static final float MOVE_DAMPING = 10f;
   /** Max horizontal speed */
-  protected static final float MAX_X_SPEED = 3.5f;
+  protected static final float MAX_X_SPEED = 4f;
   /** Max vertical speed */
   protected static final float MAX_Y_SPEED = 11f;
   /** Min jump duration */
-  protected static final int MIN_JUMP_DURATION = 5;
+  protected static final int MIN_JUMP_DURATION = 6;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 10;
+  protected static final int MAX_JUMP_DURATION = 12;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -268,18 +268,14 @@ public class Player extends Entity {
   public void drawPhysics(GameCanvas canvas) {
     Vector2 pos = getPosition();
     canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
-                       pos.x, pos.y, 0,
-                       Constants.PPM, Constants.PPM);
+                       pos.x, pos.y, 0);
     canvas.drawPhysics(groundSensor.getShape(), Color.RED,
-                       pos.x, pos.y, 0,
-                       Constants.PPM, Constants.PPM);
+                       pos.x, pos.y, 0);
     if (isHitboxActive()) {
       CircleShape shape = new CircleShape();
       shape.setPosition(getPosition().add(temp.set(ATTACK_POS).scl(dir, 1)));
       shape.setRadius(ATTACK_SIZE);
-      canvas.drawPhysics(shape, Color.RED,
-                         shape.getPosition().x, shape.getPosition().y,
-                         Constants.PPM, Constants.PPM);
+      canvas.drawPhysics(shape, Color.RED, shape.getPosition().x, shape.getPosition().y);
     }
   }
 }
