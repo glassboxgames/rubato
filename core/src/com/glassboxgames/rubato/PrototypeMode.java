@@ -148,7 +148,6 @@ public class PrototypeMode implements ContactListener, Screen {
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
     CollisionController cc = CollisionController.getInstance();
-
     cc.startCollision(d1, d2);
   }
   
@@ -159,7 +158,6 @@ public class PrototypeMode implements ContactListener, Screen {
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
     CollisionController cc = CollisionController.getInstance();
-
     cc.endCollision(d1, d2);
   }
 
@@ -180,7 +178,7 @@ public class PrototypeMode implements ContactListener, Screen {
       manager.finishLoading();
       loadContent(manager);
 
-      player = new Player(1f, 1f, 0.5f, 1f, Player.NUM_STATES);
+      player = new Player(1f, 1f, 0.3f, 1f, Player.NUM_STATES);
       player.initState(Player.STATE_IDLE, adagioIdleTexture);
       player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
       player.initState(Player.STATE_FALL, adagioIdleTexture);
@@ -188,6 +186,7 @@ public class PrototypeMode implements ContactListener, Screen {
       player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.activatePhysics(world);
+      player.setAlive(true);
 
       Platform platform = new Platform(0f, -0.25f, 40f, 0.5f);
       platform.initState(0, platformTexture);
@@ -219,7 +218,7 @@ public class PrototypeMode implements ContactListener, Screen {
         debug = !debug;
       }
 
-      if (player != null) {
+      if (player.isAlive()) {
         float horizontal = input.getHorizontal();
         player.tryMove(horizontal);
         if (input.didJump()) {
@@ -228,15 +227,12 @@ public class PrototypeMode implements ContactListener, Screen {
         if (input.didAttack()) {
           player.tryAttack();
         }
-        player.update(delta);
 
-        if (!player.isAlive()) {
-          killPlayer();
-        }
+        player.update(delta);
       }
       
       for (Enemy enemy : enemies) {
-        if (player != null
+        if (player.isAlive()
             && player.isHitboxActive()
             && !player.getEnemiesHit().contains(enemy, true)) {
           // TODO make this not manual
@@ -279,8 +275,9 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Platform platform : platforms) {
       // platform.draw(canvas);
     }
-    if (player != null)
+    if (player.isAlive()) {
       player.draw(canvas);
+    }
     canvas.end();
 
     if (debug) {
@@ -291,7 +288,7 @@ public class PrototypeMode implements ContactListener, Screen {
       for (Platform platform : platforms) {
         platform.drawPhysics(canvas);
       }
-      if (player != null) {
+      if (player.isAlive()) {
         player.drawPhysics(canvas);
       }
       canvas.endDebug();
@@ -351,13 +348,7 @@ public class PrototypeMode implements ContactListener, Screen {
   }
 
   /**
-   * What happens when the player dies (can handle post death animation etc.)
-   */
-  public void killPlayer() {
-    player = null;
-  }
-  /**
-   * Manages reseting the world
+   * Manages resetting the world.
    */
   public void reset() {
     for (Platform platform : platforms) {
@@ -366,9 +357,7 @@ public class PrototypeMode implements ContactListener, Screen {
     for (Enemy enemy : enemies) {
       enemy.deactivatePhysics(world);
     }
-    if (player != null) {
-      player.deactivatePhysics(world);
-    }
+    player.deactivatePhysics(world);
 
     platforms.clear();
     enemies.clear();

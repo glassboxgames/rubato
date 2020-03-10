@@ -7,8 +7,6 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.util.*;
 
-import java.beans.VetoableChangeListener;
-
 /**
  * Class representing a main player character in Rubato.
  */
@@ -22,7 +20,7 @@ public class Player extends Entity {
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
-  protected static final float MOVE_DAMPING = 5f;
+  protected static final float MOVE_DAMPING = 10f;
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 3.5f;
   /** Max vertical speed */
@@ -41,10 +39,6 @@ public class Player extends Entity {
   protected static final int ATTACK_END = 25;
   /** Attack damage */
   protected static final float ATTACK_DAMAGE = 3f;
-  /** Ground sensor height */
-  protected static final float SENSOR_HEIGHT = 0.05f;
-  /** Name of the ground sensor */
-  protected static final String SENSOR_NAME = "PlayerGroundSensor";
 
   /** Player state constants */
   public static final int NUM_STATES = 6;
@@ -59,16 +53,11 @@ public class Player extends Entity {
   protected Vector2 dim;
   /** Current horizontal movement of the character (from the input) */
   protected float movement;
-
-  /** Ground sensor relative position */
-  protected Vector2 sensorPos;
-  /** Ground sensor fixture definition */
-  protected FixtureDef sensorDef;
-  /** Ground sensor fixture */
-  protected Fixture sensorFixture;
+  /** Ground sensor for the player */
+  protected GroundSensor groundSensor;
 
   /** Whether the player is currently alive */
-  protected boolean isAlive;
+  protected boolean alive;
   /** Whether the player is currently on a platform */
   protected boolean grounded;
   /** Current jump length so far */
@@ -97,19 +86,12 @@ public class Player extends Entity {
     fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
     fixtureDef.density = DENSITY;
-
-    PolygonShape sensorShape = new PolygonShape();
-    sensorPos = new Vector2(0, -dim.y / 2 + SENSOR_HEIGHT);
-    sensorShape.setAsBox(dim.x / 2, SENSOR_HEIGHT, sensorPos, 0);
-    sensorDef = new FixtureDef();
-    sensorDef.isSensor = true;
-    sensorDef.shape = sensorShape;
-
+    groundSensor = new GroundSensor(this, dim);
     jumpTime = 0;
     jumpDuration = 0;
     dir = 1;
     enemiesHit = new Array();
-    isAlive = true;
+    alive = true;
   }
 
   @Override
@@ -117,9 +99,7 @@ public class Player extends Entity {
     if (!super.activatePhysics(world)) {
       return false;
     }
-    sensorFixture = body.createFixture(sensorDef);
-    sensorFixture.setUserData(SENSOR_NAME);
-    return true;
+    return groundSensor.activatePhysics();
   }
 
   /**
@@ -144,14 +124,20 @@ public class Player extends Entity {
   }
 
   /**
-   * Returns whether the player is alive currently
+   * Returns whether the player is alive currently.
    */
-  public boolean isAlive() { return isAlive; }
+  public boolean isAlive() {
+    return alive;
+  }
 
   /**
-   * set the player's alive state
+   * Sets the player's alive state.
+   * @param value value to set
    */
-  public void setAlive(boolean value) {isAlive = value; }
+  public void setAlive(boolean value) {
+    alive = value;
+  }
+  
   /**
    * Returns whether the player is standing on a platform.
    */
@@ -161,6 +147,7 @@ public class Player extends Entity {
 
   /**
    * Sets the player's grounded state.
+   * @param value value to set
    */
   public void setGrounded(boolean value) {
     grounded = value;
@@ -283,7 +270,7 @@ public class Player extends Entity {
     canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
                        pos.x, pos.y, 0,
                        Constants.PPM, Constants.PPM);
-    canvas.drawPhysics((PolygonShape)sensorFixture.getShape(), Color.RED,
+    canvas.drawPhysics(groundSensor.getShape(), Color.RED,
                        pos.x, pos.y, 0,
                        Constants.PPM, Constants.PPM);
     if (isHitboxActive()) {
