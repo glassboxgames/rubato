@@ -27,7 +27,7 @@ public class PrototypeMode implements ContactListener, Screen {
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
-  private static String BACKGROUND_FILE = "Backgrounds/sunset-forest-yellow.png";
+  private static String BACKGROUND_FILE = "Backgrounds/Realism Update/Realistic-Forest.png";
   /** The file for the idle image */
   private static final String ADAGIO_IDLE = "Adagio/00 Filmstrips/wait-strip.png";
   /** The file for the walking filmstrip */
@@ -61,7 +61,7 @@ public class PrototypeMode implements ContactListener, Screen {
   private Array<String> assets;
 
   /** Gravity **/
-  private static float GRAVITY = -50f;
+  private static float GRAVITY = -70f;
   
   /** Canvas on which to draw content */
   private GameCanvas canvas;

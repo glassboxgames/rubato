@@ -16,7 +16,7 @@ public class Player extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
   /** Jump force */
-  protected static final float JUMP_IMPULSE = 0.5f;
+  protected static final float JUMP_IMPULSE = 0.85f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
@@ -24,11 +24,11 @@ public class Player extends Entity {
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 4f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 11f;
+  protected static final float MAX_Y_SPEED = 12f;
   /** Min jump duration */
   protected static final int MIN_JUMP_DURATION = 6;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 12;
+  protected static final int MAX_JUMP_DURATION = 15;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
