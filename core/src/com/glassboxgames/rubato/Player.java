@@ -49,6 +49,12 @@ public class Player extends Entity {
   public static final int STATE_GND_ATTACK = 4;
   public static final int STATE_AIR_ATTACK = 5;
 
+  /** Fixture definition */
+  protected FixtureDef def1, def2;
+  /** Current fixture index */
+  protected int mode;
+  /** Fixture */
+  protected Fixture fixture;
   /** Player dimensions */
   protected Vector2 dim;
   /** Current horizontal movement of the character (from the input) */
@@ -68,11 +74,10 @@ public class Player extends Entity {
   /** Enemies that have been hit by the current active attack */
   protected Array<Enemy> enemiesHit;
 
-
   /**
    * Instantiates a player with the given parameters.
-   * @param x x-coordinate
-   * @param y y-coordinate
+   * @param x x-coordinate of center
+   * @param y y-coordinate of center
    * @param w width
    * @param h height
    * @param numStates number of entity states
@@ -81,15 +86,24 @@ public class Player extends Entity {
     super(x, y, numStates);
     dim = new Vector2(w, h);
 
-    PolygonShape shape = new PolygonShape();
-    shape.setAsBox(dim.x / 2, dim.y / 2);
-    fixtureDef.shape = shape;
-    fixtureDef.friction = FRICTION;
-    fixtureDef.density = DENSITY;
+    mode = 0;
+    def1 = new FixtureDef();
+    PolygonShape shape1 = new PolygonShape();
+    shape1.setAsBox(dim.x / 2, dim.y / 2);
+    def1.shape = shape1;
+    def1.friction = FRICTION;
+    def1.density = DENSITY;
+    
+    def2 = new FixtureDef();
+    CircleShape shape2 = new CircleShape();
+    shape2.setRadius(dim.x);
+    def2.shape = shape2;
+    def2.friction = FRICTION;
+    def2.density = DENSITY;
+    
     groundSensor = new GroundSensor(this, dim);
     jumpTime = 0;
     jumpDuration = 0;
-    dir = 1;
     enemiesHit = new Array();
     alive = true;
   }
@@ -99,6 +113,8 @@ public class Player extends Entity {
     if (!super.activatePhysics(world)) {
       return false;
     }
+    fixture = body.createFixture(def1);
+    fixture.setUserData(this);
     return groundSensor.activatePhysics();
   }
 
@@ -119,6 +135,17 @@ public class Player extends Entity {
    */
   public void tryAttack() {
     if (!isAttacking()) {
+      body.destroyFixture(fixture);
+      if (mode == 0) {
+        fixture = body.createFixture(def2);
+        fixture.setUserData(this);
+        mode = 1;
+      } else {
+        fixture = body.createFixture(def1);
+        fixture.setUserData(this);
+        mode = 0;
+      }
+    
       setState(isGrounded() ? STATE_GND_ATTACK : STATE_AIR_ATTACK);
     }
   }
@@ -175,13 +202,6 @@ public class Player extends Entity {
   public Array<Enemy> getEnemiesHit() {
     return enemiesHit;
   }
-  
-  /**
-   * Gets the player's current facing direction (1 for right, -1 for left).
-   */
-  public int getDirection() {
-    return dir;
-  }
 
   /**
    * Tries to set the player's horizontal movement.
@@ -191,9 +211,9 @@ public class Player extends Entity {
     movement = input;
     if (!isAttacking()) {
       if (input > 0) {
-        dir = 1;
+        faceRight();
       } else if (input < 0) {
-        dir = -1;
+        faceLeft();
       }
     }
   }
@@ -257,7 +277,7 @@ public class Player extends Entity {
       temp.set(0, JUMP_IMPULSE);
       body.applyLinearImpulse(temp, getPosition(), true);
       jumpTime++;
-    } 
+    }
     
     float vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
     float vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
@@ -267,15 +287,21 @@ public class Player extends Entity {
   @Override
   public void drawPhysics(GameCanvas canvas) {
     Vector2 pos = getPosition();
-    canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
-                       pos.x, pos.y, 0);
+    if (mode == 0) {
+      canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
+                         pos.x, pos.y, 0);
+    } else {
+      canvas.drawPhysics((CircleShape)fixture.getShape(), Color.RED,
+                         pos.x, pos.y);
+    }
     canvas.drawPhysics(groundSensor.getShape(), Color.RED,
                        pos.x, pos.y, 0);
     if (isHitboxActive()) {
       CircleShape shape = new CircleShape();
-      shape.setPosition(getPosition().add(temp.set(ATTACK_POS).scl(dir, 1)));
+      pos = getPosition().add(temp.set(ATTACK_POS).scl(getDirection(), 1));
+      shape.setPosition(pos);
       shape.setRadius(ATTACK_SIZE);
-      canvas.drawPhysics(shape, Color.RED, shape.getPosition().x, shape.getPosition().y);
+      canvas.drawPhysics(shape, Color.RED, pos.x, pos.y);
     }
   }
 }
