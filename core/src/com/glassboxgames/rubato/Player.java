@@ -24,7 +24,7 @@ public class Player extends Entity {
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 4f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 8f;
+  protected static final float MAX_Y_SPEED = 12f;
   /** Min jump duration */
   protected static final int MIN_JUMP_DURATION = 6;
   /** Max jump duration */
@@ -184,19 +184,16 @@ public class Player extends Entity {
       if (isGrounded()) {
         if (vdir > 0) {
           setState(STATE_UP_GND_ATTACK);
-        }
-        else {
+        } else {
           setState(STATE_GND_ATTACK);
         }
       }
       else {
         if (vdir > 0) {
           setState(STATE_UAIR_ATTACK);
-        }
-        else if (vdir < 0) {
+        } else if (vdir < 0) {
           setState(STATE_DAIR_ATTACK);
-        }
-        else {
+        } else {
           setState(STATE_AIR_ATTACK);
         }
       }
@@ -255,14 +252,18 @@ public class Player extends Entity {
   }
 
   /**
-   * Sets the player's horizontal movement
+   * Sets the player's horizontal movement.
    */
-  public void setHorizontal(int horizontal) { movement = hdir = horizontal; }
+  public void setHorizontal(int horizontal) {
+    movement = hdir = horizontal;
+  }
 
   /**
-   * Sets the player's vertical direction
+   * Sets the player's vertical direction.
    */
-  public void setVertical(int vertical) { vdir = vertical; }
+  public void setVertical(int vertical) {
+    vdir = vertical;
+  }
 
   /**
    * Tries to move the player by the horizontal movement
@@ -283,33 +284,14 @@ public class Player extends Entity {
   public void advanceState() {
     switch (stateIndex) {
     case STATE_GND_ATTACK:
+    case STATE_UP_GND_ATTACK:
       if (getState().done) {
         enemiesHit.clear();
         setState(movement != 0 ? STATE_WALK : STATE_IDLE);
       }
       break;
-    case STATE_UP_GND_ATTACK:
-        if (getState().done) {
-          enemiesHit.clear();
-          setState(movement != 0 ? STATE_WALK : STATE_IDLE);
-        }
     case STATE_AIR_ATTACK:
-      if (isGrounded()) {
-        enemiesHit.clear();
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
-      } else if (getState().done) {
-        enemiesHit.clear();
-        setState(STATE_FALL);
-      }
-      break;
     case STATE_UAIR_ATTACK:
-      if (isGrounded()) {
-        enemiesHit.clear();
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
-      } else if (getState().done) {
-        enemiesHit.clear();
-        setState(STATE_FALL);
-      }
     case STATE_DAIR_ATTACK:
       if (isGrounded()) {
         enemiesHit.clear();
@@ -318,6 +300,7 @@ public class Player extends Entity {
         enemiesHit.clear();
         setState(STATE_FALL);
       }
+      break;
     case STATE_DASH:
       if (getState().done) {
         dashTime = 0;
@@ -332,6 +315,10 @@ public class Player extends Entity {
     case STATE_JUMP:
       if (jumpTime >= jumpDuration) {
         setState(STATE_FALL);
+        jumpTime = jumpDuration = 0;
+      }
+      if (isGrounded()) {
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
         jumpTime = jumpDuration = 0;
       }
       break;
@@ -357,8 +344,8 @@ public class Player extends Entity {
   public void update(float delta) {
     super.update(delta);
 
-    float vx, vy = 0;
-
+    float vx = 0;
+    float vy = 0;
     if (dashTime <= 0) {
       if (movement != 0) {
         temp.set(MOVE_IMPULSE * movement, 0);
@@ -376,25 +363,26 @@ public class Player extends Entity {
         body.applyLinearImpulse(temp, getPosition(), true);
         jumpTime++;
       }
-      vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
+      vy = MathUtils.clamp(getVelocity().y, -MAX_Y_SPEED, MAX_Y_SPEED);
 
       if (!grounded) {
-        vx -= vx/MOVE_DAMPING;
+        vx -= vx / MOVE_DAMPING;
       }
     } else {
       int hDirection = dashDir[0];
       int vDirection = dashDir[1];
-      float factor = Math.abs(hDirection) == 1 && Math.abs(vDirection) == 1 ? (float) Math.sqrt(2)/2 : 1;
+      float factor = Math.abs(hDirection) == 1 && Math.abs(vDirection) == 1
+        ? (float) Math.sqrt(2)/2 : 1;
       vx = factor * hDirection * DASH_SPEED;
       vy = factor * vDirection * DASH_SPEED;
       dashTime--;
     }
 
-    body.setLinearVelocity(vx, vy);
-
     if (dashCooldown > 0) {
       dashCooldown--;
     }
+
+    body.setLinearVelocity(vx, vy);
   }
 
   @Override

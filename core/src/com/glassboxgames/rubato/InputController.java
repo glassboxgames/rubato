@@ -44,7 +44,9 @@ public class InputController {
   /**
    * Returns whether the debug code was entered.
    */
-  public boolean didDebug() { return debug; }
+  public boolean didDebug() {
+    return debug;
+  }
 
   /**
    * Returns whether the player exit the game.
