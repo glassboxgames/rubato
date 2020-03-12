@@ -84,26 +84,19 @@ public class InputController {
   }
 
   /**
-   * Returns whether the player pressed attack.
+   * Returns whether the player pressed dash.
    */
-  public boolean didDash() {
-    return dashPressed;
-  }
+  public boolean didDash() { return dashPressed; }
 
   /**
    * Returns whether the player input a jump.
    */
-  public boolean didJump() {
-    return jumpPressed;
-  }
+  public boolean didJump() { return jumpPressed; }
 
   /**
    * Reads the input from the player.
    */
-  public void readInput() {
-
-    readKeyboard();
-  }
+  public void readInput() { readKeyboard(); }
 
   /**
    * Reads the input from the player's keyboard.
