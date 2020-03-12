@@ -9,8 +9,6 @@ public class InputController {
 
   /** Whether the exit button was pressed */
   private boolean exitPressed;
-  /** Whether the reset button was pressed in the previous frame */
-  private boolean wasReset;
   /** Whether the reset button was pressed */
   private boolean resetPressed;
   /** Whether the jump button was pressed */
@@ -20,8 +18,10 @@ public class InputController {
   /** Whether the attack button was pressed */
   private boolean attackPressed;
 
-  /** How much did we move horizontally */
+  /** Horizontal movement input */
   private int horizontal;
+  /** Vertical direction input */
+  private int vertical;
 
   /** The singleton instance of the input controller */
   private static InputController controller = null;
@@ -57,7 +57,7 @@ public class InputController {
    * Returns whether the player reset the game.
    */
   public boolean didReset() {
-    return resetPressed && !wasReset;
+    return resetPressed;
   }
 
   /**
@@ -65,6 +65,13 @@ public class InputController {
    */
   public int getHorizontal() {
     return horizontal;
+  }
+
+  /**
+   * Returns the vertical direction input from the player.
+   */
+  public int getVertical() {
+    return vertical;
   }
 
   /**
@@ -103,7 +110,6 @@ public class InputController {
     debug = Gdx.input.isKeyJustPressed(Input.Keys.SLASH);
 
     // TODO: maybe secondary to allow gamepad override
-    wasReset = resetPressed;
 
     exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
@@ -117,6 +123,14 @@ public class InputController {
     }
     if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
       horizontal -= 1;
+    }
+
+    vertical = 0;
+    if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+      vertical += 1;
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+      vertical -= 1;
     }
   }
 }

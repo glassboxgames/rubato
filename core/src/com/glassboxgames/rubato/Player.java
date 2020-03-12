@@ -68,6 +68,8 @@ public class Player extends Entity {
   protected Vector2 dim;
   /** Current horizontal movement of the character */
   protected float movement;
+  /** Horizontal dash direction of the player (-1 for left, 1 for right) [different than dir] */
+  protected int hdir;
   /** Vertical direction of the player (-1 for down, 1 for up) */
   protected int vdir;
   /** Ground sensor for the player */
@@ -123,7 +125,8 @@ public class Player extends Entity {
     dashCooldown = 0;
     enemiesHit = new Array();
     alive = true;
-    dir = 0;
+    hdir = 0;
+    vdir = 0;
   }
 
   @Override
@@ -204,9 +207,7 @@ public class Player extends Entity {
    * Sets the player's grounded state.
    * @param value value to set
    */
-  public void setGrounded(boolean value) {
-    grounded = value;
-  }
+  public void setGrounded(boolean value) { grounded = value; }
   
   /**
    * Returns whether the player is attacking.
@@ -232,16 +233,24 @@ public class Player extends Entity {
   }
 
   /**
-   * Tries to set the player's horizontal movement.
-   * @param input player input (1 for right, -1 for left, 0 for none)
+   * Sets the player's horizontal movement
    */
-  public void tryMove(int input) {
-    movement = input;
-    if (input != 0) {
+  public void setHorizontal(int horizontal) { movement = hdir = horizontal; }
+
+  /**
+   * Sets the player's vertical direction
+   */
+  public void setVertical(int vertical) { vdir = vertical; }
+
+  /**
+   * Tries to move the player by the horizontal movement
+   */
+  public void tryMove() {
+    if (movement != 0) {
       if (!isAttacking()) {
-        if (input > 0) {
+        if (movement > 0) {
           faceRight();
-        } else if (input < 0) {
+        } else if (movement < 0) {
           faceLeft();
         }
       }
@@ -268,9 +277,13 @@ public class Player extends Entity {
       break;
     case STATE_DASH:
       if (getState().done) {
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
         dashTime = 0;
         dashCooldown = DASH_COOLDOWN;
+        if (isGrounded()) {
+          setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+        } else {
+          setState(STATE_FALL);
+        }
       }
       break;
     case STATE_JUMP:
@@ -322,7 +335,11 @@ public class Player extends Entity {
       }
       vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
     } else {
-      temp.set(super.dir*DASH_IMPULSE,vdir*DASH_IMPULSE);
+      if (vdir == 0) {
+        temp.set(super.dir*DASH_IMPULSE,vdir*DASH_IMPULSE);
+      } else {
+        temp.set(hdir*DASH_IMPULSE,vdir*DASH_IMPULSE);
+      }
       body.applyLinearImpulse(temp, getPosition(), true);
       dashTime--;
       vx = Math.min(DASH_SPEED, Math.max(-DASH_SPEED, getVelocity().x));

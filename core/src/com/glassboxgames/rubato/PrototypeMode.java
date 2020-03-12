@@ -228,8 +228,9 @@ public class PrototypeMode implements ContactListener, Screen {
       }
 
       if (player.isAlive()) {
-        int horizontal = input.getHorizontal();
-        player.tryMove(horizontal);
+        player.setHorizontal(input.getHorizontal());
+        player.setVertical(input.getVertical());
+        player.tryMove();
         if (input.didJump()) {
           player.tryJump();
         }
