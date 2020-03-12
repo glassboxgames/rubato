@@ -17,8 +17,6 @@ public class Player extends Entity {
   protected static final float FRICTION = 0f;
   /** Jump force */
   protected static final float JUMP_IMPULSE = 0.85f;
-  /** Jump force */
-  protected static final float DASH_IMPULSE = 1f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
@@ -26,17 +24,15 @@ public class Player extends Entity {
   /** Max horizontal speed */
   protected static final float MAX_X_SPEED = 4f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 12f;
+  protected static final float MAX_Y_SPEED = 8f;
   /** Min jump duration */
   protected static final int MIN_JUMP_DURATION = 6;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 15;
+  protected static final int MAX_JUMP_DURATION = 12;
   /** Dash duration */
-  protected static final int DASH_DURATION = 10; // keep this above 10
-  /** Dash cooldown */
-  protected static final int DASH_COOLDOWN = 40;
+  protected static final int DASH_DURATION = 40; // keep this above 10
   /** Dash speed */
-  protected static final float DASH_SPEED = 20f;
+  protected static final float DASH_SPEED = 15f;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -83,6 +79,8 @@ public class Player extends Entity {
   protected int dashTime;
   /** Dash cooldown */
   protected int dashCooldown;
+  /** Dash direction */
+  protected int[] dashDir;
   /** Current jump length so far */
   protected int jumpTime;
   /** How long the player held jump */
@@ -127,6 +125,7 @@ public class Player extends Entity {
     alive = true;
     hdir = 0;
     vdir = 0;
+    dashDir = new int[2];
   }
 
   @Override
@@ -156,8 +155,10 @@ public class Player extends Entity {
    */
   public void tryDash() {
     if (dashTime <= 0 && dashCooldown <= 0 && !isAttacking()) {
-      setState(STATE_DASH);
       dashTime = DASH_DURATION;
+      dashDir[0] = vdir == 0 ? super.dir : hdir;
+      dashDir[1] = vdir;
+      setState(STATE_DASH);
     }
   }
 
@@ -278,7 +279,7 @@ public class Player extends Entity {
     case STATE_DASH:
       if (getState().done) {
         dashTime = 0;
-        dashCooldown = DASH_COOLDOWN;
+        dashCooldown = DASH_DURATION;
         if (isGrounded()) {
           setState(movement != 0 ? STATE_WALK : STATE_IDLE);
         } else {
@@ -334,22 +335,24 @@ public class Player extends Entity {
         jumpTime++;
       }
       vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
-    } else {
-      if (vdir == 0) {
-        temp.set(super.dir*DASH_IMPULSE,vdir*DASH_IMPULSE);
-      } else {
-        temp.set(hdir*DASH_IMPULSE,vdir*DASH_IMPULSE);
+
+      if (!grounded) {
+        vx -= vx/MOVE_DAMPING;
       }
-      body.applyLinearImpulse(temp, getPosition(), true);
+    } else {
+      int hDirection = dashDir[0];
+      int vDirection = dashDir[1];
+      float factor = Math.abs(hDirection) == 1 && Math.abs(vDirection) == 1 ? (float) Math.sqrt(2)/2 : 1;
+      vx = factor * hDirection * DASH_SPEED;
+      vy = factor * vDirection * DASH_SPEED;
       dashTime--;
-      vx = Math.min(DASH_SPEED, Math.max(-DASH_SPEED, getVelocity().x));
-      vy = Math.min(DASH_SPEED, Math.max(-DASH_SPEED, getVelocity().y));
-    }
-    if (dashCooldown > 0) {
-      dashCooldown--;
     }
 
     body.setLinearVelocity(vx, vy);
+
+    if (dashCooldown > 0) {
+      dashCooldown--;
+    }
   }
 
   @Override
