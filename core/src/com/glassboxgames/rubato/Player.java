@@ -16,7 +16,7 @@ public class Player extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
   /** Jump force */
-  protected static final float JUMP_IMPULSE = 0.85f;
+  protected static final float JUMP_IMPULSE = 0.65f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
@@ -315,10 +315,6 @@ public class Player extends Entity {
     case STATE_JUMP:
       if (jumpTime >= jumpDuration) {
         setState(STATE_FALL);
-        jumpTime = jumpDuration = 0;
-      }
-      if (isGrounded()) {
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
         jumpTime = jumpDuration = 0;
       }
       break;
