@@ -195,7 +195,10 @@ public class PrototypeMode implements ContactListener, Screen {
       player.initState(Player.STATE_JUMP, adagioJumpTexture, 1, 9, 9, 0.25f, false);
       player.initState(Player.STATE_DASH, adagioDashTexture, 1, 2, 2, 0.2f, false);
       player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      player.initState(Player.STATE_UP_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      player.initState(Player.STATE_DAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      player.initState(Player.STATE_UAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.activatePhysics(world);
       player.setAlive(true);
 

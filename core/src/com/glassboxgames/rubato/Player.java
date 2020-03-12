@@ -45,14 +45,17 @@ public class Player extends Entity {
   protected static final float ATTACK_DAMAGE = 3f;
 
   /** Player state constants */
-  public static final int NUM_STATES = 7;
+  public static final int NUM_STATES = 10;
   public static final int STATE_IDLE = 0;
   public static final int STATE_WALK = 1;
   public static final int STATE_FALL = 2;
   public static final int STATE_JUMP = 3;
   public static final int STATE_DASH = 4;
   public static final int STATE_GND_ATTACK = 5;
-  public static final int STATE_AIR_ATTACK = 6;
+  public static final int STATE_UP_GND_ATTACK = 6;
+  public static final int STATE_AIR_ATTACK = 7;
+  public static final int STATE_DAIR_ATTACK = 8;
+  public static final int STATE_UAIR_ATTACK = 9;
 
   /** Fixture definition */
   protected FixtureDef def1, def2;
@@ -177,8 +180,26 @@ public class Player extends Entity {
         fixture.setUserData(this);
         mode = 0;
       }
-    
-      setState(isGrounded() ? STATE_GND_ATTACK : STATE_AIR_ATTACK);
+
+      if (isGrounded()) {
+        if (vdir > 0) {
+          setState(STATE_UP_GND_ATTACK);
+        }
+        else {
+          setState(STATE_GND_ATTACK);
+        }
+      }
+      else {
+        if (vdir > 0) {
+          setState(STATE_UAIR_ATTACK);
+        }
+        else if (vdir < 0) {
+          setState(STATE_DAIR_ATTACK);
+        }
+        else {
+          setState(STATE_AIR_ATTACK);
+        }
+      }
     }
   }
 
@@ -267,6 +288,11 @@ public class Player extends Entity {
         setState(movement != 0 ? STATE_WALK : STATE_IDLE);
       }
       break;
+    case STATE_UP_GND_ATTACK:
+        if (getState().done) {
+          enemiesHit.clear();
+          setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+        }
     case STATE_AIR_ATTACK:
       if (isGrounded()) {
         enemiesHit.clear();
@@ -276,6 +302,22 @@ public class Player extends Entity {
         setState(STATE_FALL);
       }
       break;
+    case STATE_UAIR_ATTACK:
+      if (isGrounded()) {
+        enemiesHit.clear();
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+      } else if (getState().done) {
+        enemiesHit.clear();
+        setState(STATE_FALL);
+      }
+    case STATE_DAIR_ATTACK:
+      if (isGrounded()) {
+        enemiesHit.clear();
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+      } else if (getState().done) {
+        enemiesHit.clear();
+        setState(STATE_FALL);
+      }
     case STATE_DASH:
       if (getState().done) {
         dashTime = 0;
