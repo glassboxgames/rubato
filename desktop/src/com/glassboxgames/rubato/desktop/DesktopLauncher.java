@@ -5,12 +5,12 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.glassboxgames.rubato.GDXRoot;
 
 public class DesktopLauncher {
-	public static void main (String[] arg) {
+	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		// config.setFromDisplayMode(LwjglApplicationConfiguration.getDesktopDisplayMode());
 		config.forceExit = false;
-		// config.fullscreen = true;
 		config.vSyncEnabled = true;
+    config.width = 1200;
+    config.height = 675;
 		new LwjglApplication(new GDXRoot(), config);
 	}
 }

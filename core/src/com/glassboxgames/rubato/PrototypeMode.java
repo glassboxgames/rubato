@@ -61,23 +61,27 @@ public class PrototypeMode implements ContactListener, Screen {
   private Array<String> assets;
 
   /** Gravity **/
-  private static float GRAVITY = -70f;
+  protected static float GRAVITY = -70f;
+  /** Level width */
+  protected static float LEVEL_WIDTH = 30f;
+  /** Level height */
+  protected static float LEVEL_HEIGHT = 10.8f;
   
   /** Canvas on which to draw content */
-  private GameCanvas canvas;
+  protected GameCanvas canvas;
   /** Current state of the game */
-  private GameState gameState;
+  protected GameState gameState;
   /** Whether this game mode is active */
-  private boolean active;
+  protected boolean active;
   /** The Box2D world */
-  private World world;
+  protected World world;
 
   /** The player entity */
-  private Player player;
+  protected Player player;
   /** The list of platforms */
-  private Array<Platform> platforms;
+  protected Array<Platform> platforms;
   /** The list of enemies */
-  private Array<Enemy> enemies;
+  protected Array<Enemy> enemies;
 
   /**
    * Instantiate a PrototypeMode.
@@ -173,7 +177,6 @@ public class PrototypeMode implements ContactListener, Screen {
   private void update(float delta) {
     switch (gameState) {
     case INTRO: {
-      loadContent(manager);
       preloadContent(manager);
       manager.finishLoading();
       loadContent(manager);
@@ -188,7 +191,7 @@ public class PrototypeMode implements ContactListener, Screen {
       player.activatePhysics(world);
       player.setAlive(true);
 
-      Platform platform = new Platform(3f, 0.5f, 5f, 0.5f, 0.5f, 0.5f);
+      Platform platform = new Platform(LEVEL_WIDTH / 2f, 0.25f, LEVEL_WIDTH, 0.5f, 0.5f, 0.5f);
       platform.initState(0, platformTexture);
       platform.activatePhysics(world);
       platforms = new Array(new Platform[] {platform});
@@ -266,6 +269,11 @@ public class PrototypeMode implements ContactListener, Screen {
    * @param delta
    */
   private void draw(float delta) {
+    if (player.isAlive()) {
+      canvas.moveCamera(player.getPosition().scl(Constants.PPM),
+                        LEVEL_WIDTH * Constants.PPM, LEVEL_HEIGHT * Constants.PPM);
+    }
+    canvas.clear();
     canvas.begin();
     canvas.drawBackground(background);
     canvas.end();
