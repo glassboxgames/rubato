@@ -13,10 +13,12 @@ public class InputController {
   private boolean wasReset;
   /** Whether the reset button was pressed */
   private boolean resetPressed;
-  /** Whether the attack button was pressed */
-  private boolean attackPressed;
   /** Whether the jump button was pressed */
   private boolean jumpPressed;
+  /** Whether the dash button was pressed */
+  private boolean dashPressed;
+  /** Whether the attack button was pressed */
+  private boolean attackPressed;
 
   /** How much did we move horizontally */
   private int horizontal;
@@ -66,17 +68,24 @@ public class InputController {
   }
 
   /**
-   * Returns whether the player input a jump.
+   * Returns whether the player pressed attack.
    */
-  public boolean didJump() {
-    return jumpPressed;
+  public boolean didAttack() {
+    return attackPressed;
   }
 
   /**
    * Returns whether the player pressed attack.
    */
-  public boolean didAttack() {
-    return attackPressed;
+  public boolean didDash() {
+    return dashPressed;
+  }
+
+  /**
+   * Returns whether the player input a jump.
+   */
+  public boolean didJump() {
+    return jumpPressed;
   }
 
   /**
@@ -97,8 +106,9 @@ public class InputController {
     wasReset = resetPressed;
 
     exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
-    resetPressed = Gdx.input.isKeyPressed(Input.Keys.R);
+    resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
+    dashPressed = Gdx.input.isKeyPressed(Input.Keys.D);
     jumpPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE);
 
     horizontal = 0;

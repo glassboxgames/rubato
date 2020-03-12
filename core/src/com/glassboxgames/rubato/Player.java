@@ -17,6 +17,8 @@ public class Player extends Entity {
   protected static final float FRICTION = 0f;
   /** Jump force */
   protected static final float JUMP_IMPULSE = 0.85f;
+  /** Jump force */
+  protected static final float DASH_IMPULSE = 1f;
   /** Movement impulse */
   protected static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
@@ -29,6 +31,12 @@ public class Player extends Entity {
   protected static final int MIN_JUMP_DURATION = 6;
   /** Max jump duration */
   protected static final int MAX_JUMP_DURATION = 15;
+  /** Dash duration */
+  protected static final int DASH_DURATION = 10; // keep this above 10
+  /** Dash cooldown */
+  protected static final int DASH_COOLDOWN = 40;
+  /** Dash speed */
+  protected static final float DASH_SPEED = 20f;
   /** Attack hitbox position, relative to center */
   protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -41,13 +49,14 @@ public class Player extends Entity {
   protected static final float ATTACK_DAMAGE = 3f;
 
   /** Player state constants */
-  public static final int NUM_STATES = 6;
+  public static final int NUM_STATES = 7;
   public static final int STATE_IDLE = 0;
   public static final int STATE_WALK = 1;
   public static final int STATE_FALL = 2;
   public static final int STATE_JUMP = 3;
-  public static final int STATE_GND_ATTACK = 4;
-  public static final int STATE_AIR_ATTACK = 5;
+  public static final int STATE_DASH = 4;
+  public static final int STATE_GND_ATTACK = 5;
+  public static final int STATE_AIR_ATTACK = 6;
 
   /** Fixture definition */
   protected FixtureDef def1, def2;
@@ -57,8 +66,10 @@ public class Player extends Entity {
   protected Fixture fixture;
   /** Player dimensions */
   protected Vector2 dim;
-  /** Current horizontal movement of the character (from the input) */
+  /** Current horizontal movement of the character */
   protected float movement;
+  /** Vertical direction of the player (-1 for down, 1 for up) */
+  protected int vdir;
   /** Ground sensor for the player */
   protected GroundSensor groundSensor;
 
@@ -66,6 +77,10 @@ public class Player extends Entity {
   protected boolean alive;
   /** Whether the player is currently on a platform */
   protected boolean grounded;
+  /** Current dash length so far */
+  protected int dashTime;
+  /** Dash cooldown */
+  protected int dashCooldown;
   /** Current jump length so far */
   protected int jumpTime;
   /** How long the player held jump */
@@ -104,8 +119,11 @@ public class Player extends Entity {
     groundSensor = new GroundSensor(this, dim);
     jumpTime = 0;
     jumpDuration = 0;
+    dashTime = 0;
+    dashCooldown = 0;
     enemiesHit = new Array();
     alive = true;
+    dir = 0;
   }
 
   @Override
@@ -127,6 +145,16 @@ public class Player extends Entity {
       jumpDuration = MIN_JUMP_DURATION;
     } else if (stateIndex == STATE_JUMP && jumpDuration < MAX_JUMP_DURATION) {
       jumpDuration++;
+    }
+  }
+
+  /**
+   * Tries to start a player dash.
+   */
+  public void tryDash() {
+    if (dashTime <= 0 && dashCooldown <= 0 && !isAttacking()) {
+      setState(STATE_DASH);
+      dashTime = DASH_DURATION;
     }
   }
 
@@ -181,7 +209,7 @@ public class Player extends Entity {
   }
   
   /**
-   * Returns whether the player is mid-attack-animation.
+   * Returns whether the player is attacking.
    */
   public boolean isAttacking() {
     return stateIndex == STATE_GND_ATTACK || stateIndex == STATE_AIR_ATTACK;
@@ -207,13 +235,15 @@ public class Player extends Entity {
    * Tries to set the player's horizontal movement.
    * @param input player input (1 for right, -1 for left, 0 for none)
    */
-  public void tryMove(float input) {
+  public void tryMove(int input) {
     movement = input;
-    if (!isAttacking()) {
-      if (input > 0) {
-        faceRight();
-      } else if (input < 0) {
-        faceLeft();
+    if (input != 0) {
+      if (!isAttacking()) {
+        if (input > 0) {
+          faceRight();
+        } else if (input < 0) {
+          faceLeft();
+        }
       }
     }
   }
@@ -234,6 +264,13 @@ public class Player extends Entity {
       } else if (getState().done) {
         enemiesHit.clear();
         setState(STATE_FALL);
+      }
+      break;
+    case STATE_DASH:
+      if (getState().done) {
+        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+        dashTime = 0;
+        dashCooldown = DASH_COOLDOWN;
       }
       break;
     case STATE_JUMP:
@@ -264,23 +301,37 @@ public class Player extends Entity {
   public void update(float delta) {
     super.update(delta);
 
-    if (movement != 0) {
-      temp.set(MOVE_IMPULSE * movement, 0);
-      body.applyLinearImpulse(temp, getPosition(), true);
+    float vx, vy = 0;
+
+    if (dashTime <= 0) {
+      if (movement != 0) {
+        temp.set(MOVE_IMPULSE * movement, 0);
+        body.applyLinearImpulse(temp, getPosition(), true);
+        vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
+      } else {
+        // damping
+        temp.set(-MOVE_DAMPING * getVelocity().x, 0);
+        body.applyForce(temp, getPosition(), true);
+        vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
+      }
+
+      if (jumpTime < jumpDuration) {
+        temp.set(0, JUMP_IMPULSE);
+        body.applyLinearImpulse(temp, getPosition(), true);
+        jumpTime++;
+      }
+      vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
     } else {
-      // damping
-      temp.set(-MOVE_DAMPING * getVelocity().x, 0);
-      body.applyForce(temp, getPosition(), true);
+      temp.set(super.dir*DASH_IMPULSE,vdir*DASH_IMPULSE);
+      body.applyLinearImpulse(temp, getPosition(), true);
+      dashTime--;
+      vx = Math.min(DASH_SPEED, Math.max(-DASH_SPEED, getVelocity().x));
+      vy = Math.min(DASH_SPEED, Math.max(-DASH_SPEED, getVelocity().y));
+    }
+    if (dashCooldown > 0) {
+      dashCooldown--;
     }
 
-    if (jumpTime < jumpDuration) {
-      temp.set(0, JUMP_IMPULSE);
-      body.applyLinearImpulse(temp, getPosition(), true);
-      jumpTime++;
-    }
-    
-    float vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
-    float vy = Math.min(MAX_Y_SPEED, Math.max(-MAX_Y_SPEED, getVelocity().y));
     body.setLinearVelocity(vx, vy);
   }
 

@@ -92,7 +92,7 @@ public abstract class Entity {
     bodyDef.gravityScale = 1;
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
-    states = new Array<State>();
+    states = new Array();
     for (int i = 0; i < numStates; i++) {
       states.add(null);
     }

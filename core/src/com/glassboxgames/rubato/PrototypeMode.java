@@ -34,6 +34,8 @@ public class PrototypeMode implements ContactListener, Screen {
   private static final String ADAGIO_WALK = "Adagio/00 Filmstrips/walk-strip75.png";
   /** The file for the jumping filmstrip */
   private static final String ADAGIO_JUMP = "Adagio/00 Filmstrips/jump-strip75.png";
+  /** The file for the dashing filmstrip */
+  private static final String ADAGIO_DASH = "Adagio/00 Filmstrips/dash-strip75.png";
   /** The file for the attacking filmstrip */
   private static final String ADAGIO_ATTACK = "Adagio/00 Filmstrips/tornado-strip150.png";
   /** The file for the enemy image */
@@ -50,6 +52,8 @@ public class PrototypeMode implements ContactListener, Screen {
   private Texture adagioWalkTexture;
   /** Texture for Adagio jumping */
   private Texture adagioJumpTexture;
+  /** Texture for Adagio dashing */
+  private Texture adagioDashTexture;
   /** Texture for Adagio attacking */
   private Texture adagioAttackTexture;
   /** Texture for enemies */
@@ -108,6 +112,8 @@ public class PrototypeMode implements ContactListener, Screen {
     assets.add(ADAGIO_WALK);
     manager.load(ADAGIO_JUMP, Texture.class);
     assets.add(ADAGIO_JUMP);
+    manager.load(ADAGIO_DASH, Texture.class);
+    assets.add(ADAGIO_DASH);
     manager.load(ADAGIO_ATTACK, Texture.class);
     assets.add(ADAGIO_ATTACK);
     manager.load(ENEMY_FILE, Texture.class);
@@ -131,6 +137,7 @@ public class PrototypeMode implements ContactListener, Screen {
     adagioIdleTexture = createTexture(manager, ADAGIO_IDLE);
     adagioWalkTexture = createTexture(manager, ADAGIO_WALK);
     adagioJumpTexture = createTexture(manager, ADAGIO_JUMP);
+    adagioDashTexture = createTexture(manager, ADAGIO_DASH);
     adagioAttackTexture = createTexture(manager, ADAGIO_ATTACK);
     enemyTexture = createTexture(manager, ENEMY_FILE);
     platformTexture = createTexture(manager, PLATFORM_FILE);
@@ -186,6 +193,7 @@ public class PrototypeMode implements ContactListener, Screen {
       player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
       player.initState(Player.STATE_FALL, adagioIdleTexture);
       player.initState(Player.STATE_JUMP, adagioJumpTexture, 1, 9, 9, 0.25f, false);
+      player.initState(Player.STATE_DASH, adagioDashTexture, 1, 2, 2, 0.2f, false);
       player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.activatePhysics(world);
@@ -208,7 +216,6 @@ public class PrototypeMode implements ContactListener, Screen {
       InputController input = InputController.getInstance();
       input.readInput();
       if (input.didExit()) {
-        // TODO fix this cleanup bug
         Gdx.app.exit();
         break;
       }
@@ -221,10 +228,13 @@ public class PrototypeMode implements ContactListener, Screen {
       }
 
       if (player.isAlive()) {
-        float horizontal = input.getHorizontal();
+        int horizontal = input.getHorizontal();
         player.tryMove(horizontal);
         if (input.didJump()) {
           player.tryJump();
+        }
+        if (input.didDash()) {
+          player.tryDash();
         }
         if (input.didAttack()) {
           player.tryAttack();
@@ -370,7 +380,7 @@ public class PrototypeMode implements ContactListener, Screen {
 
     platforms.clear();
     enemies.clear();
-    //world.dispose(); I think we need to reset the world but it crashes whenever we do.
+    world.dispose(); // TODO I think we need to reset the world but it crashes whenever we do.
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(this);
     gameState = GameState.INTRO;
