@@ -178,7 +178,7 @@ public class PrototypeMode implements ContactListener, Screen {
       manager.finishLoading();
       loadContent(manager);
 
-      player = new Player(1f, 1f, 0.3f, 1f, Player.NUM_STATES);
+      player = new Player(1f, 2f, 0.3f, 1f, Player.NUM_STATES);
       player.initState(Player.STATE_IDLE, adagioIdleTexture);
       player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
       player.initState(Player.STATE_FALL, adagioIdleTexture);
@@ -188,7 +188,7 @@ public class PrototypeMode implements ContactListener, Screen {
       player.activatePhysics(world);
       player.setAlive(true);
 
-      Platform platform = new Platform(0f, 0f, 40f, 0.5f, 0.5f, 0.5f);
+      Platform platform = new Platform(3f, 0.5f, 5f, 0.5f, 0.5f, 0.5f);
       platform.initState(0, platformTexture);
       platform.activatePhysics(world);
       platforms = new Array(new Platform[] {platform});
@@ -207,7 +207,6 @@ public class PrototypeMode implements ContactListener, Screen {
       if (input.didExit()) {
         // TODO fix this cleanup bug
         Gdx.app.exit();
-        System.exit(0);
         break;
       }
       if (input.didReset()) {

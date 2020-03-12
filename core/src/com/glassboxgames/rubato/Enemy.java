@@ -9,7 +9,7 @@ import com.glassboxgames.util.*;
 /**
  * Class representing a simple path-following enemy in Rubato.
  */
-public class Enemy extends Entity {
+public class Enemy extends BoxEntity {
   /** Maximum health */
   protected static final float MAX_HEALTH = 10;
   /** Maximum speed */
@@ -19,8 +19,6 @@ public class Enemy extends Entity {
   /** Friction */
   protected static final float FRICTION = 0f;
 
-  /** Enemy dimensions */
-  protected Vector2 dim;
   /** Current health */
   protected float health;
   /** Movement limits */
@@ -34,8 +32,6 @@ public class Enemy extends Entity {
   protected Vector2 prevPosCache = new Vector2(0, 0);
   /** Cache for prevVelocity Calculation */
   protected Vector2 prevVelCache = new Vector2(0, 0);
-  /** Cache for dimensions */
-  protected Vector2 dimCache = new Vector2(0, 0);
 
   /**
    * Initializes an enemy with the specified parameters.
@@ -45,36 +41,17 @@ public class Enemy extends Entity {
    * @param h height
    */
   public Enemy(float x, float y, float w, float h) {
-    super(x, y, 1);
-    dim = new Vector2(w, h);
+    super(x, y, w, h, 1);
 
-    PolygonShape shape = new PolygonShape();
-    shape.setAsBox(dim.x / 2, dim.y / 2);
     bodyDef.type = BodyDef.BodyType.KinematicBody;
-    fixtureDef.shape = shape;
     fixtureDef.friction = FRICTION;
 
     health = MAX_HEALTH;
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
-    dir = 1;
 
     prevPosition = getPosition();
     prevVelocity = getVelocity();
-  }
-
-  /**
-   * Returns direction this enemy is facing (1 for right, -1 for left).
-   */
-  public int getDirection() {
-    return dir;
-  }
-
-  /**
-   * Returns a copy of the dimension vector.
-   */
-  public Vector2 getDimensions() {
-    return dimCache.set(dim);
   }
 
   /**
@@ -96,11 +73,11 @@ public class Enemy extends Entity {
   public void update(float delta) {
     super.update(delta);
     if (getPosition().x >= maxX) {
-      dir = -1;
+      faceLeft();
     } else if (getPosition().x <= minX) {
-      dir = 1;
+      faceRight();
     }
-    body.setLinearVelocity(MAX_SPEED * dir, 0);
+    body.setLinearVelocity(MAX_SPEED * getDirection(), 0);
     timeslow(delta);
   }
 
@@ -117,5 +94,4 @@ public class Enemy extends Entity {
     body.setTransform(prevPosCache, body.getAngle());
     body.setLinearVelocity(prevVelCache);
   }
-
 }

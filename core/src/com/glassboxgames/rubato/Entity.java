@@ -16,17 +16,15 @@ public abstract class Entity {
   
   /** The body definition for this entity */
   protected BodyDef bodyDef;
-  /** The fixture definition for this entity */
-  protected FixtureDef fixtureDef;
   /** The body for this entity */
   protected Body body;
-  /** The fixture for this entity */
-  protected Fixture fixture;
   /** Direction the entity is facing (1 for right, -1 for left) */
   protected int dir;
 
   /** Container for the entity state */
   protected class State {
+    /** Fixture for this state */
+    public Fixture fixture;
     /** Number of frames this state has been active */
     public int activeTime;
     /** Filmstrip for the animation */
@@ -85,6 +83,7 @@ public abstract class Entity {
    * @param numStates number of states for this entity
    */
   public Entity(float x, float y, int numStates) {
+    dir = 1;
     bodyDef = new BodyDef();
     bodyDef.position.set(x, y);
     bodyDef.active = true;
@@ -93,7 +92,6 @@ public abstract class Entity {
     bodyDef.gravityScale = 1;
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
-    fixtureDef = new FixtureDef();
     states = new Array<State>();
     for (int i = 0; i < numStates; i++) {
       states.add(null);
@@ -117,16 +115,32 @@ public abstract class Entity {
   }
 
   /**
+   * Returns direction this entity is facing (1 for right, -1 for left).
+   */
+  public int getDirection() {
+    return dir;
+  }
+
+  /**
+   * Sets the direction of this entity to 1 (right).
+   */
+  public void faceRight() {
+    dir = 1;
+  }
+
+  /**
+   * Sets the direction of this entity to -1 (left).
+   */
+  public void faceLeft() {
+    dir = -1;
+  }
+
+  /**
    * Adds this entity as a physics object in the given world.
    */
   public boolean activatePhysics(World world) {
     body = world.createBody(bodyDef);
-    if (body != null) {
-      fixture = body.createFixture(fixtureDef);
-      fixture.setUserData(this);
-      return true;
-    }
-    return false;
+    return body != null;
   }
 
   public void deactivatePhysics(World world) {
@@ -207,26 +221,15 @@ public abstract class Entity {
     FilmStrip filmStrip = getState().filmStrip;
     float w = filmStrip.getWidth() / Constants.PPM;
     float h = filmStrip.getHeight() / Constants.PPM;
+    Vector2 pos = getPosition();
     canvas.draw(filmStrip, Color.WHITE,
                 dir * w / 2, h / 2,
-                getPosition().x, getPosition().y,
+                pos.x, pos.y,
                 dir * w, h);
   }
 
   /**
-   * Draws the physics outline of this entity to the given canvas.
+   * Draws this entity's physics outline (hurtboxes) to the given canvas.
    */
-  public void drawPhysics(GameCanvas canvas) {
-    Shape shape = fixture.getShape();
-    switch (shape.getType()) {
-    case Polygon:
-      canvas.drawPhysics((PolygonShape)shape, Color.RED,
-                         getPosition().x, getPosition().y, 0);
-      break;
-    case Circle:
-      canvas.drawPhysics((CircleShape)shape, Color.RED,
-                         getPosition().x, getPosition().y);
-      break;
-    }
-  }
+  public abstract void drawPhysics(GameCanvas canvas);
 }
