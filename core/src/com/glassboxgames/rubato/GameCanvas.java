@@ -416,11 +416,10 @@ public class GameCanvas {
    */
   public void moveCamera() {
     if (InputController.getInstance().didReset()) {
-      camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
+      camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight/2f, 0);
     } else {
       int movement = InputController.getInstance().getHorizontal();
       camera.translate(3 * movement, 0, 0);
-//      System.out.println(camera.position.x);
     }
     camera.position.x = MathUtils.clamp(camera.position.x, getWidth() - (getWidth() / 2f), getWidth());
   }
@@ -441,6 +440,7 @@ public class GameCanvas {
       return;
     }
     spriteBatch.draw(image, 0, 0, getWidth(), getHeight());
+    spriteBatch.draw(image, getWidth(), 0, getWidth(), getHeight());
   }
 
   /**
