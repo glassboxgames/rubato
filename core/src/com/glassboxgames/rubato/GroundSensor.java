@@ -1,11 +1,8 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.*;
-import com.glassboxgames.util.*;
+import com.glassboxgames.rubato.entity.Player;
 
 /**
  * Class representing a ground sensor for an player.
@@ -45,7 +42,7 @@ public class GroundSensor {
    * @return whether the fixture was created successfully
    */
   public boolean activatePhysics() {
-    fixture = player.body.createFixture(fixtureDef);
+    fixture = player.getBody().createFixture(fixtureDef);
     fixture.setUserData(this);
     return true;
   }

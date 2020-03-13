@@ -1,50 +1,50 @@
-package com.glassboxgames.rubato;
+package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
-import com.glassboxgames.util.*;
+import com.glassboxgames.rubato.GameCanvas;
+import com.glassboxgames.rubato.GroundSensor;
 
 /**
  * Class representing a main player character in Rubato.
  */
 public class Player extends Entity {
   /** Density */
-  protected static final float DENSITY = 1f;
+  public static final float DENSITY = 1f;
   /** Friction */
-  protected static final float FRICTION = 0f;
+  public static final float FRICTION = 0f;
   /** Jump force */
-  protected static final float JUMP_IMPULSE = 0.65f;
+  public static final float JUMP_IMPULSE = 0.65f;
   /** Movement impulse */
-  protected static final float MOVE_IMPULSE = 1f;
+  public static final float MOVE_IMPULSE = 1f;
   /** Horizontal damping */
-  protected static final float MOVE_DAMPING = 10f;
+  public static final float MOVE_DAMPING = 10f;
   /** Max horizontal speed */
-  protected static final float MAX_X_SPEED = 4f;
+  public static final float MAX_X_SPEED = 4f;
   /** Max vertical speed */
-  protected static final float MAX_Y_SPEED = 12f;
+  public static final float MAX_Y_SPEED = 12f;
   /** Min jump duration */
-  protected static final int MIN_JUMP_DURATION = 6;
+  public static final int MIN_JUMP_DURATION = 6;
   /** Max jump duration */
-  protected static final int MAX_JUMP_DURATION = 12;
+  public static final int MAX_JUMP_DURATION = 12;
   /** Dash cooldown */
-  protected static final int DASH_COOLDOWN = 40;
+  public static final int DASH_COOLDOWN = 40;
   /** Dash duration */
-  protected static final int DASH_DURATION = 10;
+  public static final int DASH_DURATION = 10;
   /** Dash speed */
-  protected static final float DASH_SPEED = 15f;
+  public static final float DASH_SPEED = 15f;
   /** Attack hitbox position, relative to center */
-  protected static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
+  public static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
-  protected static final float ATTACK_SIZE = 0.45f;
+  public static final float ATTACK_SIZE = 0.45f;
   /** Attack hitbox start frame */
-  protected static final int ATTACK_START = 5;
+  public static final int ATTACK_START = 5;
   /** Attack hitbox end frame */
-  protected static final int ATTACK_END = 25;
+  public static final int ATTACK_END = 25;
   /** Attack damage */
-  protected static final float ATTACK_DAMAGE = 3f;
+  public static final float ATTACK_DAMAGE = 3f;
 
   /** Player state constants */
   public static final int NUM_STATES = 10;

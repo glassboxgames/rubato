@@ -1,10 +1,12 @@
-package com.glassboxgames.rubato;
+package com.glassboxgames.rubato.entity;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
+import com.glassboxgames.rubato.Constants;
+import com.glassboxgames.rubato.GameCanvas;
 import com.glassboxgames.util.*;
 
 /**
@@ -121,6 +123,7 @@ public abstract class Entity {
     return dir;
   }
 
+  public Body getBody() { return body; }
   /**
    * Sets the direction of this entity to 1 (right).
    */

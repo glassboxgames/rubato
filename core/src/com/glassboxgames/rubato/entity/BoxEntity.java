@@ -1,11 +1,9 @@
-package com.glassboxgames.rubato;
+package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.*;
-import com.glassboxgames.util.*;
+import com.glassboxgames.rubato.GameCanvas;
 
 /**
  * Abstract class representing a box-shaped entity.

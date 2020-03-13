@@ -3,11 +3,12 @@ package com.glassboxgames.rubato;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.glassboxgames.rubato.entity.Enemy;
+import com.glassboxgames.rubato.entity.Platform;
+import com.glassboxgames.rubato.entity.Player;
 
 /**
  * Primary controller class for the gameplay prototype.

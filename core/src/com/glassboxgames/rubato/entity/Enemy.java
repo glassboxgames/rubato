@@ -1,10 +1,7 @@
-package com.glassboxgames.rubato;
+package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
-import com.glassboxgames.util.*;
 
 /**
  * Class representing a simple path-following enemy in Rubato.

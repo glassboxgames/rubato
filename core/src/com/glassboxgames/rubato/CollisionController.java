@@ -1,9 +1,8 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.glassboxgames.rubato.entity.Enemy;
+import com.glassboxgames.rubato.entity.Platform;
+import com.glassboxgames.rubato.entity.Player;
 
 public class CollisionController {
 
