@@ -176,6 +176,7 @@ public abstract class Entity {
    * @param i entity state index
    */
   public void setState(int i) {
+    leaveState();
     stateIndex = i;
     State state = getState();
     state.activeTime = 0;
@@ -211,6 +212,12 @@ public abstract class Entity {
     states.set(i, state);
   }
 
+  /**
+   * Executes any final state changes before leaving current state.
+   * Called before new state is set.
+   */
+  public void leaveState() {}
+  
   /**
    * Transitions entity states based on current entity state.
    * Inputs should be set as flags in the entity and read in the implementing body.

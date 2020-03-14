@@ -60,19 +60,13 @@ public class Player extends Entity {
   public static final int STATE_UAIR_ATTACK = 9;
 
   /** Fixture definition */
-  protected FixtureDef def1, def2;
-  /** Current fixture index */
-  protected int mode;
+  protected FixtureDef def;
   /** Fixture */
   protected Fixture fixture;
   /** Player dimensions */
   protected Vector2 dim;
-  /** Current horizontal movement of the character */
-  protected float movement;
-  /** Horizontal dash direction of the player (-1 for left, 1 for right) [different than dir] */
-  protected int hdir;
-  /** Vertical direction of the player (-1 for down, 1 for up) */
-  protected int vdir;
+  /** Normalized vector indicating the directions the player is pressing */
+  protected Vector2 input;
   /** Ground sensor for the player */
   protected GroundSensor groundSensor;
 
@@ -80,10 +74,12 @@ public class Player extends Entity {
   protected boolean alive;
   /** Whether the player is currently on a platform */
   protected boolean grounded;
+  /** Whether the player has a dash available */
+  protected boolean hasDash;
   /** Current dash length so far */
   protected int dashTime;
   /** Dash direction */
-  protected int[] dashDir;
+  protected Vector2 dashDir;
   /** Current jump length so far */
   protected int jumpTime;
   /** How long the player held jump */
@@ -104,30 +100,22 @@ public class Player extends Entity {
     super(x, y, numStates);
     dim = new Vector2(w, h);
 
-    mode = 0;
-    def1 = new FixtureDef();
-    PolygonShape shape1 = new PolygonShape();
-    shape1.setAsBox(dim.x / 2, dim.y / 2);
-    def1.shape = shape1;
-    def1.friction = FRICTION;
-    def1.density = DENSITY;
-    
-    def2 = new FixtureDef();
-    CircleShape shape2 = new CircleShape();
-    shape2.setRadius(dim.x);
-    def2.shape = shape2;
-    def2.friction = FRICTION;
-    def2.density = DENSITY;
-    
+    def = new FixtureDef();
+    PolygonShape shape = new PolygonShape();
+    shape.setAsBox(dim.x / 2, dim.y / 2);
+    def.shape = shape;
+    def.friction = FRICTION;
+    def.density = DENSITY;
+
+    input = new Vector2();
     groundSensor = new GroundSensor(this, dim);
-    jumpTime = 0;
-    jumpDuration = 0;
-    dashTime = 0;
+    jumpTime = -1;
+    jumpDuration = -1;
+    dashTime = -1;
     enemiesHit = new Array();
     alive = true;
-    hdir = 0;
-    vdir = 0;
-    dashDir = new int[2];
+    hasDash = false;
+    dashDir = new Vector2();
   }
 
   @Override
@@ -135,7 +123,7 @@ public class Player extends Entity {
     if (!super.activatePhysics(world)) {
       return false;
     }
-    fixture = body.createFixture(def1);
+    fixture = body.createFixture(def);
     fixture.setUserData(this);
     return groundSensor.activatePhysics();
   }
@@ -156,10 +144,15 @@ public class Player extends Entity {
    * Tries to start a player dash.
    */
   public void tryDash() {
-    if ((dashTime == 0 || dashTime > DASH_COOLDOWN) && !isAttacking()) {
-      dashTime = 1;
-      dashDir[0] = vdir == 0 ? super.dir : hdir;
-      dashDir[1] = vdir;
+    if (hasDash && dashTime < 0 && !isAttacking()) {
+      body.setGravityScale(0f);
+      hasDash = false;
+      dashTime = 0;
+      if (input.isZero()) {
+        dashDir.set(dir, 0f);
+      } else {
+        dashDir.set(input);
+      }
       setState(STATE_DASH);
     }
   }
@@ -168,29 +161,17 @@ public class Player extends Entity {
    * Tries to start a player attack.
    */
   public void tryAttack() {
-    if (!isAttacking()) {
-      body.destroyFixture(fixture);
-      if (mode == 0) {
-        fixture = body.createFixture(def2);
-        fixture.setUserData(this);
-        mode = 1;
-      } else {
-        fixture = body.createFixture(def1);
-        fixture.setUserData(this);
-        mode = 0;
-      }
-
+    if (!isAttacking() && !isDashing()) {
       if (isGrounded()) {
-        if (vdir > 0) {
+        if (input.y > 0) {
           setState(STATE_UP_GND_ATTACK);
         } else {
           setState(STATE_GND_ATTACK);
         }
-      }
-      else {
-        if (vdir > 0) {
+      } else {
+        if (input.y > 0) {
           setState(STATE_UAIR_ATTACK);
-        } else if (vdir < 0) {
+        } else if (input.y < 0) {
           setState(STATE_DAIR_ATTACK);
         } else {
           setState(STATE_AIR_ATTACK);
@@ -225,13 +206,26 @@ public class Player extends Entity {
    * Sets the player's grounded state.
    * @param value value to set
    */
-  public void setGrounded(boolean value) { grounded = value; }
+  public void setGrounded(boolean value) {
+    grounded = value;
+  }
+
+  /**
+   * Returns whether the player is dashing.
+   */
+  public boolean isDashing() {
+    return stateIndex == STATE_DASH;
+  }
   
   /**
    * Returns whether the player is attacking.
    */
   public boolean isAttacking() {
-    return stateIndex == STATE_GND_ATTACK || stateIndex == STATE_AIR_ATTACK;
+    return stateIndex == STATE_GND_ATTACK
+      || stateIndex == STATE_UP_GND_ATTACK
+      || stateIndex == STATE_AIR_ATTACK
+      || stateIndex == STATE_DAIR_ATTACK
+      || stateIndex == STATE_UAIR_ATTACK;
   }
 
   /**
@@ -251,28 +245,21 @@ public class Player extends Entity {
   }
 
   /**
-   * Sets the player's horizontal movement.
+   * Sets the player's input vector.
    */
-  public void setHorizontal(int horizontal) {
-    movement = hdir = horizontal;
+  public void setInputVector(float x, float y) {
+    input.set(x, y);
   }
 
   /**
-   * Sets the player's vertical direction.
-   */
-  public void setVertical(int vertical) {
-    vdir = vertical;
-  }
-
-  /**
-   * Tries to move the player by the horizontal movement
+   * Tries to move the player based on the horizontal input.
    */
   public void tryMove() {
-    if (movement != 0) {
+    if (input.x != 0) {
       if (!isAttacking()) {
-        if (movement > 0) {
+        if (input.x > 0) {
           faceRight();
-        } else if (movement < 0) {
+        } else if (input.x < 0) {
           faceLeft();
         }
       }
@@ -280,30 +267,46 @@ public class Player extends Entity {
   }
 
   @Override
+  public void leaveState() {
+    switch (stateIndex) {
+    case STATE_DASH:
+      body.setGravityScale(1f);
+      break;
+    case STATE_JUMP:
+      jumpTime = jumpDuration = -1;
+      break;
+    case STATE_GND_ATTACK:
+    case STATE_UP_GND_ATTACK:
+    case STATE_AIR_ATTACK:
+    case STATE_DAIR_ATTACK:
+    case STATE_UAIR_ATTACK:
+      enemiesHit.clear();
+      break;
+    }
+  }
+  
+  @Override
   public void advanceState() {
     switch (stateIndex) {
     case STATE_GND_ATTACK:
     case STATE_UP_GND_ATTACK:
       if (getState().done) {
-        enemiesHit.clear();
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+        setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
       }
       break;
     case STATE_AIR_ATTACK:
     case STATE_UAIR_ATTACK:
     case STATE_DAIR_ATTACK:
       if (isGrounded()) {
-        enemiesHit.clear();
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+        setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
       } else if (getState().done) {
-        enemiesHit.clear();
         setState(STATE_FALL);
       }
       break;
     case STATE_DASH:
-      if (dashTime > DASH_DURATION) {
+      if (dashTime >= DASH_DURATION) {
         if (isGrounded()) {
-          setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+          setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
         } else {
           setState(STATE_FALL);
         }
@@ -312,21 +315,20 @@ public class Player extends Entity {
     case STATE_JUMP:
       if (jumpTime >= jumpDuration) {
         setState(STATE_FALL);
-        jumpTime = jumpDuration = 0;
       }
       break;
     case STATE_FALL:
       if (isGrounded()) {
-        setState(movement != 0 ? STATE_WALK : STATE_IDLE);
+        setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
       }
       break;
     case STATE_WALK:
-      if (movement == 0) {
+      if (input.x == 0) {
         setState(STATE_IDLE);
       }
       break;
     case STATE_IDLE:
-      if (movement != 0) {
+      if (input.x != 0) {
         setState(STATE_WALK);
       }
       break;
@@ -337,18 +339,23 @@ public class Player extends Entity {
   public void update(float delta) {
     super.update(delta);
 
-    float vx = 0;
-    float vy = 0;
-    if (dashTime == 0 || dashTime > DASH_DURATION) {
-      if (movement != 0) {
-        temp.set(MOVE_IMPULSE * movement, 0);
+    Vector2 vel = new Vector2();
+    if (isDashing()) {
+      vel.set(dashDir).setLength(DASH_SPEED);
+    } else {
+      if (isGrounded()) {
+        hasDash = true;
+      } else {
+        // vx -= vx / MOVE_DAMPING;
+      }
+      
+      if (input.x != 0) {
+        temp.set(MOVE_IMPULSE * Math.signum(input.x), 0);
         body.applyLinearImpulse(temp, getPosition(), true);
-        vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
       } else {
         // damping
         temp.set(-MOVE_DAMPING * getVelocity().x, 0);
         body.applyForce(temp, getPosition(), true);
-        vx = Math.min(MAX_X_SPEED, Math.max(-MAX_X_SPEED, getVelocity().x));
       }
 
       if (jumpTime < jumpDuration) {
@@ -356,36 +363,26 @@ public class Player extends Entity {
         body.applyLinearImpulse(temp, getPosition(), true);
         jumpTime++;
       }
-      vy = MathUtils.clamp(getVelocity().y, -MAX_Y_SPEED, MAX_Y_SPEED);
 
-      if (!grounded) {
-        vx -= vx / MOVE_DAMPING;
-      }
-    } else {
-      int hDirection = dashDir[0];
-      int vDirection = dashDir[1];
-      temp.set(hDirection, vDirection);
-      temp.setLength(1);
-      temp.scl(DASH_SPEED);
-      vx = temp.x;
-      vy = temp.y;
-      System.out.println(dashTime);
+      vel.set(MathUtils.clamp(getVelocity().x, -MAX_X_SPEED, MAX_X_SPEED),
+              MathUtils.clamp(getVelocity().y, -MAX_Y_SPEED, MAX_Y_SPEED));
     }
-    dashTime++;
-
-    body.setLinearVelocity(vx, vy);
+    
+    if (dashTime >= 0 && dashTime < DASH_COOLDOWN) {
+      dashTime++;
+    } else {
+      dashTime = -1;
+    }
+    
+    body.setLinearVelocity(vel);
   }
 
   @Override
   public void drawPhysics(GameCanvas canvas) {
     Vector2 pos = getPosition();
-    if (mode == 0) {
-      canvas.drawPhysics((PolygonShape)fixture.getShape(), Color.RED,
-                         pos.x, pos.y, 0);
-    } else {
-      canvas.drawPhysics((CircleShape)fixture.getShape(), Color.RED,
-                         pos.x, pos.y);
-    }
+    canvas.drawPhysics((PolygonShape)fixture.getShape(),
+                       isDashing() ? Color.GREEN : Color.RED,
+                       pos.x, pos.y, 0);
     canvas.drawPhysics(groundSensor.getShape(), Color.RED,
                        pos.x, pos.y, 0);
     if (isHitboxActive()) {
