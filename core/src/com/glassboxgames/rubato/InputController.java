@@ -4,8 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 public class InputController {
-  /** Whether the debug code was entered */
+  /** Whether the debug input was entered */
   private boolean debug;
+  /** Whether the devMode input was entered */
+  private boolean devMode;
+  /** The devSelect input 0-9 */
+  private int devSelect;
+  /** The devChange increment/decrement input */
+  private int devChange;
 
   /** Whether the exit button was pressed */
   private boolean exitPressed;
@@ -42,10 +48,31 @@ public class InputController {
   private InputController() {}
 
   /**
-   * Returns whether the debug code was entered.
+   * Returns whether the debug input was entered.
    */
   public boolean didDebug() {
     return debug;
+  }
+
+  /**
+   * Returns whether the devMode input was entered.
+   */
+  public boolean didDevMode() {
+    return devMode;
+  }
+
+  /**
+   * Returns the devSelect input.
+   */
+  public int getDevSelect() {
+    return devSelect;
+  }
+
+  /**
+   * Returns the devChange input.
+   */
+  public int getDevChange() {
+    return devChange;
   }
 
   /**
@@ -103,6 +130,37 @@ public class InputController {
    */
   private void readKeyboard() {
     debug = Gdx.input.isKeyJustPressed(Input.Keys.SLASH);
+    devMode = Gdx.input.isKeyJustPressed(Input.Keys.PERIOD);
+    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+      devSelect = 1;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+      devSelect = 2;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+      devSelect = 3;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+      devSelect = 4;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
+      devSelect = 5;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
+      devSelect = 6;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) {
+      devSelect = 7;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
+      devSelect = 8;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) {
+      devSelect = 9;
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+      devSelect = 0;
+    } else {
+      devSelect = -1;
+    }
+    devChange = 0;
+    if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
+      devChange += 1;
+    }
+    if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
+      devChange -= 1;
+    }
 
     // TODO: maybe secondary to allow gamepad override
 

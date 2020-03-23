@@ -1,15 +1,11 @@
 package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.*;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.glutils.*;
+import com.badlogic.gdx.assets.*;
+import com.badlogic.gdx.assets.loaders.*;
+import com.badlogic.gdx.assets.loaders.resolvers.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.freetype.*;
 
 public class GDXRoot extends Game {
   /** AssetManager to load game assets (textures, sounds, etc.) */
@@ -23,13 +19,15 @@ public class GDXRoot extends Game {
 
     // Add font support to the asset manager
     FileHandleResolver resolver = new InternalFileHandleResolver();
+    manager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+    manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
   }
 
   @Override
   public void create() {
     canvas = new GameCanvas();
     // canvas.setFullscreen(true, false);
-    PrototypeMode mode = new PrototypeMode(canvas);
+    PrototypeMode mode = new PrototypeMode(manager, canvas);
     setScreen(mode);
   }
 }
