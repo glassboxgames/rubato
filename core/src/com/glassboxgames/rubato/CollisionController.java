@@ -1,11 +1,9 @@
 package com.glassboxgames.rubato;
 
-import com.glassboxgames.rubato.entity.Enemy;
-import com.glassboxgames.rubato.entity.Platform;
-import com.glassboxgames.rubato.entity.Player;
+import com.badlogic.gdx.physics.box2d.*;
+import com.glassboxgames.rubato.entity.*;
 
-public class CollisionController {
-
+public class CollisionController implements ContactListener {
   /** The singleton instance of the collision controller */
   private static CollisionController controller = null;
 
@@ -23,6 +21,30 @@ public class CollisionController {
    * Create a new collision controller. Only used to create the singleton.
    */
   private CollisionController() {}
+
+  @Override
+  public void beginContact(Contact contact) {
+    Fixture f1 = contact.getFixtureA();
+    Fixture f2 = contact.getFixtureB();
+    Object d1 = f1.getUserData();
+    Object d2 = f2.getUserData();
+    startCollision(d1, d2);
+  }
+  
+  @Override
+  public void endContact(Contact contact) {
+    Fixture f1 = contact.getFixtureA();
+    Fixture f2 = contact.getFixtureB();
+    Object d1 = f1.getUserData();
+    Object d2 = f2.getUserData();
+    endCollision(d1, d2);
+  }
+
+  @Override
+  public void preSolve(Contact contact, Manifold manifold) {}
+
+  @Override
+  public void postSolve(Contact contact, ContactImpulse impulse) {}
 
   public void startCollision(Object o1, Object o2) {
     if (o1 instanceof Player && o2 instanceof Platform){
