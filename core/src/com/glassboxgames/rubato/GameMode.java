@@ -10,20 +10,18 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.util.*;
 
 /**
- * Primary controller class for the gameplay prototype.
+ * Mode controller for the main gameplay loop.
  */
-public class PrototypeMode implements ContactListener, Screen {
+public class GameMode implements Screen {
   public enum GameState {
     /** Before the game has started */
     INTRO,
     /** While we are playing the game */
     PLAY,
   }
-
-  /** AssetManager to load game assets (textures, sounds, etc.) */
-  private AssetManager manager;
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
@@ -82,6 +80,8 @@ public class PrototypeMode implements ContactListener, Screen {
   
   /** Canvas on which to draw content */
   protected GameCanvas canvas;
+  /** Listener to handle exiting */
+  protected ScreenListener listener;
   /** Current state of the game */
   protected GameState gameState;
   /** Whether this game mode is active */
@@ -104,22 +104,25 @@ public class PrototypeMode implements ContactListener, Screen {
   private int devSelect = -1;
 
   /**
-   * Instantiate a PrototypeMode.
-   * @param m the asset manager
+   * Instantiate a GameMode.
    * @param c the canvas to draw on
+   * @param l the listener for exiting the screen
    */
-  public PrototypeMode(AssetManager m, GameCanvas c) {
-    // Start loading with the asset manager
-    manager = m;
+  public GameMode(GameCanvas c, ScreenListener l) {
     assets = new Array();
     canvas = c;
+    listener = l;
     gameState = GameState.INTRO;
 
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
-    world.setContactListener(this);
+    world.setContactListener(CollisionController.getInstance());
   }
 
+  /**
+   * Adds the assets to load for the game to the given manager.
+   * @param manager asset manager to use
+   */
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
     assets.add(BACKGROUND_FILE);
@@ -145,15 +148,24 @@ public class PrototypeMode implements ContactListener, Screen {
     assets.add(FONT_FILE);
   }
 
+  /**
+   * Returns a texture for the given file if loaded, otherwise returns null.
+   * @param manager the asset manager to use
+   * @param file the file path
+   */
   private Texture createTexture(AssetManager manager, String file) {
     if (manager.isLoaded(file)) {
       Texture texture = manager.get(file, Texture.class);
       texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
       return texture;
     }
-    return new Texture(Gdx.files.internal(file));
+    return null;
   }
 
+  /**
+   * Pulls the loaded textures from the asset manager for the game.
+   * @param manager the asset manager to use
+   */
   public void loadContent(AssetManager manager) {
     displayFont = manager.get(FONT_FILE, BitmapFont.class);
     background = createTexture(manager, BACKGROUND_FILE);
@@ -164,9 +176,12 @@ public class PrototypeMode implements ContactListener, Screen {
     adagioAttackTexture = createTexture(manager, ADAGIO_ATTACK);
     enemyTexture = createTexture(manager, ENEMY_FILE);
     platformTexture = createTexture(manager, PLATFORM_FILE);
-    platformTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
   }
 
+  /**
+   * Unloads the assets loaded for the game.
+   * @param manager the asset manager to use
+   */
   public void unloadContent(AssetManager manager) {
     for (String s : assets) {
       if (manager.isLoaded(s)) {
@@ -175,42 +190,32 @@ public class PrototypeMode implements ContactListener, Screen {
     }
   }
 
-  @Override
-  public void beginContact(Contact contact) {
-    Fixture f1 = contact.getFixtureA();
-    Fixture f2 = contact.getFixtureB();
-    Object d1 = f1.getUserData();
-    Object d2 = f2.getUserData();
-    CollisionController cc = CollisionController.getInstance();
-    cc.startCollision(d1, d2);
-  }
-  
-  @Override
-  public void endContact(Contact contact) {
-    Fixture f1 = contact.getFixtureA();
-    Fixture f2 = contact.getFixtureB();
-    Object d1 = f1.getUserData();
-    Object d2 = f2.getUserData();
-    CollisionController cc = CollisionController.getInstance();
-    cc.endCollision(d1, d2);
-  }
+  /**
+   * Resets the world.
+   */
+  public void reset() {
+    for (Platform platform : platforms) {
+      platform.deactivatePhysics(world);
+    }
+    for (Enemy enemy : enemies) {
+      enemy.deactivatePhysics(world);
+    }
+    player.deactivatePhysics(world);
 
-  @Override
-  public void preSolve(Contact contact, Manifold manifold) {}
-
-  @Override
-  public void postSolve(Contact contact, ContactImpulse impulse) {}
+    platforms.clear();
+    enemies.clear();
+    world.dispose(); 
+    world = new World(new Vector2(0, GRAVITY), false);
+    world.setContactListener(CollisionController.getInstance());
+    gameState = GameState.INTRO;
+  }
 
   /**
-   * TODO
+   * Updates the state of the game.
+   * @param delta time in seconds since last frame
    */
-  private void update(float delta) {
-    switch (gameState) {
-    case INTRO: {
-      preloadContent(manager);
-      manager.finishLoading();
-      loadContent(manager);
-
+  protected void update(float delta) {
+    if (gameState == GameState.INTRO) {
       player = new Player(1f, 2f, 0.3f, 1f, Player.NUM_STATES);
       player.initState(Player.STATE_IDLE, adagioIdleTexture);
       player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
@@ -236,18 +241,16 @@ public class PrototypeMode implements ContactListener, Screen {
       enemies = new Array(new Enemy[] {enemy});
 
       gameState = GameState.PLAY;
-      break;
-    }
-    case PLAY: {
+    } else if (gameState == GameState.PLAY) {
       InputController input = InputController.getInstance();
       input.readInput();
       if (input.didExit()) {
         Gdx.app.exit();
-        break;
+        return;
       }
       if (input.didReset()) {
         reset();
-        break;
+        return;
       }
       if (input.didDebug()) {
         debug = !debug;
@@ -333,22 +336,13 @@ public class PrototypeMode implements ContactListener, Screen {
         enemy.update(delta);
       }
       world.step(1 / 60f, 8, 3);
-      break;
-    }
     }
   }
 
   /**
-   * TODO: process a single frame
-   * @param delta
+   * Draw the current game state to the canvas.
    */
-  private void play(float delta) {}
-
-  /**
-   * TODO:
-   * @param delta
-   */
-  private void draw(float delta) {
+  protected void draw() {
     if (player.isAlive()) {
       canvas.moveCamera(player.getPosition().scl(Constants.PPM),
                         LEVEL_WIDTH * Constants.PPM, LEVEL_HEIGHT * Constants.PPM);
@@ -426,75 +420,36 @@ public class PrototypeMode implements ContactListener, Screen {
     canvas.drawText(text, displayFont, color, x - 1, y); // bold effect
   }
 
-  /**
-   * TODO:
-   * @param delta
-   */
+  @Override
   public void render(float delta) {
     if (active) {
       update(delta);
-      draw(delta);
-      // TODO: implement quitting after draw function in the future
+      draw();
     }
   }
 
-  /**
-   * TODO:
-   * @param width
-   * @param height
-   */
+  @Override
   public void resize(int width, int height) {}
 
-  /**
-   * TODO:
-   */
+  @Override
   public void pause() {}
 
-  /**
-   * TODO:
-   */
+  @Override
   public void resume() {}
 
-  /**
-   * TODO:
-   */
+  @Override
   public void show() {
     active = true;
   }
 
-  /**
-   * TODO:
-   */
+  @Override
   public void hide() {
     active = false;
   }
 
-  /**
-   * TODO:
-   */
+  @Override
   public void dispose() {
     player = null;
     canvas = null;
-    unloadContent(manager);
-  }
-
-  /**
-   * Manages resetting the world.
-   */
-  public void reset() {
-    for (Platform platform : platforms) {
-      platform.deactivatePhysics(world);
-    }
-    for (Enemy enemy : enemies) {
-      enemy.deactivatePhysics(world);
-    }
-    player.deactivatePhysics(world);
-
-    platforms.clear();
-    enemies.clear();
-    world.dispose(); // TODO I think we need to reset the world but it crashes whenever we do.
-    world = new World(new Vector2(0, GRAVITY), false);
-    world.setContactListener(this);
-    gameState = GameState.INTRO;
   }
 }
