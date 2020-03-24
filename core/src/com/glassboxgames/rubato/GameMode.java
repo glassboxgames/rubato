@@ -1,8 +1,11 @@
 package com.glassboxgames.rubato;
 
+import java.text.DecimalFormat;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
@@ -13,8 +16,6 @@ import com.glassboxgames.util.*;
  * Mode controller for the main gameplay loop.
  */
 public class GameMode implements Screen {
-  private boolean debug = false;
-
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -40,7 +41,16 @@ public class GameMode implements Screen {
   /** The file for the platform tile */
   private static final String PLATFORM_FILE = "Tilesets/Grass/edge-n.png";
 
+  /** The file for the font */
+  private static final String FONT_FILE = "Fonts/LucidaGrande.ttf";
+  /** The font size */
+  private static final int FONT_SIZE = 24;
+  /** The text offset */
+  private static final float TEXT_OFFSET = 20.0f;
+
   // Loaded assets
+  /** The font for giving messages to the player */
+  private BitmapFont displayFont;
   /** The background image for the game */
   private Texture background;
   /** Texture for Adagio idling */
@@ -86,6 +96,13 @@ public class GameMode implements Screen {
   /** The list of enemies */
   protected Array<Enemy> enemies;
 
+  /** Whether debug mode is on */
+  private boolean debug = false;
+  /** Whether dev mode is on */
+  private boolean devMode = false;
+  /** Numerical selector for devMode */
+  private int devSelect = -1;
+
   /**
    * Instantiate a GameMode.
    * @param c the canvas to draw on
@@ -123,6 +140,12 @@ public class GameMode implements Screen {
     assets.add(ENEMY_FILE);
     manager.load(PLATFORM_FILE, Texture.class);
     assets.add(PLATFORM_FILE);
+
+    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+    size2Params.fontFileName = FONT_FILE;
+    size2Params.fontParameters.size = FONT_SIZE;
+    manager.load(FONT_FILE, BitmapFont.class, size2Params);
+    assets.add(FONT_FILE);
   }
 
   /**
@@ -133,7 +156,7 @@ public class GameMode implements Screen {
   private Texture createTexture(AssetManager manager, String file) {
     if (manager.isLoaded(file)) {
       Texture texture = manager.get(file, Texture.class);
-      //texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+      texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
       return texture;
     }
     return null;
@@ -144,6 +167,7 @@ public class GameMode implements Screen {
    * @param manager the asset manager to use
    */
   public void loadContent(AssetManager manager) {
+    displayFont = manager.get(FONT_FILE, BitmapFont.class);
     background = createTexture(manager, BACKGROUND_FILE);
     adagioIdleTexture = createTexture(manager, ADAGIO_IDLE);
     adagioWalkTexture = createTexture(manager, ADAGIO_WALK);
@@ -191,7 +215,6 @@ public class GameMode implements Screen {
    * @param delta time in seconds since last frame
    */
   protected void update(float delta) {
-    System.out.println(delta);
     if (gameState == GameState.INTRO) {
       player = new Player(1f, 2f, 0.3f, 1f, Player.NUM_STATES);
       player.initState(Player.STATE_IDLE, adagioIdleTexture);
@@ -231,6 +254,50 @@ public class GameMode implements Screen {
       }
       if (input.didDebug()) {
         debug = !debug;
+      }
+      if (input.didDevMode()) {
+        devMode = !devMode;
+        devSelect = -1;
+      }
+      if (devMode) {
+        if (input.getDevSelect() != -1) {
+          devSelect = input.getDevSelect();
+        }
+        int devChange = input.getDevChange();
+        if (devChange != 0) {
+          switch (devSelect) {
+            case -1:
+              break;
+            case 1:
+              Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
+              break;
+            case 2:
+              Player.maxXSpeed += devChange * 0.5;
+              break;
+            case 3:
+              Player.maxYSpeed += devChange * 0.5;
+              break;
+            case 4:
+              Player.minJumpDuration += devChange * 1;
+              break;
+            case 5:
+              Player.maxJumpDuration += devChange * 1;
+              break;
+            case 6:
+              Player.dashCooldown += devChange * 1;
+              break;
+            case 7:
+              Player.dashDuration += devChange * 1;
+              break;
+            case 8:
+              Player.dashSpeed += devChange * 0.5;
+              break;
+            case 9:
+              break;
+            case 0:
+              break;
+          }
+        }
       }
 
       if (player.isAlive()) {
@@ -309,6 +376,48 @@ public class GameMode implements Screen {
       }
       canvas.endDebug();
     }
+
+    if (devMode) {
+      float xOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).x - canvas.getWidth() / 2, 0, LEVEL_WIDTH * Constants.PPM - canvas.getWidth()) + TEXT_OFFSET;
+      float yOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).y + canvas.getHeight() / 2, canvas.getHeight(), canvas.getHeight() + LEVEL_HEIGHT * Constants.PPM) - TEXT_OFFSET;
+      float deltaOffset = 2 * TEXT_OFFSET;
+      canvas.begin();
+      drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE, xOffset, yOffset);
+      drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED, xOffset, yOffset - deltaOffset);
+      drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED, xOffset, yOffset - 2 * deltaOffset);
+      drawText(4, "Min Jump Duration", Player.minJumpDuration, Player.MIN_JUMP_DURATION, xOffset, yOffset - 3 * deltaOffset);
+      drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION, xOffset, yOffset - 4 * deltaOffset);
+      drawText(6, "Dash Cooldown", Player.dashCooldown, Player.DASH_COOLDOWN, xOffset, yOffset - 5 * deltaOffset);
+      drawText(7, "Dash Duration", Player.dashDuration, Player.DASH_DURATION, xOffset, yOffset - 6 * deltaOffset);
+      drawText(8, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED, xOffset, yOffset - 7 * deltaOffset);
+      canvas.end();
+    }
+
+  }
+
+  /**
+   * Draws devMode text
+   * TODO
+   * @param num
+   */
+  private void drawText(int num, String name, float value, float oldValue, float x, float y) {
+    Color color;
+    if (num == devSelect) {
+      if (value != oldValue) {
+        color = Color.RED;
+      } else {
+        color = Color.WHITE;
+      }
+    } else {
+      if (value != oldValue) {
+        color = Color.FIREBRICK;
+      } else {
+        color = Color.BLACK;
+      }
+    }
+    String text = "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
+    canvas.drawText(text, displayFont, color, x, y);
+    canvas.drawText(text, displayFont, color, x - 1, y); // bold effect
   }
 
   @Override

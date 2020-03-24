@@ -437,6 +437,26 @@ public class GameCanvas {
   }
 
   /**
+   * Draws text on the screen.
+   *
+   * @param text The string to draw
+   * @param font The font to use
+   * @param color The font color to use
+   * @param x The x-coordinate of the lower-left corner
+   * @param y The y-coordinate of the lower-left corner
+   */
+  public void drawText(String text, BitmapFont font, Color color, float x, float y) {
+    if (active != DrawPass.STANDARD) {
+      Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+      return;
+    }
+
+    font.setColor(color);
+    GlyphLayout layout = new GlyphLayout(font,text);
+    font.draw(spriteBatch, layout, x, y);
+  }
+
+  /**
    * Start the debug drawing sequence.
    * Nothing is flushed to the graphics card until the method end() is called.
    */

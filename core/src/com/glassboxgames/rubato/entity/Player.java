@@ -15,26 +15,34 @@ public class Player extends Entity {
   public static final float DENSITY = 1f;
   /** Friction */
   public static final float FRICTION = 0f;
-  /** Jump force */
+  /** Jump impulse */
   public static final float JUMP_IMPULSE = 0.65f;
+  public static float jumpImpulse = JUMP_IMPULSE;
   /** Movement impulse */
   public static final float MOVE_IMPULSE = 1f;
-  /** Horizontal damping */
+  /** Horizontal move damping */
   public static final float MOVE_DAMPING = 10f;
   /** Max horizontal speed */
   public static final float MAX_X_SPEED = 4f;
+  public static float maxXSpeed = MAX_X_SPEED;
   /** Max vertical speed */
   public static final float MAX_Y_SPEED = 12f;
+  public static float maxYSpeed = MAX_Y_SPEED;
   /** Min jump duration */
   public static final int MIN_JUMP_DURATION = 6;
+  public static int minJumpDuration = MIN_JUMP_DURATION;
   /** Max jump duration */
   public static final int MAX_JUMP_DURATION = 12;
+  public static int maxJumpDuration = MAX_JUMP_DURATION;
   /** Dash cooldown */
   public static final int DASH_COOLDOWN = 40;
+  public static int dashCooldown = DASH_COOLDOWN;
   /** Dash duration */
   public static final int DASH_DURATION = 10;
+  public static int dashDuration = DASH_DURATION;
   /** Dash speed */
   public static final float DASH_SPEED = 15f;
+  public static float dashSpeed = DASH_SPEED;
   /** Attack hitbox position, relative to center */
   public static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -134,8 +142,8 @@ public class Player extends Entity {
   public void tryJump() {
     if (isGrounded() && !isAttacking()) {
       setState(STATE_JUMP);
-      jumpDuration = MIN_JUMP_DURATION;
-    } else if (stateIndex == STATE_JUMP && jumpDuration < MAX_JUMP_DURATION) {
+      jumpDuration = minJumpDuration;
+    } else if (stateIndex == STATE_JUMP && jumpDuration < maxJumpDuration) {
       jumpDuration++;
     }
   }
@@ -304,7 +312,7 @@ public class Player extends Entity {
       }
       break;
     case STATE_DASH:
-      if (dashTime >= DASH_DURATION) {
+      if (dashTime >= dashDuration) {
         if (isGrounded()) {
           setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
         } else {
@@ -341,12 +349,12 @@ public class Player extends Entity {
 
     Vector2 vel = new Vector2();
     if (isDashing()) {
-      vel.set(dashDir).setLength(DASH_SPEED);
+      vel.set(dashDir).setLength(dashSpeed);
     } else {
       if (isGrounded()) {
         hasDash = true;
       } else {
-        // vx -= vx / MOVE_DAMPING;
+        // vx -= vx / moveDamping;
       }
       
       if (input.x != 0) {
@@ -359,16 +367,16 @@ public class Player extends Entity {
       }
 
       if (jumpTime < jumpDuration) {
-        temp.set(0, JUMP_IMPULSE);
+        temp.set(0, jumpImpulse);
         body.applyLinearImpulse(temp, getPosition(), true);
         jumpTime++;
       }
 
-      vel.set(MathUtils.clamp(getVelocity().x, -MAX_X_SPEED, MAX_X_SPEED),
-              MathUtils.clamp(getVelocity().y, -MAX_Y_SPEED, MAX_Y_SPEED));
+      vel.set(MathUtils.clamp(getVelocity().x, -maxXSpeed, maxXSpeed),
+              MathUtils.clamp(getVelocity().y, -maxYSpeed, maxYSpeed));
     }
     
-    if (dashTime >= 0 && dashTime < DASH_COOLDOWN) {
+    if (dashTime >= 0 && dashTime < dashCooldown) {
       dashTime++;
     } else {
       dashTime = -1;
