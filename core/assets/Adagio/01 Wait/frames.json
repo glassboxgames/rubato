@@ -1,0 +1,14 @@
+[
+  {
+    "file": "0.png",
+    "hurtboxes": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 0.3,
+        "height": 1,
+        "angle": 0
+      }
+    ]
+  }
+]

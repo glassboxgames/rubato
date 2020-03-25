@@ -25,10 +25,9 @@ public abstract class BoxEntity extends Entity {
    * @param y y-coordinate of center
    * @param w width
    * @param h height
-   * @param numStates number of entity states
    */
-  public BoxEntity(float x, float y, float w, float h, int numStates) {
-    super(x, y, numStates);
+  public BoxEntity(float x, float y, float w, float h) {
+    super(x, y);
     dim = new Vector2(w, h);
 
     PolygonShape shape = new PolygonShape();

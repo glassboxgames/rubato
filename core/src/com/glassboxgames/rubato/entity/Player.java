@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
-import com.glassboxgames.rubato.GameCanvas;
-import com.glassboxgames.rubato.GroundSensor;
+import com.glassboxgames.rubato.*;
 
 /**
  * Class representing a main player character in Rubato.
@@ -43,6 +42,7 @@ public class Player extends Entity {
   /** Dash speed */
   public static final float DASH_SPEED = 15f;
   public static float dashSpeed = DASH_SPEED;
+
   /** Attack hitbox position, relative to center */
   public static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
   /** Attack hitbox radius */
@@ -55,7 +55,6 @@ public class Player extends Entity {
   public static final float ATTACK_DAMAGE = 3f;
 
   /** Player state constants */
-  public static final int NUM_STATES = 10;
   public static final int STATE_IDLE = 0;
   public static final int STATE_WALK = 1;
   public static final int STATE_FALL = 2;
@@ -67,12 +66,6 @@ public class Player extends Entity {
   public static final int STATE_DAIR_ATTACK = 8;
   public static final int STATE_UAIR_ATTACK = 9;
 
-  /** Fixture definition */
-  protected FixtureDef def;
-  /** Fixture */
-  protected Fixture fixture;
-  /** Player dimensions */
-  protected Vector2 dim;
   /** Normalized vector indicating the directions the player is pressing */
   protected Vector2 input;
   /** Ground sensor for the player */
@@ -100,23 +93,12 @@ public class Player extends Entity {
    * Instantiates a player with the given parameters.
    * @param x x-coordinate of center
    * @param y y-coordinate of center
-   * @param w width
-   * @param h height
-   * @param numStates number of entity states
    */
-  public Player(float x, float y, float w, float h, int numStates) {
-    super(x, y, numStates);
-    dim = new Vector2(w, h);
-
-    def = new FixtureDef();
-    PolygonShape shape = new PolygonShape();
-    shape.setAsBox(dim.x / 2, dim.y / 2);
-    def.shape = shape;
-    def.friction = FRICTION;
-    def.density = DENSITY;
-
+  public Player(float x, float y) {
+    super(x, y);
     input = new Vector2();
-    groundSensor = new GroundSensor(this, dim);
+    // TODO fix hardcoded dims
+    groundSensor = new GroundSensor(this, new Vector2(0.3f, 1f));
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
@@ -131,8 +113,7 @@ public class Player extends Entity {
     if (!super.activatePhysics(world)) {
       return false;
     }
-    fixture = body.createFixture(def);
-    fixture.setUserData(this);
+    setState(STATE_IDLE);
     return groundSensor.activatePhysics();
   }
 
@@ -241,8 +222,8 @@ public class Player extends Entity {
    */
   public boolean isHitboxActive() {
     return isAttacking()
-      && getState().activeTime >= ATTACK_START
-      && getState().activeTime < ATTACK_END;
+      && getState().getCount() >= ATTACK_START
+      && getState().getCount() < ATTACK_END;
   }
 
   /**
@@ -387,12 +368,9 @@ public class Player extends Entity {
 
   @Override
   public void drawPhysics(GameCanvas canvas) {
+    super.drawPhysics(canvas);
     Vector2 pos = getPosition();
-    canvas.drawPhysics((PolygonShape)fixture.getShape(),
-                       isDashing() ? Color.GREEN : Color.RED,
-                       pos.x, pos.y, 0);
-    canvas.drawPhysics(groundSensor.getShape(), Color.RED,
-                       pos.x, pos.y, 0);
+    canvas.drawPhysics(groundSensor.getShape(), Color.RED, pos.x, pos.y, 0f);
     if (isHitboxActive()) {
       CircleShape shape = new CircleShape();
       pos = getPosition().add(temp.set(ATTACK_POS).scl(getDirection(), 1));

@@ -117,6 +117,8 @@ public class GameMode implements Screen {
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(CollisionController.getInstance());
+
+    Player.states = State.readStates("Adagio/");
   }
 
   /**
@@ -126,16 +128,9 @@ public class GameMode implements Screen {
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
     assets.add(BACKGROUND_FILE);
-    manager.load(ADAGIO_IDLE, Texture.class);
-    assets.add(ADAGIO_IDLE);
-    manager.load(ADAGIO_WALK, Texture.class);
-    assets.add(ADAGIO_WALK);
-    manager.load(ADAGIO_JUMP, Texture.class);
-    assets.add(ADAGIO_JUMP);
-    manager.load(ADAGIO_DASH, Texture.class);
-    assets.add(ADAGIO_DASH);
-    manager.load(ADAGIO_ATTACK, Texture.class);
-    assets.add(ADAGIO_ATTACK);
+    for (State state : Player.states) {
+      state.preloadContent(manager);
+    }
     manager.load(ENEMY_FILE, Texture.class);
     assets.add(ENEMY_FILE);
     manager.load(PLATFORM_FILE, Texture.class);
@@ -169,11 +164,9 @@ public class GameMode implements Screen {
   public void loadContent(AssetManager manager) {
     displayFont = manager.get(FONT_FILE, BitmapFont.class);
     background = createTexture(manager, BACKGROUND_FILE);
-    adagioIdleTexture = createTexture(manager, ADAGIO_IDLE);
-    adagioWalkTexture = createTexture(manager, ADAGIO_WALK);
-    adagioJumpTexture = createTexture(manager, ADAGIO_JUMP);
-    adagioDashTexture = createTexture(manager, ADAGIO_DASH);
-    adagioAttackTexture = createTexture(manager, ADAGIO_ATTACK);
+    for (State state : Player.states) {
+      state.loadContent(manager);
+    }
     enemyTexture = createTexture(manager, ENEMY_FILE);
     platformTexture = createTexture(manager, PLATFORM_FILE);
   }
@@ -187,6 +180,9 @@ public class GameMode implements Screen {
       if (manager.isLoaded(s)) {
         manager.unload(s);
       }
+    }
+    for (State state : Player.states) {
+      state.unloadContent(manager);
     }
   }
 
@@ -216,27 +212,25 @@ public class GameMode implements Screen {
    */
   protected void update(float delta) {
     if (gameState == GameState.INTRO) {
-      player = new Player(1f, 2f, 0.3f, 1f, Player.NUM_STATES);
-      player.initState(Player.STATE_IDLE, adagioIdleTexture);
-      player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
-      player.initState(Player.STATE_FALL, adagioIdleTexture);
-      player.initState(Player.STATE_JUMP, adagioJumpTexture, 1, 9, 9, 0.25f, false);
-      player.initState(Player.STATE_DASH, adagioDashTexture, 1, 2, 2, 0.2f, false);
-      player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      player.initState(Player.STATE_UP_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      player.initState(Player.STATE_DAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      player.initState(Player.STATE_UAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      player = new Player(1f, 2f);
+      // player.initState(Player.STATE_IDLE, adagioIdleTexture);
+      // player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
+      // player.initState(Player.STATE_FALL, adagioIdleTexture);
+      // player.initState(Player.STATE_JUMP, adagioJumpTexture, 1, 9, 9, 0.25f, false);
+      // player.initState(Player.STATE_DASH, adagioDashTexture, 1, 2, 2, 0.2f, false);
+      // player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      // player.initState(Player.STATE_UP_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      // player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      // player.initState(Player.STATE_DAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
+      // player.initState(Player.STATE_UAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.activatePhysics(world);
       player.setAlive(true);
 
       Platform platform = new Platform(LEVEL_WIDTH / 2f, 0.25f, LEVEL_WIDTH, 0.5f, 0.5f, 0.5f);
-      platform.initState(0, platformTexture);
       platform.activatePhysics(world);
       platforms = new Array(new Platform[] {platform});
 
       Enemy enemy = new Enemy(6f, 1.5f, 1.5f, 0.6f);
-      enemy.initState(0, enemyTexture);
       enemy.activatePhysics(world);
       enemies = new Array(new Enemy[] {enemy});
 
@@ -378,17 +372,25 @@ public class GameMode implements Screen {
     }
 
     if (devMode) {
-      float xOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).x - canvas.getWidth() / 2, 0, LEVEL_WIDTH * Constants.PPM - canvas.getWidth()) + TEXT_OFFSET;
-      float yOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).y + canvas.getHeight() / 2, canvas.getHeight(), canvas.getHeight() + LEVEL_HEIGHT * Constants.PPM) - TEXT_OFFSET;
+      float xOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).x - canvas.getWidth() / 2,
+                                      0,
+                                      LEVEL_WIDTH * Constants.PPM - canvas.getWidth()) + TEXT_OFFSET;
+      float yOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).y + canvas.getHeight() / 2,
+                                      canvas.getHeight(),
+                                      canvas.getHeight() + LEVEL_HEIGHT * Constants.PPM) - TEXT_OFFSET;
       float deltaOffset = 2 * TEXT_OFFSET;
       canvas.begin();
       drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE, xOffset, yOffset);
       drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED, xOffset, yOffset - deltaOffset);
       drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED, xOffset, yOffset - 2 * deltaOffset);
-      drawText(4, "Min Jump Duration", Player.minJumpDuration, Player.MIN_JUMP_DURATION, xOffset, yOffset - 3 * deltaOffset);
-      drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION, xOffset, yOffset - 4 * deltaOffset);
-      drawText(6, "Dash Cooldown", Player.dashCooldown, Player.DASH_COOLDOWN, xOffset, yOffset - 5 * deltaOffset);
-      drawText(7, "Dash Duration", Player.dashDuration, Player.DASH_DURATION, xOffset, yOffset - 6 * deltaOffset);
+      drawText(4, "Min Jump Duration", Player.minJumpDuration, Player.MIN_JUMP_DURATION,
+               xOffset, yOffset - 3 * deltaOffset);
+      drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION,
+               xOffset, yOffset - 4 * deltaOffset);
+      drawText(6, "Dash Cooldown", Player.dashCooldown, Player.DASH_COOLDOWN,
+               xOffset, yOffset - 5 * deltaOffset);
+      drawText(7, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
+               xOffset, yOffset - 6 * deltaOffset);
       drawText(8, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED, xOffset, yOffset - 7 * deltaOffset);
       canvas.end();
     }

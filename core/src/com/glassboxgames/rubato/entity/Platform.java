@@ -25,7 +25,7 @@ public class Platform extends BoxEntity {
    * @param baseH height for single tile
    */
   public Platform(float x, float y, float w, float h, float baseW, float baseH) {
-    super(x, y, w, h, 1);
+    super(x, y, w, h);
     bodyDef.type = BodyDef.BodyType.StaticBody;
     fixtureDef.friction = FRICTION;
     baseDim = new Vector2(baseW, baseH);
@@ -38,7 +38,7 @@ public class Platform extends BoxEntity {
     float h = baseDim.y;
     for (float x = -dim.x / 2; x < dim.x / 2; x += baseDim.x) {
       for (float y = -dim.y / 2; y < dim.y / 2; y += baseDim.y) {
-        canvas.draw(getState().filmStrip, Color.WHITE,
+        canvas.draw(getState().getTexture(), Color.WHITE,
                     0, 0,
                     pos.x + x, pos.y + y,
                     w, h);

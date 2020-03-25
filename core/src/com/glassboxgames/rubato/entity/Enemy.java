@@ -38,7 +38,7 @@ public class Enemy extends BoxEntity {
    * @param h height
    */
   public Enemy(float x, float y, float w, float h) {
-    super(x, y, w, h, 1);
+    super(x, y, w, h);
 
     bodyDef.type = BodyDef.BodyType.KinematicBody;
     fixtureDef.friction = FRICTION;
