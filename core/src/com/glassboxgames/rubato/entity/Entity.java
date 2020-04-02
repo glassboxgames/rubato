@@ -12,9 +12,6 @@ import com.glassboxgames.util.*;
  * Abstract class representing a textured entity.
  */
 public abstract class Entity {
-  /** Array of entity states, indexed by animation state index */
-  public static Array<State> states;
-  
   /** The body definition for this entity */
   protected BodyDef bodyDef;
   /** The body for this entity */
@@ -25,6 +22,8 @@ public abstract class Entity {
   protected int dir;
   /** Current entity state, represented as an integer */
   protected int stateIndex;
+  /** Number of frames spent in current state */
+  protected int count;
 
   /** Temp vector for calculations */
   protected Vector2 temp = new Vector2();
@@ -52,6 +51,11 @@ public abstract class Entity {
   }
 
   /**
+   * Returns an array of states for this entity.
+   */
+  public abstract Array<State> getStates();
+
+  /**
    * Returns the position vector. Always returns a copy the same vector.
    */
   public Vector2 getPosition() {
@@ -74,7 +78,13 @@ public abstract class Entity {
     return dir;
   }
 
-  public Body getBody() { return body; }
+  /**
+   * Returns the Box2D body of this entity.
+   */
+  public Body getBody() {
+    return body;
+  }
+  
   /**
    * Sets the direction of this entity to 1 (right).
    */
@@ -114,15 +124,25 @@ public abstract class Entity {
    * @param delta time since the last update
    */
   public void update(float delta) {
-    getState().update();
+    for (Fixture fixture : fixtures) {
+      body.destroyFixture(fixture);
+    }
+    fixtures.clear();
+    count++;
     advanceState();
+    State state = getState();
+    for (FixtureDef def : state.getHurtboxDefs(count)) {
+      Fixture fixture = body.createFixture(def);
+      fixture.setUserData(this);
+      fixtures.add(fixture);
+    }
   }
 
   /**
    * Returns the current entity state.
    */
   public State getState() {
-    return states.get(stateIndex);
+    return getStates().get(stateIndex);
   }
 
   /**
@@ -132,11 +152,6 @@ public abstract class Entity {
   public void setState(int i) {
     leaveState();
     stateIndex = i;
-    for (FixtureDef def : getState().getHurtboxDefs()) {
-      Fixture fixture = body.createFixture(def);
-      fixture.setUserData(this);
-      fixtures.add(fixture);
-    }
   }
 
   /**
@@ -144,10 +159,7 @@ public abstract class Entity {
    * Called before new state is set.
    */
   public void leaveState() {
-    for (Fixture fixture : fixtures) {
-      body.destroyFixture(fixture);
-    }
-    getState().reset();
+    count = 0;
   }
   
   /**
@@ -160,7 +172,7 @@ public abstract class Entity {
    * Draws this entity to the given canvas.
    */
   public void draw(GameCanvas canvas) {
-    Texture texture = getState().getTexture();
+    Texture texture = getState().getTexture(count);
     float w = texture.getWidth() / Constants.PPM;
     float h = texture.getHeight() / Constants.PPM;
     Vector2 pos = getPosition();

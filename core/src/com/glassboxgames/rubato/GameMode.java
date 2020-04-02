@@ -117,8 +117,9 @@ public class GameMode implements Screen {
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(CollisionController.getInstance());
-
     Player.states = State.readStates("Adagio/");
+    Platform.states = State.readStates("Tilesets/");
+    Enemy.states = State.readStates("Enemies/Drone/");
   }
 
   /**
@@ -128,13 +129,16 @@ public class GameMode implements Screen {
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
     assets.add(BACKGROUND_FILE);
+
     for (State state : Player.states) {
       state.preloadContent(manager);
     }
-    manager.load(ENEMY_FILE, Texture.class);
-    assets.add(ENEMY_FILE);
-    manager.load(PLATFORM_FILE, Texture.class);
-    assets.add(PLATFORM_FILE);
+    for (State state : Platform.states) {
+      state.preloadContent(manager);
+    }
+    for (State state : Enemy.states) {
+      state.preloadContent(manager);
+    }
 
     FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
     size2Params.fontFileName = FONT_FILE;
@@ -167,8 +171,12 @@ public class GameMode implements Screen {
     for (State state : Player.states) {
       state.loadContent(manager);
     }
-    enemyTexture = createTexture(manager, ENEMY_FILE);
-    platformTexture = createTexture(manager, PLATFORM_FILE);
+    for (State state : Platform.states) {
+      state.loadContent(manager);
+    }
+    for (State state : Enemy.states) {
+      state.loadContent(manager);
+    }
   }
 
   /**
@@ -182,6 +190,12 @@ public class GameMode implements Screen {
       }
     }
     for (State state : Player.states) {
+      state.unloadContent(manager);
+    }
+    for (State state : Platform.states) {
+      state.unloadContent(manager);
+    }
+    for (State state : Enemy.states) {
       state.unloadContent(manager);
     }
   }
@@ -213,26 +227,20 @@ public class GameMode implements Screen {
   protected void update(float delta) {
     if (gameState == GameState.INTRO) {
       player = new Player(1f, 2f);
-      // player.initState(Player.STATE_IDLE, adagioIdleTexture);
-      // player.initState(Player.STATE_WALK, adagioWalkTexture, 1, 10, 10, 0.25f, true);
-      // player.initState(Player.STATE_FALL, adagioIdleTexture);
-      // player.initState(Player.STATE_JUMP, adagioJumpTexture, 1, 9, 9, 0.25f, false);
-      // player.initState(Player.STATE_DASH, adagioDashTexture, 1, 2, 2, 0.2f, false);
-      // player.initState(Player.STATE_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      // player.initState(Player.STATE_UP_GND_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      // player.initState(Player.STATE_AIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      // player.initState(Player.STATE_DAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
-      // player.initState(Player.STATE_UAIR_ATTACK, adagioAttackTexture, 1, 11, 11, 0.4f, false);
       player.activatePhysics(world);
       player.setAlive(true);
 
-      Platform platform = new Platform(LEVEL_WIDTH / 2f, 0.25f, LEVEL_WIDTH, 0.5f, 0.5f, 0.5f);
-      platform.activatePhysics(world);
-      platforms = new Array(new Platform[] {platform});
+      platforms = new Array();
+      for (float x = 0.25f; x < LEVEL_WIDTH - 0.25f; x += 0.5f) {
+        Platform platform = new Platform(x, 0.25f);
+        platform.activatePhysics(world);
+        platforms.add(platform);
+      }
 
-      Enemy enemy = new Enemy(6f, 1.5f, 1.5f, 0.6f);
+      enemies = new Array();
+      Enemy enemy = new Enemy(6f, 1.5f);
       enemy.activatePhysics(world);
-      enemies = new Array(new Enemy[] {enemy});
+      enemies.add(enemy);
 
       gameState = GameState.PLAY;
     } else if (gameState == GameState.PLAY) {
@@ -309,25 +317,27 @@ public class GameMode implements Screen {
 
         player.update(delta);
       }
-      
       for (Enemy enemy : enemies) {
-        if (player.isAlive()
-            && player.isHitboxActive()
-            && !player.getEnemiesHit().contains(enemy, true)) {
-          // TODO make this not manual
-          Vector2 center = new Vector2(Player.ATTACK_POS)
-            .scl(player.getDirection(), 0)
-            .add(player.getPosition());
-          Circle circle = new Circle(center, Player.ATTACK_SIZE);
-          Vector2 dim = enemy.getDimensions();
-          Vector2 corner = new Vector2(dim).scl(-0.5f).add(enemy.getPosition());
-          Rectangle rectangle = new Rectangle(corner.x, corner.y, dim.x, dim.y);
-          if (Intersector.overlaps(circle, rectangle)) {
-            player.getEnemiesHit().add(enemy);
-            enemy.lowerHealth(Player.ATTACK_DAMAGE);
-          }
-        }
+        // if (player.isAlive()
+        //     && player.isHitboxActive()
+        //     && !player.getEnemiesHit().contains(enemy, true)) {
+        //   // TODO make this not manual
+        //   Vector2 center = new Vector2(Player.ATTACK_POS)
+        //     .scl(player.getDirection(), 0)
+        //     .add(player.getPosition());
+        //   Circle circle = new Circle(center, Player.ATTACK_SIZE);
+        //   Vector2 dim = enemy.getDimensions();
+        //   Vector2 corner = new Vector2(dim).scl(-0.5f).add(enemy.getPosition());
+        //   Rectangle rectangle = new Rectangle(corner.x, corner.y, dim.x, dim.y);
+        //   if (Intersector.overlaps(circle, rectangle)) {
+        //     player.getEnemiesHit().add(enemy);
+        //     enemy.lowerHealth(Player.ATTACK_DAMAGE);
+        //   }
+        // }
         enemy.update(delta);
+      }
+      for (Platform platform : platforms) {
+        platform.update(delta);
       }
       world.step(1 / 60f, 8, 3);
     }
@@ -346,11 +356,11 @@ public class GameMode implements Screen {
     canvas.drawBackground(background);
     canvas.end();
     canvas.begin(Constants.PPM, Constants.PPM);
-    for (Enemy enemy : enemies) {
-      enemy.draw(canvas);
-    }
     for (Platform platform : platforms) {
       platform.draw(canvas);
+    }
+    for (Enemy enemy : enemies) {
+      enemy.draw(canvas);
     }
     if (player.isAlive()) {
       player.draw(canvas);
@@ -359,11 +369,11 @@ public class GameMode implements Screen {
 
     if (debug) {
       canvas.beginDebug(Constants.PPM, Constants.PPM);
-      for (Enemy enemy : enemies) {
-        enemy.drawPhysics(canvas);
-      }
       for (Platform platform : platforms) {
         platform.drawPhysics(canvas);
+      }
+      for (Enemy enemy : enemies) {
+        enemy.drawPhysics(canvas);
       }
       if (player.isAlive()) {
         player.drawPhysics(canvas);

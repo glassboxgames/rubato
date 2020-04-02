@@ -16,33 +16,26 @@ public class State {
   /**
    * Class to represent state metadata for JSON serialization.
    */
-  class StateMetadata {
-    String name, path;
-    boolean loop;
+  private static class StateMetadata {
+    public String name, path;
+    public boolean loop;
   }
   
   /**
-   * Class to represent a hurtbox for JSON serialization.
-   */
-  class HurtboxData {
-    float x, y, width, height, angle;
-  }
-
-  /**
    * Class to represent an animation frame for JSON serialization.
    */
-  class FrameData {
-    String file;
-    Array<HurtboxData> hurtboxes;
+  private static class FrameData {
+    public String file;
+    public Array<Array<Float>> hurtboxes;
   }
 
   /**
    * Class to represent an in-memory frame.
    */
-  class Frame {
-    String path;
-    Texture texture;
-    Array<FixtureDef> hurtboxDefs;
+  private static class Frame {
+    public String path;
+    public Texture texture;
+    public Array<FixtureDef> hurtboxDefs;
   }
 
   /** Filename of the state master file */
@@ -52,10 +45,6 @@ public class State {
   
   /** Whether to loop the animation */
   protected boolean loop;
-  /** Whether the animation is finished (always false if looping) */
-  protected boolean done;
-  /** Current animation frame count */
-  protected int count;
   /** Array of frame data */
   protected Array<FrameData> frameDataList;
   /** Array of frames */
@@ -91,15 +80,22 @@ public class State {
       Frame frame = new Frame();
       frame.path = path + frameData.file;
       frame.hurtboxDefs = new Array<FixtureDef>();
-      for (HurtboxData hurtboxData : frameData.hurtboxes) {
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(hurtboxData.width, hurtboxData.height,
-                       new Vector2(hurtboxData.x, hurtboxData.y),
-                       hurtboxData.angle);
+      for (Array<Float> arr : frameData.hurtboxes) {
         FixtureDef def = new FixtureDef();
         def.density = 1f;
         def.friction = 0f;
-        def.shape = shape;
+        if (arr.size == 3) {
+          CircleShape shape = new CircleShape();
+          shape.setPosition(new Vector2(arr.get(0), arr.get(1)));
+          shape.setRadius(arr.get(2));
+          def.shape = shape;
+        } else if (arr.size == 5) {
+          PolygonShape shape = new PolygonShape();
+          shape.setAsBox(arr.get(2) / 2, arr.get(3) / 2,
+                         new Vector2(arr.get(0), arr.get(1)),
+                         arr.get(4));
+          def.shape = shape;
+        }
         frame.hurtboxDefs.add(def);
       }
       frames.add(frame);
@@ -141,49 +137,38 @@ public class State {
   }
 
   /**
-   * Updates this entity state.
+   * Returns the frame object at the given frame index for this state.
+   * If looping, takes index mod length; otherwise returns last frame on overflow.
    */
-  public void update() {
-    if (count >= frames.size && !loop) {
-      done = true;
-    } else {
-      count++;
-    }
-  }
-
-  /**
-   * Returns the number of frames that have passed.
-   */
-  public int getCount() {
-    return count;
-  }
-
-  /**
-   * Returns the current frame object for this state.
-   */
-  protected Frame getFrame() {
-    return frames.get(count % frames.size);
+  protected Frame getFrame(int index) {
+    return frames.get(loop ? index % frames.size : Math.min(index, frames.size - 1));
   }
   
   /**
+   * Returns the length of the state (number of frames in animation).
+   */
+  public int getLength() {
+    return frames.size;
+  }
+
+  /**
+   * Returns whether this animation state loops.
+   */
+  public boolean isLooping() {
+    return loop;
+  }
+
+  /**
    * Returns the current texture of this state.
    */
-  public Texture getTexture() {
-    return getFrame().texture;
+  public Texture getTexture(int index) {
+    return getFrame(index).texture;
   }
 
   /**
    * Returns the current hurtbox fixture definition array of this state.
    */
-  public Array<FixtureDef> getHurtboxDefs() {
-    return getFrame().hurtboxDefs;
-  }
-
-  /**
-   * Resets this state for re-animation.
-   */
-  public void reset() {
-    count = 0;
-    done = false;
+  public Array<FixtureDef> getHurtboxDefs(int index) {
+    return getFrame(index).hurtboxDefs;
   }
 }

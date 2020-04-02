@@ -2,19 +2,21 @@ package com.glassboxgames.rubato.entity;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.*;
 
 /**
  * Class representing a simple path-following enemy in Rubato.
  */
-public class Enemy extends BoxEntity {
+public class Enemy extends Entity {
   /** Maximum health */
   protected static final float MAX_HEALTH = 10;
   /** Maximum speed */
   protected static final float MAX_SPEED = 3f;
   /** Movement range */
   protected static final float MOVE_RANGE = 2f;
-  /** Friction */
-  protected static final float FRICTION = 0f;
+
+  /** Enemy states */
+  public static Array<State> states = null;
 
   /** Current health */
   protected float health;
@@ -34,21 +36,20 @@ public class Enemy extends BoxEntity {
    * Initializes an enemy with the specified parameters.
    * @param x x-coordinate
    * @param y y-coordinate
-   * @param w width
-   * @param h height
    */
-  public Enemy(float x, float y, float w, float h) {
-    super(x, y, w, h);
-
+  public Enemy(float x, float y) {
+    super(x, y);
     bodyDef.type = BodyDef.BodyType.KinematicBody;
-    fixtureDef.friction = FRICTION;
-
     health = MAX_HEALTH;
     minX = x - MOVE_RANGE;
     maxX = x + MOVE_RANGE;
-
     prevPosition = getPosition();
     prevVelocity = getVelocity();
+  }
+
+  @Override
+  public Array<State> getStates() {
+    return states;
   }
 
   /**

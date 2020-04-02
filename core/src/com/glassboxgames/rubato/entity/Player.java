@@ -66,6 +66,9 @@ public class Player extends Entity {
   public static final int STATE_DAIR_ATTACK = 8;
   public static final int STATE_UAIR_ATTACK = 9;
 
+  /** Player states */
+  public static Array<State> states = null;
+  
   /** Normalized vector indicating the directions the player is pressing */
   protected Vector2 input;
   /** Ground sensor for the player */
@@ -106,6 +109,11 @@ public class Player extends Entity {
     alive = true;
     hasDash = false;
     dashDir = new Vector2();
+  }
+
+  @Override
+  public Array<State> getStates() {
+    return states;
   }
 
   @Override
@@ -222,8 +230,8 @@ public class Player extends Entity {
    */
   public boolean isHitboxActive() {
     return isAttacking()
-      && getState().getCount() >= ATTACK_START
-      && getState().getCount() < ATTACK_END;
+      && count >= ATTACK_START
+      && count < ATTACK_END;
   }
 
   /**
@@ -257,6 +265,7 @@ public class Player extends Entity {
 
   @Override
   public void leaveState() {
+    super.leaveState();
     switch (stateIndex) {
     case STATE_DASH:
       body.setGravityScale(1f);
@@ -279,7 +288,7 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_GND_ATTACK:
     case STATE_UP_GND_ATTACK:
-      if (getState().done) {
+      if (!getState().isLooping() && count >= getState().getLength()) {
         setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
       }
       break;
@@ -288,7 +297,7 @@ public class Player extends Entity {
     case STATE_DAIR_ATTACK:
       if (isGrounded()) {
         setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
-      } else if (getState().done) {
+      } else if (count >= getState().getLength()) {
         setState(STATE_FALL);
       }
       break;
@@ -327,7 +336,6 @@ public class Player extends Entity {
   @Override
   public void update(float delta) {
     super.update(delta);
-
     Vector2 vel = new Vector2();
     if (isDashing()) {
       vel.set(dashDir).setLength(dashSpeed);
