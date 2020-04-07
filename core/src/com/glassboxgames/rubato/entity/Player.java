@@ -42,15 +42,6 @@ public class Player extends Entity {
   /** Dash speed */
   public static final float DASH_SPEED = 15f;
   public static float dashSpeed = DASH_SPEED;
-
-  /** Attack hitbox position, relative to center */
-  public static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
-  /** Attack hitbox radius */
-  public static final float ATTACK_SIZE = 0.45f;
-  /** Attack hitbox start frame */
-  public static final int ATTACK_START = 5;
-  /** Attack hitbox end frame */
-  public static final int ATTACK_END = 25;
   /** Attack damage */
   public static final float ATTACK_DAMAGE = 3f;
 
@@ -71,13 +62,9 @@ public class Player extends Entity {
   
   /** Normalized vector indicating the directions the player is pressing */
   protected Vector2 input;
-  /** Ground sensor for the player */
-  protected GroundSensor groundSensor;
 
   /** Whether the player is currently alive */
   protected boolean alive;
-  /** Whether the player is currently on a platform */
-  protected boolean grounded;
   /** Whether the player has a dash available */
   protected boolean hasDash;
   /** Current dash length so far */
@@ -91,6 +78,8 @@ public class Player extends Entity {
 
   /** Enemies that have been hit by the current active attack */
   protected Array<Enemy> enemiesHit;
+  /** Entities the the player is currently using as ground */
+  protected Array<Entity> entitiesUnderfoot;
 
   /**
    * Instantiates a player with the given parameters.
@@ -101,11 +90,11 @@ public class Player extends Entity {
     super(x, y);
     input = new Vector2();
     // TODO fix hardcoded dims
-    groundSensor = new GroundSensor(this, new Vector2(0.3f, 1f));
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
-    enemiesHit = new Array();
+    enemiesHit = new Array<Enemy>();
+    entitiesUnderfoot = new Array<Entity>();
     alive = true;
     hasDash = false;
     dashDir = new Vector2();
@@ -122,7 +111,7 @@ public class Player extends Entity {
       return false;
     }
     setState(STATE_IDLE);
-    return groundSensor.activatePhysics();
+    return true;
   }
 
   /**
@@ -191,21 +180,6 @@ public class Player extends Entity {
   public void setAlive(boolean value) {
     alive = value;
   }
-  
-  /**
-   * Returns whether the player is standing on a platform.
-   */
-  public boolean isGrounded() {
-    return grounded;
-  }
-
-  /**
-   * Sets the player's grounded state.
-   * @param value value to set
-   */
-  public void setGrounded(boolean value) {
-    grounded = value;
-  }
 
   /**
    * Returns whether the player is dashing.
@@ -226,12 +200,28 @@ public class Player extends Entity {
   }
 
   /**
-   * Returns whether the player's attack hitbox is active.
+   * Returns whether the player is grounded.
    */
-  public boolean isHitboxActive() {
-    return isAttacking()
-      && count >= ATTACK_START
-      && count < ATTACK_END;
+  public boolean isGrounded() {
+    return !entitiesUnderfoot.isEmpty();
+  }
+
+  /**
+   * Adds an entity to the list of entities underfoot.
+   */
+  public void addUnderfoot(Entity entity) {
+    if (!entitiesUnderfoot.contains(entity, true)) {
+      entitiesUnderfoot.add(entity);
+    }
+  }
+
+  /**
+   * Removes an entity from the list of entities underfoot.
+   */
+  public void removeUnderfoot(Entity entity) {
+    if (entitiesUnderfoot.contains(entity, true)) {
+      entitiesUnderfoot.removeValue(entity, true);
+    }
   }
 
   /**
@@ -342,8 +332,6 @@ public class Player extends Entity {
     } else {
       if (isGrounded()) {
         hasDash = true;
-      } else {
-        // vx -= vx / moveDamping;
       }
       
       if (input.x != 0) {
@@ -372,19 +360,5 @@ public class Player extends Entity {
     }
     
     body.setLinearVelocity(vel);
-  }
-
-  @Override
-  public void drawPhysics(GameCanvas canvas) {
-    super.drawPhysics(canvas);
-    Vector2 pos = getPosition();
-    canvas.drawPhysics(groundSensor.getShape(), Color.RED, pos.x, pos.y, 0f);
-    if (isHitboxActive()) {
-      CircleShape shape = new CircleShape();
-      pos = getPosition().add(temp.set(ATTACK_POS).scl(getDirection(), 1));
-      shape.setPosition(pos);
-      shape.setRadius(ATTACK_SIZE);
-      canvas.drawPhysics(shape, Color.RED, pos.x, pos.y);
-    }
   }
 }

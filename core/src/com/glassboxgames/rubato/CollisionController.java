@@ -1,6 +1,7 @@
 package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
 
 public class CollisionController implements ContactListener {
@@ -28,7 +29,7 @@ public class CollisionController implements ContactListener {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    startCollision(d1, d2);
+    startCollision((Collider)d1, (Collider)d2);
   }
   
   @Override
@@ -37,7 +38,7 @@ public class CollisionController implements ContactListener {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    endCollision(d1, d2);
+    endCollision((Collider)d1, (Collider)d2);
   }
 
   @Override
@@ -46,115 +47,83 @@ public class CollisionController implements ContactListener {
   @Override
   public void postSolve(Contact contact, ContactImpulse impulse) {}
 
-  public void startCollision(Object o1, Object o2) {
-    if (o1 instanceof Player && o2 instanceof Platform){
-      startCollision((Player) o1, (Platform) o2);
-    } else if (o2 instanceof Player && o1 instanceof Platform) {
-      startCollision((Player) o2, (Platform) o1);
-    } else if (o1 instanceof Player && o2 instanceof Enemy) {
-      startCollision((Player) o1, (Enemy) o2);
-    } else if (o2 instanceof Player && o1 instanceof Enemy) {
-      startCollision((Player) o2, (Enemy) o1);
-    } else if (o1 instanceof GroundSensor && o2 instanceof Platform){
-      startCollision((GroundSensor) o1, (Platform) o2);
-    } else if (o2 instanceof GroundSensor && o1 instanceof Platform) {
-      startCollision((GroundSensor) o2, (Platform) o1);
-    } else if (o1 instanceof GroundSensor && o2 instanceof Enemy) {
-      startCollision((GroundSensor) o1, (Enemy) o2);
-    } else if (o2 instanceof GroundSensor && o1 instanceof Enemy) {
-      startCollision((GroundSensor) o2, (Enemy) o1);
-    }
-  }
-
-  public void endCollision(Object o1, Object o2) {
-    if (o1 instanceof Player && o2 instanceof Platform){
-      endCollision((Player) o1, (Platform) o2);
-    } else if (o2 instanceof Player && o1 instanceof Platform) {
-      endCollision((Player) o2, (Platform) o1);
-    } else if (o1 instanceof Player && o2 instanceof Enemy) {
-      endCollision((Player) o1, (Enemy) o2);
-    } else if (o2 instanceof Player && o1 instanceof Enemy) {
-      endCollision((Player) o2, (Enemy) o1);
-    } else if (o1 instanceof GroundSensor && o2 instanceof Platform){
-      endCollision((GroundSensor) o1, (Platform) o2);
-    } else if (o2 instanceof GroundSensor && o1 instanceof Platform) {
-      endCollision((GroundSensor) o2, (Platform) o1);
-    } else if (o1 instanceof GroundSensor && o2 instanceof Enemy) {
-      endCollision((GroundSensor) o1, (Enemy) o2);
-    } else if (o2 instanceof GroundSensor && o1 instanceof Enemy) {
-      endCollision((GroundSensor) o2, (Enemy) o1);
+  /**
+   * Process the start of a collision between the two given entities (with metadata).
+   */
+  private void startCollision(Collider o1, Collider o2) {
+    if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
+      startCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
+    } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
+      startCollision((Player)o2.entity, o2, (Enemy)o1.entity, o1);
+    } else if (o1.entity instanceof Player && o2.entity instanceof Platform) {
+      startCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
+    } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
+      startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
     }
   }
 
   /**
-   * Handles the start collision between players and enemies.
-   * @param player
-   * @param enemy
+   * Process the end of a collision between the two given entities (with metadata).
    */
-  public void startCollision(Player player, Enemy enemy) {
-    if (!enemy.isSuspended()) {
-      player.setAlive(false);
+  private void endCollision(Collider o1, Collider o2) {
+    if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
+      endCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
+    } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
+      endCollision((Player)o2.entity, o2, (Enemy)o1.entity, o1);
+    } else if (o1.entity instanceof Player && o2.entity instanceof Platform) {
+      endCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
+    } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
+      endCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
     }
   }
 
   /**
-   * Handles the start collision between players and enemies.
-   * @param player
-   * @param enemy
+   * Handles a collision starting between a player and an enemy.
    */
-  public void endCollision(Player player, Enemy enemy) {}
-
-  /**
-   * Handles the start collision between players and platforms.
-   * @param player
-   * @param platform
-   */
-  public void startCollision(Player player, Platform platform) {}
-
-  /**
-   * Handles the end collision between players and platforms.
-   * @param player
-   * @param platform
-   */
-  public void endCollision(Player player, Platform platform) {}
-
-  /**
-   * Handles the start collision between ground sensors and enemies.
-   * @param sensor
-   * @param enemy
-   */
-  public void startCollision(GroundSensor sensor, Enemy enemy) {
-    if (enemy.isSuspended()) {
-      sensor.getPlayer().setGrounded(true);
+  private void startCollision(Player player, Collider playerCollider,
+                              Enemy enemy, Collider enemyCollider) {
+    if (playerCollider.isHitbox() && enemyCollider.isHurtbox()) {
+      Array<Enemy> enemiesHit = player.getEnemiesHit();
+      if (!enemiesHit.contains(enemy, true)) {
+        enemy.lowerHealth(Player.ATTACK_DAMAGE);
+        enemiesHit.add(enemy);
+      }
+    } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
+      if (!enemy.isSuspended()) {
+        player.setAlive(false);
+      }
+    } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
+      player.addUnderfoot(enemy);
     }
   }
 
   /**
-   * Handles the start collision between ground sensors and enemy.
-   * @param sensor
-   * @param enemy
+   * Handles a collision ending between a player and an enemy.
    */
-  public void endCollision(GroundSensor sensor, Enemy enemy) {
-    if (enemy.isSuspended()) {
-      sensor.getPlayer().setGrounded(false);
+  private void endCollision(Player player, Collider playerCollider,
+                            Enemy enemy, Collider enemyCollider) {
+    if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
+      player.removeUnderfoot(enemy);
     }
   }
 
   /**
-   * Handles the start collision between ground sensors and platforms.
-   * @param sensor
-   * @param platform
+   * Handles a collision starting between a player and a platform.
    */
-  public void startCollision(GroundSensor sensor, Platform platform) {
-    sensor.getPlayer().setGrounded(true);
+  private void startCollision(Player player, Collider playerCollider,
+                              Platform platform, Collider platformCollider) {
+    if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
+      player.addUnderfoot(platform);
+    }
   }
 
   /**
-   * Handles the end collision between ground sensors and platforms.
-   * @param sensor
-   * @param platform
+   * Handles a collision ending between a player and a platform.
    */
-  public void endCollision(GroundSensor sensor, Platform platform) {
-    sensor.getPlayer().setGrounded(false);
+  private void endCollision(Player player, Collider playerCollider,
+                            Platform platform, Collider platformCollider) {
+    if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
+      player.removeUnderfoot(platform);
+    }
   }
 }

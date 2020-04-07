@@ -26,7 +26,9 @@ public class State {
    */
   private static class FrameData {
     public String file;
+    public Array<Array<Float>> hitboxes;
     public Array<Array<Float>> hurtboxes;
+    public ObjectMap<String, Array<Float>> sensors;
   }
 
   /**
@@ -35,7 +37,9 @@ public class State {
   private static class Frame {
     public String path;
     public Texture texture;
+    public Array<FixtureDef> hitboxDefs;
     public Array<FixtureDef> hurtboxDefs;
+    public ObjectMap<String, FixtureDef> sensorDefs;
   }
 
   /** Filename of the state master file */
@@ -67,6 +71,26 @@ public class State {
   }
 
   /**
+   * Parses the given float array into a Box2D shape.
+   */
+  private static Shape parseShape(Array<Float> params) {
+    if (params.size == 3) {
+      CircleShape shape = new CircleShape();
+      shape.setPosition(new Vector2(params.get(0), params.get(1)));
+      shape.setRadius(params.get(2));
+      return shape;
+    } else if (params.size == 5) {
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(params.get(2) / 2, params.get(3) / 2,
+                     new Vector2(params.get(0), params.get(1)),
+                     params.get(4));
+      return shape;
+    } else {
+      throw new RuntimeException("Found invalid parameters: " + params);
+    }
+  }
+
+  /**
    * Instantiates an entity state.
    * @param path path to the directory containing the entity state data
    */
@@ -79,24 +103,27 @@ public class State {
     for (FrameData frameData : frameDataList) {
       Frame frame = new Frame();
       frame.path = path + frameData.file;
+      frame.hitboxDefs = new Array<FixtureDef>();
       frame.hurtboxDefs = new Array<FixtureDef>();
+      frame.sensorDefs = new ObjectMap<String, FixtureDef>();
+      for (Array<Float> arr : frameData.hitboxes) {
+        FixtureDef def = new FixtureDef();
+        def.isSensor = true;
+        def.shape = parseShape(arr);
+        frame.hitboxDefs.add(def);
+      }
       for (Array<Float> arr : frameData.hurtboxes) {
         FixtureDef def = new FixtureDef();
         def.density = 1f;
         def.friction = 0f;
-        if (arr.size == 3) {
-          CircleShape shape = new CircleShape();
-          shape.setPosition(new Vector2(arr.get(0), arr.get(1)));
-          shape.setRadius(arr.get(2));
-          def.shape = shape;
-        } else if (arr.size == 5) {
-          PolygonShape shape = new PolygonShape();
-          shape.setAsBox(arr.get(2) / 2, arr.get(3) / 2,
-                         new Vector2(arr.get(0), arr.get(1)),
-                         arr.get(4));
-          def.shape = shape;
-        }
+        def.shape = parseShape(arr);
         frame.hurtboxDefs.add(def);
+      }
+      for (String name : frameData.sensors.keys()) {
+        FixtureDef def = new FixtureDef();
+        def.isSensor = true;
+        def.shape = parseShape(frameData.sensors.get(name));
+        frame.sensorDefs.put(name, def);
       }
       frames.add(frame);
     }
@@ -119,8 +146,7 @@ public class State {
   public void loadContent(AssetManager manager) {
     for (Frame frame : frames) {
       frame.texture = manager.get(frame.path, Texture.class);
-      frame.texture.setFilter(Texture.TextureFilter.Linear,
-                              Texture.TextureFilter.Linear);
+      frame.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
   }
 
@@ -166,9 +192,23 @@ public class State {
   }
 
   /**
+   * Returns the current hitbox fixture definition array of this state.
+   */
+  public Array<FixtureDef> getHitboxDefs(int index) {
+    return getFrame(index).hitboxDefs;
+  }
+
+  /**
    * Returns the current hurtbox fixture definition array of this state.
    */
   public Array<FixtureDef> getHurtboxDefs(int index) {
     return getFrame(index).hurtboxDefs;
+  }
+
+  /**
+   * Returns the current sensor fixture definition array of this state.
+   */
+  public ObjectMap<String, FixtureDef> getSensorDefs(int index) {
+    return getFrame(index).sensorDefs;
   }
 }

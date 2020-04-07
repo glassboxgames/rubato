@@ -26,21 +26,6 @@ public class GameMode implements Screen {
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
   private static String BACKGROUND_FILE = "Backgrounds/Realism Update/Realistic-Forest.png";
-  /** The file for the idle image */
-  private static final String ADAGIO_IDLE = "Adagio/00 Filmstrips/wait-strip.png";
-  /** The file for the walking filmstrip */
-  private static final String ADAGIO_WALK = "Adagio/00 Filmstrips/walk-strip75.png";
-  /** The file for the jumping filmstrip */
-  private static final String ADAGIO_JUMP = "Adagio/00 Filmstrips/jump-strip75.png";
-  /** The file for the dashing filmstrip */
-  private static final String ADAGIO_DASH = "Adagio/00 Filmstrips/dash-strip75.png";
-  /** The file for the attacking filmstrip */
-  private static final String ADAGIO_ATTACK = "Adagio/00 Filmstrips/tornado-strip150.png";
-  /** The file for the enemy image */
-  private static final String ENEMY_FILE = "enemy.png";
-  /** The file for the platform tile */
-  private static final String PLATFORM_FILE = "Tilesets/Grass/edge-n.png";
-
   /** The file for the font */
   private static final String FONT_FILE = "Fonts/LucidaGrande.ttf";
   /** The font size */
@@ -53,21 +38,6 @@ public class GameMode implements Screen {
   private BitmapFont displayFont;
   /** The background image for the game */
   private Texture background;
-  /** Texture for Adagio idling */
-  private Texture adagioIdleTexture;
-  /** Texture for Adagio walking */
-  private Texture adagioWalkTexture;
-  /** Texture for Adagio jumping */
-  private Texture adagioJumpTexture;
-  /** Texture for Adagio dashing */
-  private Texture adagioDashTexture;
-  /** Texture for Adagio attacking */
-  private Texture adagioAttackTexture;
-  /** Texture for enemies */
-  private Texture enemyTexture;
-  /** Texture for platforms */
-  private Texture platformTexture;
-
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
@@ -117,6 +87,8 @@ public class GameMode implements Screen {
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(CollisionController.getInstance());
+
+    // Initialize entity state machines
     Player.states = State.readStates("Adagio/");
     Platform.states = State.readStates("Tilesets/");
     Enemy.states = State.readStates("Enemies/Drone/");
@@ -129,7 +101,6 @@ public class GameMode implements Screen {
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
     assets.add(BACKGROUND_FILE);
-
     for (State state : Player.states) {
       state.preloadContent(manager);
     }
@@ -139,8 +110,8 @@ public class GameMode implements Screen {
     for (State state : Enemy.states) {
       state.preloadContent(manager);
     }
-
-    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params =
+      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
     size2Params.fontFileName = FONT_FILE;
     size2Params.fontParameters.size = FONT_SIZE;
     manager.load(FONT_FILE, BitmapFont.class, size2Params);
@@ -211,10 +182,10 @@ public class GameMode implements Screen {
       enemy.deactivatePhysics(world);
     }
     player.deactivatePhysics(world);
-
     platforms.clear();
     enemies.clear();
     world.dispose(); 
+
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(CollisionController.getInstance());
     gameState = GameState.INTRO;
@@ -316,28 +287,15 @@ public class GameMode implements Screen {
         }
 
         player.update(delta);
+        player.sync();
       }
       for (Enemy enemy : enemies) {
-        // if (player.isAlive()
-        //     && player.isHitboxActive()
-        //     && !player.getEnemiesHit().contains(enemy, true)) {
-        //   // TODO make this not manual
-        //   Vector2 center = new Vector2(Player.ATTACK_POS)
-        //     .scl(player.getDirection(), 0)
-        //     .add(player.getPosition());
-        //   Circle circle = new Circle(center, Player.ATTACK_SIZE);
-        //   Vector2 dim = enemy.getDimensions();
-        //   Vector2 corner = new Vector2(dim).scl(-0.5f).add(enemy.getPosition());
-        //   Rectangle rectangle = new Rectangle(corner.x, corner.y, dim.x, dim.y);
-        //   if (Intersector.overlaps(circle, rectangle)) {
-        //     player.getEnemiesHit().add(enemy);
-        //     enemy.lowerHealth(Player.ATTACK_DAMAGE);
-        //   }
-        // }
         enemy.update(delta);
+        enemy.sync();
       }
       for (Platform platform : platforms) {
         platform.update(delta);
+        platform.sync();
       }
       world.step(1 / 60f, 8, 3);
     }

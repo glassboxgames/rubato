@@ -16,8 +16,12 @@ public abstract class Entity {
   protected BodyDef bodyDef;
   /** The body for this entity */
   protected Body body;
-  /** Fixtures for this entity */
-  protected Array<Fixture> fixtures;
+  /** Hitbox colliders for this entity */
+  protected Array<Collider> hitboxes;
+  /** Hurtbox colliders for this entity */
+  protected Array<Collider> hurtboxes;
+  /** Sensor colliders for this entity */
+  protected ObjectMap<String, Collider> sensors;
   /** Direction the entity is facing (1 for right, -1 for left) */
   protected int dir;
   /** Current entity state, represented as an integer */
@@ -47,7 +51,9 @@ public abstract class Entity {
     bodyDef.gravityScale = 1;
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
-    fixtures = new Array<Fixture>();
+    hitboxes = new Array<Collider>();
+    hurtboxes = new Array<Collider>();
+    sensors = new ObjectMap<String, Collider>();
   }
 
   /**
@@ -120,22 +126,91 @@ public abstract class Entity {
   }
 
   /**
+   * Reflects a shape horizontally across its origin.
+   */
+  private Shape reflectShape(Shape shape) {
+    if (shape instanceof PolygonShape) {
+      PolygonShape pShape = (PolygonShape)shape;
+      PolygonShape newShape = new PolygonShape();
+      int n = pShape.getVertexCount();
+      Vector2[] vertices = new Vector2[n];
+      for (int i = 0; i < n; i++) {
+        Vector2 vertex = new Vector2();
+        pShape.getVertex(i, vertex);
+        vertex.scl(-1, 1);
+        vertices[i] = vertex;
+      }
+      newShape.set(vertices);
+      return newShape;
+    } else if (shape instanceof CircleShape) {
+      CircleShape newShape = new CircleShape();
+      newShape.setRadius(shape.getRadius());
+      newShape.setPosition(((CircleShape)shape).getPosition().scl(-1, 1));
+      return newShape;
+    }
+    return null;
+  }
+
+  /**
+   * Creates a collider with the given fixture definition.
+   */
+  private Collider createCollider(FixtureDef def, Collider.Type type) {
+    Fixture fixture;
+    if (dir < 0) {
+      FixtureDef newDef = new FixtureDef();
+      newDef.density = def.density;
+      newDef.friction = def.friction;
+      newDef.isSensor = def.isSensor;
+      newDef.shape = reflectShape(def.shape);
+      fixture = body.createFixture(newDef);
+    } else {
+      fixture = body.createFixture(def);
+    }
+    Collider collider = new Collider(this, fixture, type);
+    fixture.setUserData(collider);
+    return collider;
+  }
+  
+  /**
    * Updates this entity's state.
+   * Call sync() after updating to ensure colliders match the state.
    * @param delta time since the last update
    */
   public void update(float delta) {
-    for (Fixture fixture : fixtures) {
-      body.destroyFixture(fixture);
-    }
-    fixtures.clear();
     count++;
     advanceState();
-    State state = getState();
-    for (FixtureDef def : state.getHurtboxDefs(count)) {
-      Fixture fixture = body.createFixture(def);
-      fixture.setUserData(this);
-      fixtures.add(fixture);
+  }
+
+  /**
+   * Recreates this entity's colliders based on the current entity state.
+   */
+  public void sync() {
+    for (Collider hitbox : hitboxes) {
+      body.destroyFixture(hitbox.getFixture());
     }
+    for (Collider hurtbox : hurtboxes) {
+      body.destroyFixture(hurtbox.getFixture());
+    }
+    for (Collider sensor : sensors.values()) {
+      body.destroyFixture(sensor.getFixture());
+    }
+    hitboxes.clear();
+    hurtboxes.clear();
+    sensors.clear();
+
+    State state = getState();
+    for (FixtureDef def : state.getHitboxDefs(count)) {
+      hitboxes.add(createCollider(def, Collider.Type.HITBOX));
+    }
+    for (FixtureDef def : state.getHurtboxDefs(count)) {
+      hurtboxes.add(createCollider(def, Collider.Type.HURTBOX));
+    }
+    ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(count);
+    for (String name : sensorDefs.keys()) {
+      if (name.equals("ground")) {
+        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.GROUND));
+      }
+    }    
   }
 
   /**
@@ -183,18 +258,30 @@ public abstract class Entity {
   }
 
   /**
+   * Draws a hitbox/hurtbox shape to the canvas.
+   */
+  private void drawPhysicsShape(GameCanvas canvas, Shape shape, Color color) {
+    Vector2 pos = getPosition();
+    if (shape instanceof CircleShape) {
+      Vector2 spos = ((CircleShape)shape).getPosition();
+      canvas.drawPhysics((CircleShape)shape, color, pos.x + spos.x, pos.y + spos.y);
+    } else if (shape instanceof PolygonShape) {
+      canvas.drawPhysics((PolygonShape)shape, color, pos.x, pos.y, 0f);
+    }
+  }
+  
+  /**
    * Draws this entity's physics outline (hurtboxes) to the given canvas.
    */
   public void drawPhysics(GameCanvas canvas) {
-    Vector2 pos = getPosition();
-    for (Fixture fixture : fixtures) {
-      Shape shape = fixture.getShape();
-      if (shape instanceof CircleShape) {
-        Vector2 spos = ((CircleShape)shape).getPosition();
-        canvas.drawPhysics((CircleShape)shape, Color.RED, pos.x + spos.x, pos.y + spos.y);
-      } else if (shape instanceof PolygonShape) {
-        canvas.drawPhysics((PolygonShape)shape, Color.RED, pos.x, pos.y, 0f);
-      }
+    for (Collider hitbox : hitboxes) {
+      drawPhysicsShape(canvas, hitbox.getFixture().getShape(), Color.RED);
+    }
+    for (Collider hurtbox : hurtboxes) {
+      drawPhysicsShape(canvas, hurtbox.getFixture().getShape(), Color.BLUE);
+    }
+    for (Collider sensor : sensors.values()) {
+      drawPhysicsShape(canvas, sensor.getFixture().getShape(), Color.GREEN);
     }
   }
 }

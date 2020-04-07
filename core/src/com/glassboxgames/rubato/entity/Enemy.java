@@ -76,10 +76,13 @@ public class Enemy extends Entity {
       faceRight();
     }
     body.setLinearVelocity(MAX_SPEED * getDirection(), 0);
-    timeslow(delta);
+    timeslow();
   }
 
-  public void timeslow(float delta) {
+  /**
+   * Applies the time slowing effect to this enemy based on the health fraction remaining.
+   */
+  private void timeslow() {
     float tsf = health / MAX_HEALTH;
     prevPosCache.x = prevPosition.x * (1 - tsf) + getPosition().x * tsf;
     prevPosCache.y = prevPosition.y * (1 - tsf) + getPosition().y * tsf;
