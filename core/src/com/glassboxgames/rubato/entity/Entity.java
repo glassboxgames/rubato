@@ -5,71 +5,29 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
-import com.glassboxgames.rubato.Constants;
-import com.glassboxgames.rubato.GameCanvas;
+import com.glassboxgames.rubato.*;
 import com.glassboxgames.util.*;
 
 /**
  * Abstract class representing a textured entity.
  */
 public abstract class Entity {
-  /** Default animation speed */
-  protected static float DEFAULT_ANIMATION_SPEED = 0.25f;
-  
   /** The body definition for this entity */
   protected BodyDef bodyDef;
   /** The body for this entity */
   protected Body body;
+  /** Hitbox colliders for this entity */
+  protected Array<Collider> hitboxes;
+  /** Hurtbox colliders for this entity */
+  protected Array<Collider> hurtboxes;
+  /** Sensor colliders for this entity */
+  protected ObjectMap<String, Collider> sensors;
   /** Direction the entity is facing (1 for right, -1 for left) */
   protected int dir;
-
-  /** Container for the entity state */
-  protected class State {
-    /** Fixture for this state */
-    public Fixture fixture;
-    /** Number of frames this state has been active */
-    public int activeTime;
-    /** Filmstrip for the animation */
-    public FilmStrip filmStrip;
-    /** Speed of animation */
-    public float speed;
-    /** Current animation frame */
-    public float frame;
-    /** Length of animation in frames */
-    public int length;
-    /** Whether to loop the animation */
-    public boolean loop;
-    /** Whether the animation is finished (always false if looping) */
-    public boolean done;
-
-    /**
-     * Update this entity state.
-     * @param delta time since last animation frame
-     */
-    public void update(float delta) {
-      activeTime++;
-      frame += speed;
-      if (frame >= length) {
-        if (loop) {
-          frame -= length;
-        } else {
-          // stay on last frame? TODO change
-          done = true;
-          frame = length - 1;
-        }
-      }
-      filmStrip.setFrame((int)frame);
-    }
-  }
-  
   /** Current entity state, represented as an integer */
   protected int stateIndex;
-  /** Number of frames since last state change */
-  protected int stateDuration;
-  /** Current animation frame */
-  protected float frame;
-  /** Array of entity states, indexed by animation state */
-  protected Array<State> states;
+  /** Number of frames spent in current state */
+  protected int count;
 
   /** Temp vector for calculations */
   protected Vector2 temp = new Vector2();
@@ -82,9 +40,8 @@ public abstract class Entity {
    * Instantiates a new entity with the given parameters.
    * @param x x-coordinate
    * @param y y-coordinate
-   * @param numStates number of states for this entity
    */
-  public Entity(float x, float y, int numStates) {
+  public Entity(float x, float y) {
     dir = 1;
     bodyDef = new BodyDef();
     bodyDef.position.set(x, y);
@@ -94,11 +51,15 @@ public abstract class Entity {
     bodyDef.gravityScale = 1;
     bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
-    states = new Array();
-    for (int i = 0; i < numStates; i++) {
-      states.add(null);
-    }
+    hitboxes = new Array<Collider>();
+    hurtboxes = new Array<Collider>();
+    sensors = new ObjectMap<String, Collider>();
   }
+
+  /**
+   * Returns an array of states for this entity.
+   */
+  public abstract Array<State> getStates();
 
   /**
    * Returns the position vector. Always returns a copy the same vector.
@@ -123,7 +84,13 @@ public abstract class Entity {
     return dir;
   }
 
-  public Body getBody() { return body; }
+  /**
+   * Returns the Box2D body of this entity.
+   */
+  public Body getBody() {
+    return body;
+  }
+  
   /**
    * Sets the direction of this entity to 1 (right).
    */
@@ -146,6 +113,9 @@ public abstract class Entity {
     return body != null;
   }
 
+  /**
+   * Removes this entity as a physics object in the given world.
+   */
   public void deactivatePhysics(World world) {
     if (body != null) {
       // if we need to save the body info, we can do it here if we want
@@ -156,19 +126,98 @@ public abstract class Entity {
   }
 
   /**
+   * Reflects a shape horizontally across its origin.
+   */
+  private Shape reflectShape(Shape shape) {
+    if (shape instanceof PolygonShape) {
+      PolygonShape pShape = (PolygonShape)shape;
+      PolygonShape newShape = new PolygonShape();
+      int n = pShape.getVertexCount();
+      Vector2[] vertices = new Vector2[n];
+      for (int i = 0; i < n; i++) {
+        Vector2 vertex = new Vector2();
+        pShape.getVertex(i, vertex);
+        vertex.scl(-1, 1);
+        vertices[i] = vertex;
+      }
+      newShape.set(vertices);
+      return newShape;
+    } else if (shape instanceof CircleShape) {
+      CircleShape newShape = new CircleShape();
+      newShape.setRadius(shape.getRadius());
+      newShape.setPosition(((CircleShape)shape).getPosition().scl(-1, 1));
+      return newShape;
+    }
+    return null;
+  }
+
+  /**
+   * Creates a collider with the given fixture definition.
+   */
+  private Collider createCollider(FixtureDef def, Collider.Type type) {
+    Fixture fixture;
+    if (dir < 0) {
+      FixtureDef newDef = new FixtureDef();
+      newDef.density = def.density;
+      newDef.friction = def.friction;
+      newDef.isSensor = def.isSensor;
+      newDef.shape = reflectShape(def.shape);
+      fixture = body.createFixture(newDef);
+    } else {
+      fixture = body.createFixture(def);
+    }
+    Collider collider = new Collider(this, fixture, type);
+    fixture.setUserData(collider);
+    return collider;
+  }
+  
+  /**
    * Updates this entity's state.
+   * Call sync() after updating to ensure colliders match the state.
    * @param delta time since the last update
    */
   public void update(float delta) {
-    getState().update(delta);
+    count++;
     advanceState();
+  }
+
+  /**
+   * Recreates this entity's colliders based on the current entity state.
+   */
+  public void sync() {
+    for (Collider hitbox : hitboxes) {
+      body.destroyFixture(hitbox.getFixture());
+    }
+    for (Collider hurtbox : hurtboxes) {
+      body.destroyFixture(hurtbox.getFixture());
+    }
+    for (Collider sensor : sensors.values()) {
+      body.destroyFixture(sensor.getFixture());
+    }
+    hitboxes.clear();
+    hurtboxes.clear();
+    sensors.clear();
+
+    State state = getState();
+    for (FixtureDef def : state.getHitboxDefs(count)) {
+      hitboxes.add(createCollider(def, Collider.Type.HITBOX));
+    }
+    for (FixtureDef def : state.getHurtboxDefs(count)) {
+      hurtboxes.add(createCollider(def, Collider.Type.HURTBOX));
+    }
+    ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(count);
+    for (String name : sensorDefs.keys()) {
+      if (name.equals("ground")) {
+        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.GROUND));
+      }
+    }    
   }
 
   /**
    * Returns the current entity state.
    */
   public State getState() {
-    return states.get(stateIndex);
+    return getStates().get(stateIndex);
   }
 
   /**
@@ -178,45 +227,15 @@ public abstract class Entity {
   public void setState(int i) {
     leaveState();
     stateIndex = i;
-    State state = getState();
-    state.activeTime = 0;
-    state.frame = 0;
-    state.done = false;
-  }
-  
-  /**
-   * Initializes the entity state at the given index with the given filmstrip texture.
-   * @param texture the texture to set (as a filmstrip)
-   */
-  public void initState(int i, Texture texture) {
-    initState(i, texture, 1, 1, 1, DEFAULT_ANIMATION_SPEED, false);
-  }
-
-  /**
-   * Initializes the entity state at the given index with the given filmstrip parameters.
-   * @param i the index of the state
-   * @param texture the texture to set
-   * @param rows number of rows in filmstrip
-   * @param cols number of columns in filmstrip
-   * @param size number of frames in filmstrip
-   * @param speed frame speed multiplier
-   * @param loop whether to loop the filmstrip
-   */
-  public void initState(int i, Texture texture, int rows, int cols, int size, float speed, boolean loop) {
-    State state = new State();
-    state.frame = 0;
-    state.speed = speed;
-    state.length = size;
-    state.filmStrip = new FilmStrip(texture, rows, cols, size);
-    state.loop = loop;
-    states.set(i, state);
   }
 
   /**
    * Executes any final state changes before leaving current state.
    * Called before new state is set.
    */
-  public void leaveState() {}
+  public void leaveState() {
+    count = 0;
+  }
   
   /**
    * Transitions entity states based on current entity state.
@@ -228,18 +247,41 @@ public abstract class Entity {
    * Draws this entity to the given canvas.
    */
   public void draw(GameCanvas canvas) {
-    FilmStrip filmStrip = getState().filmStrip;
-    float w = filmStrip.getWidth() / Constants.PPM;
-    float h = filmStrip.getHeight() / Constants.PPM;
+    Texture texture = getState().getTexture(count);
+    float w = texture.getWidth() / Constants.PPM;
+    float h = texture.getHeight() / Constants.PPM;
     Vector2 pos = getPosition();
-    canvas.draw(filmStrip, Color.WHITE,
+    canvas.draw(texture, Color.WHITE,
                 dir * w / 2, h / 2,
                 pos.x, pos.y,
                 dir * w, h);
   }
 
   /**
+   * Draws a hitbox/hurtbox shape to the canvas.
+   */
+  private void drawPhysicsShape(GameCanvas canvas, Shape shape, Color color) {
+    Vector2 pos = getPosition();
+    if (shape instanceof CircleShape) {
+      Vector2 spos = ((CircleShape)shape).getPosition();
+      canvas.drawPhysics((CircleShape)shape, color, pos.x + spos.x, pos.y + spos.y);
+    } else if (shape instanceof PolygonShape) {
+      canvas.drawPhysics((PolygonShape)shape, color, pos.x, pos.y, 0f);
+    }
+  }
+  
+  /**
    * Draws this entity's physics outline (hurtboxes) to the given canvas.
    */
-  public abstract void drawPhysics(GameCanvas canvas);
+  public void drawPhysics(GameCanvas canvas) {
+    for (Collider hitbox : hitboxes) {
+      drawPhysicsShape(canvas, hitbox.getFixture().getShape(), Color.RED);
+    }
+    for (Collider hurtbox : hurtboxes) {
+      drawPhysicsShape(canvas, hurtbox.getFixture().getShape(), Color.BLUE);
+    }
+    for (Collider sensor : sensors.values()) {
+      drawPhysicsShape(canvas, sensor.getFixture().getShape(), Color.GREEN);
+    }
+  }
 }

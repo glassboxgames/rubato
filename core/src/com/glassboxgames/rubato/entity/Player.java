@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
-import com.glassboxgames.rubato.GameCanvas;
-import com.glassboxgames.rubato.GroundSensor;
+import com.glassboxgames.rubato.*;
 
 /**
  * Class representing a main player character in Rubato.
@@ -43,19 +42,10 @@ public class Player extends Entity {
   /** Dash speed */
   public static final float DASH_SPEED = 15f;
   public static float dashSpeed = DASH_SPEED;
-  /** Attack hitbox position, relative to center */
-  public static final Vector2 ATTACK_POS = new Vector2(0.4f, 0f);
-  /** Attack hitbox radius */
-  public static final float ATTACK_SIZE = 0.45f;
-  /** Attack hitbox start frame */
-  public static final int ATTACK_START = 5;
-  /** Attack hitbox end frame */
-  public static final int ATTACK_END = 25;
   /** Attack damage */
   public static final float ATTACK_DAMAGE = 3f;
 
   /** Player state constants */
-  public static final int NUM_STATES = 10;
   public static final int STATE_IDLE = 0;
   public static final int STATE_WALK = 1;
   public static final int STATE_FALL = 2;
@@ -67,21 +57,14 @@ public class Player extends Entity {
   public static final int STATE_DAIR_ATTACK = 8;
   public static final int STATE_UAIR_ATTACK = 9;
 
-  /** Fixture definition */
-  protected FixtureDef def;
-  /** Fixture */
-  protected Fixture fixture;
-  /** Player dimensions */
-  protected Vector2 dim;
+  /** Player states */
+  public static Array<State> states = null;
+  
   /** Normalized vector indicating the directions the player is pressing */
   protected Vector2 input;
-  /** Ground sensor for the player */
-  protected GroundSensor groundSensor;
 
   /** Whether the player is currently alive */
   protected boolean alive;
-  /** Whether the player is currently on a platform */
-  protected boolean grounded;
   /** Whether the player has a dash available */
   protected boolean hasDash;
   /** Current dash length so far */
@@ -95,35 +78,31 @@ public class Player extends Entity {
 
   /** Enemies that have been hit by the current active attack */
   protected Array<Enemy> enemiesHit;
+  /** Entities the the player is currently using as ground */
+  protected Array<Entity> entitiesUnderfoot;
 
   /**
    * Instantiates a player with the given parameters.
    * @param x x-coordinate of center
    * @param y y-coordinate of center
-   * @param w width
-   * @param h height
-   * @param numStates number of entity states
    */
-  public Player(float x, float y, float w, float h, int numStates) {
-    super(x, y, numStates);
-    dim = new Vector2(w, h);
-
-    def = new FixtureDef();
-    PolygonShape shape = new PolygonShape();
-    shape.setAsBox(dim.x / 2, dim.y / 2);
-    def.shape = shape;
-    def.friction = FRICTION;
-    def.density = DENSITY;
-
+  public Player(float x, float y) {
+    super(x, y);
     input = new Vector2();
-    groundSensor = new GroundSensor(this, dim);
+    // TODO fix hardcoded dims
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
-    enemiesHit = new Array();
+    enemiesHit = new Array<Enemy>();
+    entitiesUnderfoot = new Array<Entity>();
     alive = true;
     hasDash = false;
     dashDir = new Vector2();
+  }
+
+  @Override
+  public Array<State> getStates() {
+    return states;
   }
 
   @Override
@@ -131,9 +110,8 @@ public class Player extends Entity {
     if (!super.activatePhysics(world)) {
       return false;
     }
-    fixture = body.createFixture(def);
-    fixture.setUserData(this);
-    return groundSensor.activatePhysics();
+    setState(STATE_IDLE);
+    return true;
   }
 
   /**
@@ -202,21 +180,6 @@ public class Player extends Entity {
   public void setAlive(boolean value) {
     alive = value;
   }
-  
-  /**
-   * Returns whether the player is standing on a platform.
-   */
-  public boolean isGrounded() {
-    return grounded;
-  }
-
-  /**
-   * Sets the player's grounded state.
-   * @param value value to set
-   */
-  public void setGrounded(boolean value) {
-    grounded = value;
-  }
 
   /**
    * Returns whether the player is dashing.
@@ -237,12 +200,28 @@ public class Player extends Entity {
   }
 
   /**
-   * Returns whether the player's attack hitbox is active.
+   * Returns whether the player is grounded.
    */
-  public boolean isHitboxActive() {
-    return isAttacking()
-      && getState().activeTime >= ATTACK_START
-      && getState().activeTime < ATTACK_END;
+  public boolean isGrounded() {
+    return !entitiesUnderfoot.isEmpty();
+  }
+
+  /**
+   * Adds an entity to the list of entities underfoot.
+   */
+  public void addUnderfoot(Entity entity) {
+    if (!entitiesUnderfoot.contains(entity, true)) {
+      entitiesUnderfoot.add(entity);
+    }
+  }
+
+  /**
+   * Removes an entity from the list of entities underfoot.
+   */
+  public void removeUnderfoot(Entity entity) {
+    if (entitiesUnderfoot.contains(entity, true)) {
+      entitiesUnderfoot.removeValue(entity, true);
+    }
   }
 
   /**
@@ -276,6 +255,7 @@ public class Player extends Entity {
 
   @Override
   public void leaveState() {
+    super.leaveState();
     switch (stateIndex) {
     case STATE_DASH:
       body.setGravityScale(1f);
@@ -298,7 +278,7 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_GND_ATTACK:
     case STATE_UP_GND_ATTACK:
-      if (getState().done) {
+      if (!getState().isLooping() && count >= getState().getLength()) {
         setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
       }
       break;
@@ -307,7 +287,7 @@ public class Player extends Entity {
     case STATE_DAIR_ATTACK:
       if (isGrounded()) {
         setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
-      } else if (getState().done) {
+      } else if (count >= getState().getLength()) {
         setState(STATE_FALL);
       }
       break;
@@ -346,15 +326,12 @@ public class Player extends Entity {
   @Override
   public void update(float delta) {
     super.update(delta);
-
     Vector2 vel = new Vector2();
     if (isDashing()) {
       vel.set(dashDir).setLength(dashSpeed);
     } else {
       if (isGrounded()) {
         hasDash = true;
-      } else {
-        // vx -= vx / moveDamping;
       }
       
       if (input.x != 0) {
@@ -383,22 +360,5 @@ public class Player extends Entity {
     }
     
     body.setLinearVelocity(vel);
-  }
-
-  @Override
-  public void drawPhysics(GameCanvas canvas) {
-    Vector2 pos = getPosition();
-    canvas.drawPhysics((PolygonShape)fixture.getShape(),
-                       isDashing() ? Color.GREEN : Color.RED,
-                       pos.x, pos.y, 0);
-    canvas.drawPhysics(groundSensor.getShape(), Color.RED,
-                       pos.x, pos.y, 0);
-    if (isHitboxActive()) {
-      CircleShape shape = new CircleShape();
-      pos = getPosition().add(temp.set(ATTACK_POS).scl(getDirection(), 1));
-      shape.setPosition(pos);
-      shape.setRadius(ATTACK_SIZE);
-      canvas.drawPhysics(shape, Color.RED, pos.x, pos.y);
-    }
   }
 }

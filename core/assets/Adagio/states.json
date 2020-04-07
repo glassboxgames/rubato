@@ -1,0 +1,42 @@
+[
+  {
+    "path": "01 Wait/",
+    "loop": true,
+  },
+  {
+    "path": "02 Walk/",
+    "loop": true,
+  },
+  {
+    "path": "01 Wait/",
+    "loop": true,
+  },
+  {
+    "path": "03 Jump/",
+    "loop": false,
+  },
+  {
+    "path": "04 Dash/",
+    "loop": false,
+  },
+  {
+    "path": "05 Attack/",
+    "loop": false,
+  },
+  {
+    "path": "05 Attack/",
+    "loop": false,
+  },
+  {
+    "path": "05 Attack/",
+    "loop": false,
+  },
+  {
+    "path": "05 Attack/",
+    "loop": false,
+  },
+  {
+    "path": "05 Attack/",
+    "loop": false,
+  },
+]
