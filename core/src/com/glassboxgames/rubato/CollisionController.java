@@ -87,10 +87,17 @@ public class CollisionController implements ContactListener {
       if (!enemiesHit.contains(enemy, true)) {
         enemy.lowerHealth(Player.ATTACK_DAMAGE);
         enemiesHit.add(enemy);
+        if (!enemy.isSuspended()) {
+          player.addParry(Player.parryGain);
+        }
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
-        player.setAlive(false);
+        if (!player.isParrying()) {
+          player.setAlive(false);
+        } else {
+          // TODO handle what happens when enemies touch adagio while she's parrying
+        }
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.addUnderfoot(enemy);

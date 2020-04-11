@@ -23,6 +23,8 @@ public class InputController {
   private boolean dashPressed;
   /** Whether the attack button was pressed */
   private boolean attackPressed;
+  /** Whether the parry button was pressed */
+  private boolean parryPressed;
 
   /** Horizontal movement input */
   private int horizontal;
@@ -104,6 +106,20 @@ public class InputController {
   }
 
   /**
+   * Returns whether the player input a jump.
+   */
+  public boolean didJump() {
+    return jumpPressed;
+  }
+
+  /**
+   * Returns whether the player pressed dash.
+   */
+  public boolean didDash() {
+    return dashPressed;
+  }
+
+  /**
    * Returns whether the player pressed attack.
    */
   public boolean didAttack() {
@@ -111,19 +127,18 @@ public class InputController {
   }
 
   /**
-   * Returns whether the player pressed dash.
+   * Returns whether the player pressed parry.
    */
-  public boolean didDash() { return dashPressed; }
-
-  /**
-   * Returns whether the player input a jump.
-   */
-  public boolean didJump() { return jumpPressed; }
+  public boolean didParry() {
+    return parryPressed;
+  }
 
   /**
    * Reads the input from the player.
    */
-  public void readInput() { readKeyboard(); }
+  public void readInput() {
+    readKeyboard();
+  }
 
   /**
    * Reads the input from the player's keyboard.
@@ -166,6 +181,8 @@ public class InputController {
 
     exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
+
+    parryPressed = Gdx.input.isKeyPressed(Input.Keys.S);
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
     dashPressed = Gdx.input.isKeyPressed(Input.Keys.D);
     jumpPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE);

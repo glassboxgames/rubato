@@ -350,6 +350,7 @@ public class GameCanvas {
       Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
       return;
     }
+    spriteBatch.setColor(Color.WHITE);
     spriteBatch.draw(image, 0, 0);
   }
 
@@ -376,7 +377,6 @@ public class GameCanvas {
       return;
     }
 
-    // Call the master drawing method (more efficient that base method)
     holder.setRegion(image);
     draw(holder, tint, x - ox, y - oy, width, height);
   }
@@ -403,7 +403,6 @@ public class GameCanvas {
       return;
     }
 
-    // Unlike Lab 1, we can shortcut without a master drawing method
     spriteBatch.setColor(tint);
     spriteBatch.draw(region, x, y, width, height);
   }

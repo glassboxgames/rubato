@@ -44,10 +44,16 @@ public class Player extends Entity {
   public static float dashSpeed = DASH_SPEED;
   /** Attack damage */
   public static final float ATTACK_DAMAGE = 3f;
+  /** Parry capacity */
+  public static final float PARRY_CAPACITY = 100f;
+  public static float parryCapacity = PARRY_CAPACITY;
+  /** Parry gain */
+  public static final float PARRY_GAIN = 20f;
+  public static float parryGain = PARRY_GAIN;
 
   /** Player state constants */
   public static final int STATE_IDLE = 0;
-  public static final int STATE_WALK = 1;
+  public static final int STATE_RUN = 1;
   public static final int STATE_FALL = 2;
   public static final int STATE_JUMP = 3;
   public static final int STATE_DASH = 4;
@@ -75,10 +81,14 @@ public class Player extends Entity {
   protected int jumpTime;
   /** How long the player held jump */
   protected int jumpDuration;
+  /** Amount of parrying resource */
+  protected float parry;
+  /** Whether the player is currently parrying */
+  protected boolean isParrying;
 
   /** Enemies that have been hit by the current active attack */
   protected Array<Enemy> enemiesHit;
-  /** Entities the the player is currently using as ground */
+  /** Entities that the player is currently using as ground */
   protected Array<Entity> entitiesUnderfoot;
 
   /**
@@ -88,16 +98,17 @@ public class Player extends Entity {
    */
   public Player(float x, float y) {
     super(x, y);
+    alive = true;
     input = new Vector2();
     // TODO fix hardcoded dims
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
-    enemiesHit = new Array<Enemy>();
-    entitiesUnderfoot = new Array<Entity>();
-    alive = true;
+    enemiesHit = new Array<>();
+    entitiesUnderfoot = new Array<>();
     hasDash = false;
     dashDir = new Vector2();
+    parry = 0;
   }
 
   @Override
@@ -118,7 +129,7 @@ public class Player extends Entity {
    * Tries to start a player jump or extend an existing jump.
    */
   public void tryJump() {
-    if (isGrounded() && !isAttacking()) {
+    if (isGrounded() && !isAttacking() && !isDashing()) {
       setState(STATE_JUMP);
       jumpDuration = minJumpDuration;
     } else if (stateIndex == STATE_JUMP && jumpDuration < maxJumpDuration) {
@@ -167,6 +178,22 @@ public class Player extends Entity {
   }
 
   /**
+   * Tries to parry.
+   */
+  public void tryParry() {
+    if (!isAttacking() && parry > 0) {
+      isParrying = true;
+    }
+  }
+
+  /**
+   * Stops parrying.
+   */
+  public void endParry() {
+    isParrying = false;
+  }
+
+  /**
    * Returns whether the player is alive currently.
    */
   public boolean isAlive() {
@@ -175,7 +202,6 @@ public class Player extends Entity {
 
   /**
    * Sets the player's alive state.
-   * @param value value to set
    */
   public void setAlive(boolean value) {
     alive = value;
@@ -197,6 +223,21 @@ public class Player extends Entity {
       || stateIndex == STATE_AIR_ATTACK
       || stateIndex == STATE_DAIR_ATTACK
       || stateIndex == STATE_UAIR_ATTACK;
+  }
+
+  /**
+   * Returns whether the player is parrying.
+   */
+  public boolean isParrying() {
+    return isParrying;
+  }
+
+  /**
+   * Adds parry resource.
+   */
+  public void addParry(float amount) {
+    parry = Math.min(parry + amount, parryCapacity);
+    System.out.println(parry);
   }
 
   /**
@@ -229,6 +270,13 @@ public class Player extends Entity {
    */
   public Array<Enemy> getEnemiesHit() {
     return enemiesHit;
+  }
+
+  /**
+   * Returns the player's parry resource.
+   */
+  public float getParry() {
+    return parry;
   }
 
   /**
@@ -279,14 +327,14 @@ public class Player extends Entity {
     case STATE_GND_ATTACK:
     case STATE_UP_GND_ATTACK:
       if (!getState().isLooping() && count >= getState().getLength()) {
-        setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
+        setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
       }
       break;
     case STATE_AIR_ATTACK:
     case STATE_UAIR_ATTACK:
     case STATE_DAIR_ATTACK:
       if (isGrounded()) {
-        setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
+        setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
       } else if (count >= getState().getLength()) {
         setState(STATE_FALL);
       }
@@ -294,7 +342,7 @@ public class Player extends Entity {
     case STATE_DASH:
       if (dashTime >= dashDuration) {
         if (isGrounded()) {
-          setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
+          setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
         } else {
           setState(STATE_FALL);
         }
@@ -307,17 +355,21 @@ public class Player extends Entity {
       break;
     case STATE_FALL:
       if (isGrounded()) {
-        setState(input.x != 0 ? STATE_WALK : STATE_IDLE);
+        setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
       }
       break;
-    case STATE_WALK:
-      if (input.x == 0) {
+    case STATE_RUN:
+      if (!isGrounded()) {
+        setState(STATE_FALL);
+      } else if (input.x == 0) {
         setState(STATE_IDLE);
       }
       break;
     case STATE_IDLE:
-      if (input.x != 0) {
-        setState(STATE_WALK);
+      if (!isGrounded()) {
+        setState(STATE_FALL);
+      } else if (input.x != 0) {
+        setState(STATE_RUN);
       }
       break;
     }
@@ -327,6 +379,7 @@ public class Player extends Entity {
   public void update(float delta) {
     super.update(delta);
     Vector2 vel = new Vector2();
+
     if (isDashing()) {
       vel.set(dashDir).setLength(dashSpeed);
     } else {
@@ -357,6 +410,15 @@ public class Player extends Entity {
       dashTime++;
     } else {
       dashTime = -1;
+    }
+
+    if (isParrying) {
+      if (parry <= 0) {
+        endParry();
+      } else {
+        parry--;
+      }
+      System.out.println(parry);
     }
     
     body.setLinearVelocity(vel);

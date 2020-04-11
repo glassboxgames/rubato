@@ -25,28 +25,32 @@ public class GameMode implements Screen {
 
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the background image to scroll */
-  private static String BACKGROUND_FILE = "Backgrounds/Realism Update/Realistic-Forest.png";
+  private static final String BACKGROUND_FILE = "Backgrounds/Realism Update/Realistic-Forest.png";
+  /** The file for the parry meter */
+  private static final String PARRY_METER_FILE = "User Interface/Parry Meter/empty.png";
   /** The file for the font */
   private static final String FONT_FILE = "Fonts/LucidaGrande.ttf";
   /** The font size */
   private static final int FONT_SIZE = 24;
-  /** The text offset */
-  private static final float TEXT_OFFSET = 20.0f;
+  /** The draw offset */
+  private static final float DRAW_OFFSET = 20.0f;
 
   // Loaded assets
+  /** The background image */
+  private Texture background;
+  /** The parry meter image */
+  private Texture parryMeter;
   /** The font for giving messages to the player */
   private BitmapFont displayFont;
-  /** The background image for the game */
-  private Texture background;
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
   /** Gravity **/
-  protected static float GRAVITY = -70f;
+  protected static final float GRAVITY = -70f;
   /** Level width */
-  protected static float LEVEL_WIDTH = 30f;
+  protected static final float LEVEL_WIDTH = 30f;
   /** Level height */
-  protected static float LEVEL_HEIGHT = 10.8f;
+  protected static final float LEVEL_HEIGHT = 10.8f;
   
   /** Canvas on which to draw content */
   protected GameCanvas canvas;
@@ -65,6 +69,9 @@ public class GameMode implements Screen {
   protected Array<Platform> platforms;
   /** The list of enemies */
   protected Array<Enemy> enemies;
+
+  /** The upper left corner of the visible canvas **/
+  protected Vector2 positionUI;
 
   /** Whether debug mode is on */
   private boolean debug = false;
@@ -92,6 +99,8 @@ public class GameMode implements Screen {
     Player.states = State.readStates("Adagio/");
     Platform.states = State.readStates("Tilesets/");
     Enemy.states = State.readStates("Enemies/Drone/");
+
+    positionUI = new Vector2();
   }
 
   /**
@@ -101,6 +110,14 @@ public class GameMode implements Screen {
   public void preloadContent(AssetManager manager) {
     manager.load(BACKGROUND_FILE, Texture.class);
     assets.add(BACKGROUND_FILE);
+    manager.load(PARRY_METER_FILE, Texture.class);
+    assets.add(PARRY_METER_FILE);
+    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params =
+      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+    size2Params.fontFileName = FONT_FILE;
+    size2Params.fontParameters.size = FONT_SIZE;
+    manager.load(FONT_FILE, BitmapFont.class, size2Params);
+    assets.add(FONT_FILE);
     for (State state : Player.states) {
       state.preloadContent(manager);
     }
@@ -110,12 +127,6 @@ public class GameMode implements Screen {
     for (State state : Enemy.states) {
       state.preloadContent(manager);
     }
-    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params =
-      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-    size2Params.fontFileName = FONT_FILE;
-    size2Params.fontParameters.size = FONT_SIZE;
-    manager.load(FONT_FILE, BitmapFont.class, size2Params);
-    assets.add(FONT_FILE);
   }
 
   /**
@@ -137,8 +148,9 @@ public class GameMode implements Screen {
    * @param manager the asset manager to use
    */
   public void loadContent(AssetManager manager) {
-    displayFont = manager.get(FONT_FILE, BitmapFont.class);
     background = createTexture(manager, BACKGROUND_FILE);
+    parryMeter = createTexture(manager, PARRY_METER_FILE);
+    displayFont = manager.get(FONT_FILE, BitmapFont.class);
     for (State state : Player.states) {
       state.loadContent(manager);
     }
@@ -199,7 +211,6 @@ public class GameMode implements Screen {
     if (gameState == GameState.INTRO) {
       player = new Player(1f, 2f);
       player.activatePhysics(world);
-      player.setAlive(true);
 
       platforms = new Array();
       for (float x = 0.25f; x < LEVEL_WIDTH - 0.25f; x += 0.5f) {
@@ -266,8 +277,10 @@ public class GameMode implements Screen {
               Player.dashSpeed += devChange * 0.5;
               break;
             case 9:
+              Player.parryCapacity += devChange * 10;
               break;
             case 0:
+              Player.parryGain += devChange * 5;
               break;
           }
         }
@@ -285,9 +298,16 @@ public class GameMode implements Screen {
         if (input.didAttack()) {
           player.tryAttack();
         }
+        if (input.didParry()) {
+          player.tryParry();
+        } else {
+          player.endParry();
+        }
 
         player.update(delta);
         player.sync();
+      } else {
+        player.deactivatePhysics(world);
       }
       for (Enemy enemy : enemies) {
         enemy.update(delta);
@@ -308,7 +328,14 @@ public class GameMode implements Screen {
     if (player.isAlive()) {
       canvas.moveCamera(player.getPosition().scl(Constants.PPM),
                         LEVEL_WIDTH * Constants.PPM, LEVEL_HEIGHT * Constants.PPM);
+      positionUI.x = MathUtils.clamp(player.getPosition().scl(Constants.PPM).x - canvas.getWidth() / 2,
+        0,
+        LEVEL_WIDTH * Constants.PPM - canvas.getWidth()) + DRAW_OFFSET;
+      positionUI.y = MathUtils.clamp(player.getPosition().scl(Constants.PPM).y + canvas.getHeight() / 2,
+        canvas.getHeight(),
+        LEVEL_HEIGHT * Constants.PPM) - DRAW_OFFSET;
     }
+
     canvas.clear();
     canvas.begin();
     canvas.drawBackground(background);
@@ -323,6 +350,20 @@ public class GameMode implements Screen {
     if (player.isAlive()) {
       player.draw(canvas);
     }
+    canvas.end();
+
+    // TODO un-hardcode; parry meter UI
+    float parryMeterWidth = canvas.getWidth() / 2.5f;
+    float parryMeterHeight = parryMeterWidth * 1171/6274;
+    canvas.begin();
+    canvas.draw(parryMeter, Color.WHITE, 0, parryMeterHeight,
+                positionUI.x, positionUI.y, parryMeterWidth, parryMeterHeight);
+    // this is temp code (cuz the UI doesn't work):
+    String resource = new DecimalFormat("#.##").format(player.getParry());
+    String total = new DecimalFormat("#.##").format(player.PARRY_CAPACITY);
+    canvas.drawText(resource + "/" + total, displayFont, Color.BLACK,
+      positionUI.x + parryMeterWidth , positionUI.y - 2 * DRAW_OFFSET);
+    // end temp code
     canvas.end();
 
     if (debug) {
@@ -340,13 +381,9 @@ public class GameMode implements Screen {
     }
 
     if (devMode) {
-      float xOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).x - canvas.getWidth() / 2,
-                                      0,
-                                      LEVEL_WIDTH * Constants.PPM - canvas.getWidth()) + TEXT_OFFSET;
-      float yOffset = MathUtils.clamp(player.getPosition().scl(Constants.PPM).y + canvas.getHeight() / 2,
-                                      canvas.getHeight(),
-                                      canvas.getHeight() + LEVEL_HEIGHT * Constants.PPM) - TEXT_OFFSET;
-      float deltaOffset = 2 * TEXT_OFFSET;
+      float xOffset = positionUI.x;
+      float yOffset = positionUI.y - parryMeterHeight - DRAW_OFFSET;
+      float deltaOffset = 2 * DRAW_OFFSET;
       canvas.begin();
       drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE, xOffset, yOffset);
       drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED, xOffset, yOffset - deltaOffset);
@@ -360,6 +397,9 @@ public class GameMode implements Screen {
       drawText(7, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
                xOffset, yOffset - 6 * deltaOffset);
       drawText(8, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED, xOffset, yOffset - 7 * deltaOffset);
+      drawText(9, "Parry Capacity", Player.parryCapacity, Player.PARRY_CAPACITY,
+               xOffset, yOffset - 8 * deltaOffset);
+      drawText(0, "Parry Gain", Player.parryGain, Player.PARRY_GAIN, xOffset, yOffset - 9 * deltaOffset);
       canvas.end();
     }
 
