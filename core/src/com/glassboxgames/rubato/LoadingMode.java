@@ -33,6 +33,7 @@ public class LoadingMode implements Screen {
 
   @Override
   public void render(float delta) {
+    canvas.clear();
     if (manager.isFinished()) {
       listener.exitScreen(this, 0);
     } else {

@@ -335,8 +335,10 @@ public class GameCanvas {
    */
   public void moveCamera(Vector2 pos, float levelWidth, float levelHeight) {
     camera.position.set(pos.x, pos.y, camera.position.z);
-    camera.position.x = MathUtils.clamp(camera.position.x, getWidth() / 2, levelWidth - getWidth() / 2);
-    camera.position.y = MathUtils.clamp(camera.position.y, getHeight() / 2, levelHeight - getHeight() / 2);
+    camera.position.x = MathUtils.clamp(camera.position.x,
+                                        getWidth() / 2, levelWidth - getWidth() / 2);
+    camera.position.y = MathUtils.clamp(camera.position.y,
+                                        getHeight() / 2, levelHeight - getHeight() / 2);
     camera.update();
   }
 

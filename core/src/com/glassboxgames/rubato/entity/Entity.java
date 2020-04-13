@@ -62,11 +62,22 @@ public abstract class Entity {
   public abstract Array<State> getStates();
 
   /**
-   * Returns the position vector. Always returns a copy the same vector.
+   * Returns the position vector. Always returns a copy in the same vector.
    */
   public Vector2 getPosition() {
     return posCache.set(body == null ?
                         bodyDef.position : body.getPosition());
+  }
+
+  /**
+   * Sets the position of the entity.
+   */
+  public void setPosition(Vector2 pos) {
+    if (body == null) {
+      bodyDef.position.set(pos);
+    } else {
+      body.setTransform(pos, body.getAngle());
+    }
   }
 
   /**

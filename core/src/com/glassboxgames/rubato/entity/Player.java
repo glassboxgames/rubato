@@ -10,12 +10,8 @@ import com.glassboxgames.rubato.*;
  * Class representing a main player character in Rubato.
  */
 public class Player extends Entity {
-  /** Density */
-  public static final float DENSITY = 1f;
-  /** Friction */
-  public static final float FRICTION = 0f;
   /** Jump impulse */
-  public static final float JUMP_IMPULSE = 0.65f;
+  public static final float JUMP_IMPULSE = 1f;
   public static float jumpImpulse = JUMP_IMPULSE;
   /** Movement impulse */
   public static final float MOVE_IMPULSE = 1f;
@@ -25,13 +21,13 @@ public class Player extends Entity {
   public static final float MAX_X_SPEED = 4f;
   public static float maxXSpeed = MAX_X_SPEED;
   /** Max vertical speed */
-  public static final float MAX_Y_SPEED = 12f;
+  public static final float MAX_Y_SPEED = 10f;
   public static float maxYSpeed = MAX_Y_SPEED;
   /** Min jump duration */
-  public static final int MIN_JUMP_DURATION = 6;
+  public static final int MIN_JUMP_DURATION = 3;
   public static int minJumpDuration = MIN_JUMP_DURATION;
   /** Max jump duration */
-  public static final int MAX_JUMP_DURATION = 12;
+  public static final int MAX_JUMP_DURATION = 18;
   public static int maxJumpDuration = MAX_JUMP_DURATION;
   /** Dash cooldown */
   public static final int DASH_COOLDOWN = 40;
@@ -131,6 +127,7 @@ public class Player extends Entity {
   public void tryJump() {
     if (isGrounded() && !isAttacking() && !isDashing()) {
       setState(STATE_JUMP);
+      jumpTime = 0;
       jumpDuration = minJumpDuration;
     } else if (stateIndex == STATE_JUMP && jumpDuration < maxJumpDuration) {
       jumpDuration++;
@@ -142,6 +139,7 @@ public class Player extends Entity {
    */
   public void tryDash() {
     if (hasDash && dashTime < 0 && !isAttacking()) {
+      setState(STATE_DASH);
       body.setGravityScale(0f);
       hasDash = false;
       dashTime = 0;
@@ -150,7 +148,6 @@ public class Player extends Entity {
       } else {
         dashDir.set(input);
       }
-      setState(STATE_DASH);
     }
   }
 
@@ -291,7 +288,7 @@ public class Player extends Entity {
    */
   public void tryMove() {
     if (input.x != 0) {
-      if (!isAttacking()) {
+      if (!isAttacking() && !isDashing()) {
         if (input.x > 0) {
           faceRight();
         } else if (input.x < 0) {
@@ -307,8 +304,7 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_DASH:
       body.setGravityScale(1f);
-      break;
-    case STATE_JUMP:
+      dashTime = -1;
       jumpTime = jumpDuration = -1;
       break;
     case STATE_GND_ATTACK:
@@ -396,20 +392,22 @@ public class Player extends Entity {
         body.applyForce(temp, getPosition(), true);
       }
 
-      if (jumpTime < jumpDuration) {
-        temp.set(0, jumpImpulse);
-        body.applyLinearImpulse(temp, getPosition(), true);
-        jumpTime++;
+      if (jumpTime >= 0) {
+        if (jumpTime < jumpDuration) {
+          temp.set(0, jumpImpulse);
+          body.applyLinearImpulse(temp, getPosition(), true);
+          jumpTime++;
+        } else {
+          jumpTime = jumpDuration = -1;
+        }
       }
 
       vel.set(MathUtils.clamp(getVelocity().x, -maxXSpeed, maxXSpeed),
               MathUtils.clamp(getVelocity().y, -maxYSpeed, maxYSpeed));
     }
     
-    if (dashTime >= 0 && dashTime < dashCooldown) {
+    if (dashTime >= 0) {
       dashTime++;
-    } else {
-      dashTime = -1;
     }
 
     if (isParrying) {
@@ -418,7 +416,6 @@ public class Player extends Entity {
       } else {
         parry--;
       }
-      System.out.println(parry);
     }
     
     body.setLinearVelocity(vel);

@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
 import com.glassboxgames.util.*;
@@ -24,8 +26,6 @@ public class GameMode implements Screen {
   }
 
   // GRAPHICS AND SOUND RESOURCES
-  /** The file for the background image to scroll */
-  private static final String BACKGROUND_FILE = "Backgrounds/Realism Update/Realistic-Forest.png";
   /** The file for the parry meter */
   private static final String PARRY_METER_FILE = "User Interface/Parry Meter/empty.png";
   /** The file for the font */
@@ -46,11 +46,7 @@ public class GameMode implements Screen {
   private Array<String> assets;
 
   /** Gravity **/
-  protected static final float GRAVITY = -70f;
-  /** Level width */
-  protected static final float LEVEL_WIDTH = 30f;
-  /** Level height */
-  protected static final float LEVEL_HEIGHT = 10.8f;
+  private static final float GRAVITY = -50f;
   
   /** Canvas on which to draw content */
   protected GameCanvas canvas;
@@ -63,33 +59,33 @@ public class GameMode implements Screen {
   /** The Box2D world */
   protected World world;
 
-  /** The player entity */
-  protected Player player;
-  /** The list of platforms */
-  protected Array<Platform> platforms;
-  /** The list of enemies */
-  protected Array<Enemy> enemies;
+  /** The current level */
+  protected LevelContainer level;
+  /** The position of the camera */
+  protected Vector2 cameraPos;
 
   /** The upper left corner of the visible canvas **/
   protected Vector2 positionUI;
 
   /** Whether debug mode is on */
-  private boolean debug = false;
+  protected boolean debug = false;
   /** Whether dev mode is on */
-  private boolean devMode = false;
+  protected boolean devMode = false;
   /** Numerical selector for devMode */
-  private int devSelect = -1;
+  protected int devSelect = -1;
 
   /**
    * Instantiate a GameMode.
-   * @param c the canvas to draw on
-   * @param l the listener for exiting the screen
+   * @param canvas the canvas to draw on
+   * @param listener the listener for exiting the screen
    */
-  public GameMode(GameCanvas c, ScreenListener l) {
+  public GameMode(GameCanvas canvas, ScreenListener listener) {
+    this.canvas = canvas;
+    this.listener = listener;
+
     assets = new Array();
-    canvas = c;
-    listener = l;
     gameState = GameState.INTRO;
+    cameraPos = new Vector2();
 
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
@@ -108,16 +104,14 @@ public class GameMode implements Screen {
    * @param manager asset manager to use
    */
   public void preloadContent(AssetManager manager) {
-    manager.load(BACKGROUND_FILE, Texture.class);
-    assets.add(BACKGROUND_FILE);
-    manager.load(PARRY_METER_FILE, Texture.class);
-    assets.add(PARRY_METER_FILE);
     FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params =
       new FreetypeFontLoader.FreeTypeFontLoaderParameter();
     size2Params.fontFileName = FONT_FILE;
     size2Params.fontParameters.size = FONT_SIZE;
     manager.load(FONT_FILE, BitmapFont.class, size2Params);
     assets.add(FONT_FILE);
+    manager.load(PARRY_METER_FILE, Texture.class);
+    assets.add(PARRY_METER_FILE);
     for (State state : Player.states) {
       state.preloadContent(manager);
     }
@@ -130,26 +124,11 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Returns a texture for the given file if loaded, otherwise returns null.
-   * @param manager the asset manager to use
-   * @param file the file path
-   */
-  private Texture createTexture(AssetManager manager, String file) {
-    if (manager.isLoaded(file)) {
-      Texture texture = manager.get(file, Texture.class);
-      texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-      return texture;
-    }
-    return null;
-  }
-
-  /**
    * Pulls the loaded textures from the asset manager for the game.
    * @param manager the asset manager to use
    */
   public void loadContent(AssetManager manager) {
-    background = createTexture(manager, BACKGROUND_FILE);
-    parryMeter = createTexture(manager, PARRY_METER_FILE);
+    parryMeter = manager.get(PARRY_METER_FILE, Texture.class);
     displayFont = manager.get(FONT_FILE, BitmapFont.class);
     for (State state : Player.states) {
       state.loadContent(manager);
@@ -184,23 +163,10 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Resets the world.
+   * Sets the world level.
    */
-  public void reset() {
-    for (Platform platform : platforms) {
-      platform.deactivatePhysics(world);
-    }
-    for (Enemy enemy : enemies) {
-      enemy.deactivatePhysics(world);
-    }
-    player.deactivatePhysics(world);
-    platforms.clear();
-    enemies.clear();
-    world.dispose(); 
-
-    world = new World(new Vector2(0, GRAVITY), false);
-    world.setContactListener(CollisionController.getInstance());
-    gameState = GameState.INTRO;
+  public void setLevel(LevelContainer level) {
+    this.level = level;
   }
 
   /**
@@ -209,22 +175,10 @@ public class GameMode implements Screen {
    */
   protected void update(float delta) {
     if (gameState == GameState.INTRO) {
-      player = new Player(1f, 2f);
-      player.activatePhysics(world);
-
-      platforms = new Array();
-      for (float x = 0.25f; x < LEVEL_WIDTH - 0.25f; x += 0.5f) {
-        Platform platform = new Platform(x, 0.25f);
-        platform.activatePhysics(world);
-        platforms.add(platform);
+      if (level != null) {
+        level.activatePhysics(world);
+        gameState = GameState.PLAY;
       }
-
-      enemies = new Array();
-      Enemy enemy = new Enemy(6f, 1.5f);
-      enemy.activatePhysics(world);
-      enemies.add(enemy);
-
-      gameState = GameState.PLAY;
     } else if (gameState == GameState.PLAY) {
       InputController input = InputController.getInstance();
       input.readInput();
@@ -233,7 +187,15 @@ public class GameMode implements Screen {
         return;
       }
       if (input.didReset()) {
-        reset();
+        level.deactivatePhysics(world);
+        gameState = GameState.INTRO;
+        listener.exitScreen(this, 1);
+        return;
+      }
+      if (input.didEdit()) {
+        level.deactivatePhysics(world);
+        gameState = GameState.INTRO;
+        listener.exitScreen(this, 2);
         return;
       }
       if (input.didDebug()) {
@@ -286,6 +248,7 @@ public class GameMode implements Screen {
         }
       }
 
+      Player player = level.getPlayer();
       if (player.isAlive()) {
         player.setInputVector(input.getHorizontal(), input.getVertical());
         player.tryMove();
@@ -309,11 +272,11 @@ public class GameMode implements Screen {
       } else {
         player.deactivatePhysics(world);
       }
-      for (Enemy enemy : enemies) {
+      for (Enemy enemy : level.getEnemies()) {
         enemy.update(delta);
         enemy.sync();
       }
-      for (Platform platform : platforms) {
+      for (Platform platform : level.getPlatforms()) {
         platform.update(delta);
         platform.sync();
       }
@@ -325,32 +288,29 @@ public class GameMode implements Screen {
    * Draw the current game state to the canvas.
    */
   protected void draw() {
-    if (player.isAlive()) {
-      canvas.moveCamera(player.getPosition().scl(Constants.PPM),
-                        LEVEL_WIDTH * Constants.PPM, LEVEL_HEIGHT * Constants.PPM);
-      positionUI.x = MathUtils.clamp(player.getPosition().scl(Constants.PPM).x - canvas.getWidth() / 2,
-        0,
-        LEVEL_WIDTH * Constants.PPM - canvas.getWidth()) + DRAW_OFFSET;
-      positionUI.y = MathUtils.clamp(player.getPosition().scl(Constants.PPM).y + canvas.getHeight() / 2,
-        canvas.getHeight(),
-        LEVEL_HEIGHT * Constants.PPM) - DRAW_OFFSET;
+    if (level == null) {
+      return;
     }
 
     canvas.clear();
-    canvas.begin();
-    canvas.drawBackground(background);
-    canvas.end();
-    canvas.begin(Constants.PPM, Constants.PPM);
-    for (Platform platform : platforms) {
-      platform.draw(canvas);
-    }
-    for (Enemy enemy : enemies) {
-      enemy.draw(canvas);
-    }
+
+    Player player = level.getPlayer();
     if (player.isAlive()) {
-      player.draw(canvas);
+      Vector2 pos = player.getPosition().scl(Constants.PPM);
+      cameraPos.set(pos);
+      canvas.moveCamera(cameraPos,
+                        level.getWidth() * Constants.PPM,
+                        level.getHeight() * Constants.PPM);
+      positionUI.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2,
+                                     0,
+                                     level.getWidth() * Constants.PPM
+                                     - canvas.getWidth()) + DRAW_OFFSET,
+                     MathUtils.clamp(pos.y + canvas.getHeight() / 2,
+                                     canvas.getHeight(),
+                                     level.getHeight() * Constants.PPM) - DRAW_OFFSET);
     }
-    canvas.end();
+
+    level.draw(canvas, debug);
 
     // TODO un-hardcode; parry meter UI
     float parryMeterWidth = canvas.getWidth() / 2.5f;
@@ -362,32 +322,21 @@ public class GameMode implements Screen {
     String resource = new DecimalFormat("#.##").format(player.getParry());
     String total = new DecimalFormat("#.##").format(player.PARRY_CAPACITY);
     canvas.drawText(resource + "/" + total, displayFont, Color.BLACK,
-      positionUI.x + parryMeterWidth , positionUI.y - 2 * DRAW_OFFSET);
+                    positionUI.x + parryMeterWidth , positionUI.y - 2 * DRAW_OFFSET);
     // end temp code
     canvas.end();
-
-    if (debug) {
-      canvas.beginDebug(Constants.PPM, Constants.PPM);
-      for (Platform platform : platforms) {
-        platform.drawPhysics(canvas);
-      }
-      for (Enemy enemy : enemies) {
-        enemy.drawPhysics(canvas);
-      }
-      if (player.isAlive()) {
-        player.drawPhysics(canvas);
-      }
-      canvas.endDebug();
-    }
 
     if (devMode) {
       float xOffset = positionUI.x;
       float yOffset = positionUI.y - parryMeterHeight - DRAW_OFFSET;
       float deltaOffset = 2 * DRAW_OFFSET;
       canvas.begin();
-      drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE, xOffset, yOffset);
-      drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED, xOffset, yOffset - deltaOffset);
-      drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED, xOffset, yOffset - 2 * deltaOffset);
+      drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,
+               xOffset, yOffset);
+      drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED,
+               xOffset, yOffset - deltaOffset);
+      drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED,
+               xOffset, yOffset - 2 * deltaOffset);
       drawText(4, "Min Jump Duration", Player.minJumpDuration, Player.MIN_JUMP_DURATION,
                xOffset, yOffset - 3 * deltaOffset);
       drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION,
@@ -396,21 +345,27 @@ public class GameMode implements Screen {
                xOffset, yOffset - 5 * deltaOffset);
       drawText(7, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
                xOffset, yOffset - 6 * deltaOffset);
-      drawText(8, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED, xOffset, yOffset - 7 * deltaOffset);
+      drawText(8, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
+               xOffset, yOffset - 7 * deltaOffset);
       drawText(9, "Parry Capacity", Player.parryCapacity, Player.PARRY_CAPACITY,
                xOffset, yOffset - 8 * deltaOffset);
-      drawText(0, "Parry Gain", Player.parryGain, Player.PARRY_GAIN, xOffset, yOffset - 9 * deltaOffset);
+      drawText(0, "Parry Gain", Player.parryGain, Player.PARRY_GAIN,
+               xOffset, yOffset - 9 * deltaOffset);
       canvas.end();
     }
-
   }
 
   /**
-   * Draws devMode text
-   * TODO
-   * @param num
+   * Draws text to the screen for a parameter in dev mode.
+   * @param num number key for this dev mode parameter
+   * @param name name of the parameter
+   * @param value the current value of the parameter
+   * @param oldValue the original value of the parameter
+   * @param x the x position of the text
+   * @param y the y position of the text
    */
-  private void drawText(int num, String name, float value, float oldValue, float x, float y) {
+  private void drawText(int num, String name, float value, float oldValue,
+                        float x, float y) {
     Color color;
     if (num == devSelect) {
       if (value != oldValue) {
@@ -425,7 +380,8 @@ public class GameMode implements Screen {
         color = Color.BLACK;
       }
     }
-    String text = "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
+    String text =
+      "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
     canvas.drawText(text, displayFont, color, x, y);
     canvas.drawText(text, displayFont, color, x - 1, y); // bold effect
   }
@@ -459,7 +415,6 @@ public class GameMode implements Screen {
 
   @Override
   public void dispose() {
-    player = null;
-    canvas = null;
+    level = null;
   }
 }

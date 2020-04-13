@@ -17,6 +17,8 @@ public class InputController {
   private boolean exitPressed;
   /** Whether the reset button was pressed */
   private boolean resetPressed;
+  /** Whether the edit button was pressed */
+  private boolean editPressed;
   /** Whether the jump button was pressed */
   private boolean jumpPressed;
   /** Whether the dash button was pressed */
@@ -89,6 +91,13 @@ public class InputController {
    */
   public boolean didReset() {
     return resetPressed;
+  }
+
+  /**
+   * Returns whether the player presesd the edit button.
+   */
+  public boolean didEdit() {
+    return editPressed;
   }
 
   /**
@@ -181,7 +190,7 @@ public class InputController {
 
     exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
-
+    editPressed = Gdx.input.isKeyPressed(Input.Keys.E);
     parryPressed = Gdx.input.isKeyPressed(Input.Keys.S);
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
     dashPressed = Gdx.input.isKeyPressed(Input.Keys.D);

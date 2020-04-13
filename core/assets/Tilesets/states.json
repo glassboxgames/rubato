@@ -3,4 +3,8 @@
     "path": "Grass/",
     "loop": false,
   },
+  {
+    "path": "Sakura/",
+    "loop": false,
+  },
 ]
