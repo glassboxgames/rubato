@@ -1,0 +1,213 @@
+{
+"width": 30,
+"height": 10,
+"background": "Backgrounds/Realism Update/Realistic-Forest.png",
+"player": {
+	"x": 3.275,
+	"y": 1.685
+},
+"enemies": [
+	{
+		"type": "wyrm",
+		"x": 13.285,
+		"y": 2.76
+	},
+	{
+		"type": "spider",
+		"x": 23.6,
+		"y": 1.71
+	}
+],
+"platforms": [
+	{
+		"type": "crumbling",
+		"x": 3.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 4.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 4.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 5.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 5.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 6.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 6.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 7.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 7.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 11.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 11.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 14.55,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 15.05,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 15.55,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 17.55,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 18.05,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 18.55,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 10.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 10.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 14.05,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 9.75,
+		"y": 0.85
+	},
+	{
+		"type": "simple",
+		"x": 0.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 1.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 1.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 2.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 2.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 3.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 14.855,
+		"y": 3.735
+	},
+	{
+		"type": "simple",
+		"x": 23.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 23.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 24.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 25.055,
+		"y": 3.435
+	},
+	{
+		"type": "simple",
+		"x": 25.555,
+		"y": 3.435
+	},
+	{
+		"type": "simple",
+		"x": 26.055,
+		"y": 3.435
+	},
+	{
+		"type": "simple",
+		"x": 22.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 22.255,
+		"y": 0.835
+	}
+],
+"checkpoints": [
+	{
+		"x": 14.84,
+		"y": 4.645
+	},
+	{
+		"x": 26.04,
+		"y": 4.345
+	}
+]
+}

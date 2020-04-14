@@ -156,6 +156,7 @@ public class GameMode implements Screen {
    */
   public void initLevel(LevelData data, AssetManager manager) {
     level = new LevelContainer(data, manager);
+    gameState = GameState.INTRO;
   }
 
   /**
@@ -177,13 +178,11 @@ public class GameMode implements Screen {
       }
       if (input.didReset()) {
         level.deactivatePhysics(world);
-        gameState = GameState.INTRO;
         listener.exitScreen(this, 1);
         return;
       }
       if (input.didEdit()) {
         level.deactivatePhysics(world);
-        gameState = GameState.INTRO;
         listener.exitScreen(this, 2);
         return;
       }
@@ -243,6 +242,7 @@ public class GameMode implements Screen {
         complete = complete && checkpoint.isActivated();
       }
       if (complete && input.didContinue()) {
+        level.deactivatePhysics(world);
         listener.exitScreen(this, 0);
         return;
       }
@@ -453,6 +453,9 @@ public class GameMode implements Screen {
 
   @Override
   public void dispose() {
+    if (world != null) {
+      world.dispose();
+    }
     level = null;
   }
 }

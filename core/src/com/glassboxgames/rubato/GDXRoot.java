@@ -13,7 +13,8 @@ import com.glassboxgames.util.*;
 public class GDXRoot extends Game implements ScreenListener {
   // TODO replace with JSON
   public static final String[] levelPaths = new String[] {
-    "data/level.json",
+    "data/easy.json",
+    "data/medium.json",
   };
 
   /** Drawing context to display graphics (VIEW CLASS) */
@@ -78,6 +79,8 @@ public class GDXRoot extends Game implements ScreenListener {
     canvas = null;
     editing.unloadContent(manager);
     playing.unloadContent(manager);
+    editing.dispose();
+    playing.dispose();
     for (LevelData data : levels) {
       if (manager.isLoaded(data.background)) {
         manager.unload(data.background);
@@ -104,6 +107,7 @@ public class GDXRoot extends Game implements ScreenListener {
       if (exitCode == 0) {
         levelIndex++;
         if (levelIndex >= levels.length) {
+          System.out.println("Congratulations! You have completed the currently available levels.");
           Gdx.app.exit();
         } else {
           setScreen(loading);
@@ -127,7 +131,6 @@ public class GDXRoot extends Game implements ScreenListener {
         playing.initLevel(data, manager);
         setScreen(playing);
       } else {
-        dispose();
         Gdx.app.exit();
       }
     }

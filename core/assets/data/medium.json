@@ -1,0 +1,159 @@
+{
+"width": 30,
+"height": 10,
+"background": "Backgrounds/Realism Update/Realistic-Forest.png",
+"player": {
+	"x": 1.375,
+	"y": 1.585
+},
+"enemies": [
+	{
+		"type": "wyrm",
+		"x": 14.885,
+		"y": 8.76
+	},
+	{
+		"type": "spider",
+		"x": 6.2,
+		"y": 1.51
+	},
+	{
+		"type": "wisp",
+		"x": 5.63,
+		"y": 4.785
+	}
+],
+"platforms": [
+	{
+		"type": "top_spikes",
+		"x": 1.05,
+		"y": 4.75
+	},
+	{
+		"type": "top_spikes",
+		"x": 1.45,
+		"y": 4.75
+	},
+	{
+		"type": "top_spikes",
+		"x": 1.85,
+		"y": 4.75
+	},
+	{
+		"type": "top_spikes",
+		"x": 2.15,
+		"y": 4.75
+	},
+	{
+		"type": "right_spikes",
+		"x": 4.85,
+		"y": 3.65
+	},
+	{
+		"type": "simple",
+		"x": 0.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 1.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 1.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 2.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 1.655,
+		"y": 5.335
+	},
+	{
+		"type": "simple",
+		"x": 2.155,
+		"y": 5.335
+	},
+	{
+		"type": "simple",
+		"x": 4.855,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 5.355,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 5.855,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 6.355,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 6.855,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 8.455,
+		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 8.955,
+		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 9.455,
+		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 9.955,
+		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 10.455,
+		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 18.355,
+		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 5.355,
+		"y": 3.635
+	},
+	{
+		"type": "simple",
+		"x": 5.855,
+		"y": 3.635
+	},
+	{
+		"type": "simple",
+		"x": 1.155,
+		"y": 5.335
+	}
+],
+"checkpoints": [
+	{
+		"x": 18.34,
+		"y": 6.345
+	}
+]
+}
