@@ -18,7 +18,10 @@ public class Collider {
     HURTBOX,
     GROUND,
     EDGE,
-    ATTACK,
+    VISION,
+    FORWARD,
+    UP,
+    DOWN,
   }
 
   /** The entity involved in the collision */
@@ -76,6 +79,27 @@ public class Collider {
   }
 
   /**
+   * Returns whether this collider is a forward sensor.
+   */
+  public boolean isForwardSensor() {
+    return type == Type.FORWARD;
+  }
+
+  /**
+   * Returns whether this collider is an up sensor.
+   */
+  public boolean isUpSensor() {
+    return type == Type.UP;
+  }
+
+  /**
+   * Returns whether this collider is a down sensor.
+   */
+  public boolean isDownSensor() {
+    return type == Type.DOWN;
+  }
+
+  /**
    * Returns whether this collider is an edge sensor.
    */
   public boolean isEdgeSensor() {
@@ -83,10 +107,10 @@ public class Collider {
   }
 
   /**
-   * Returns whether this collider is a attack sensor.
+   * Returns whether this collider is a vision sensor.
    */
-  public boolean isAttackSensor() {
-    return type == Type.ATTACK;
+  public boolean isVisionSensor() {
+    return type == Type.VISION;
   }
 }
   

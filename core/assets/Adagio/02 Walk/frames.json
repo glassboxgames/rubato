@@ -3,6 +3,9 @@
     "file": "1.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -15,6 +18,9 @@
     "file": "2.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -27,6 +33,9 @@
     "file": "3.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -39,6 +48,9 @@
     "file": "4.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -51,6 +63,9 @@
     "file": "5.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -63,6 +78,9 @@
     "file": "6.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -75,6 +93,9 @@
     "file": "7.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -87,6 +108,9 @@
     "file": "8.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -99,6 +123,9 @@
     "file": "9.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -111,6 +138,9 @@
     "file": "10.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [

@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.*;
 
+
 /**
  * Class representing a main player character in Rubato.
  */
@@ -40,6 +41,11 @@ public class Player extends Entity {
   public static float dashSpeed = DASH_SPEED;
   /** Attack damage */
   public static final float ATTACK_DAMAGE = 3f;
+  /** Attack duration */
+  public static final int ATTACK_DURATION = 10;
+  public static int attackDuration = ATTACK_DURATION;
+  /** Attack cooldown */
+  public static final int ATTACK_COOLDOWN = 20;
   /** Parry capacity */
   public static final float PARRY_CAPACITY = 100f;
   public static float parryCapacity = PARRY_CAPACITY;
@@ -53,11 +59,6 @@ public class Player extends Entity {
   public static final int STATE_FALL = 2;
   public static final int STATE_JUMP = 3;
   public static final int STATE_DASH = 4;
-  public static final int STATE_GND_ATTACK = 5;
-  public static final int STATE_UP_GND_ATTACK = 6;
-  public static final int STATE_AIR_ATTACK = 7;
-  public static final int STATE_DAIR_ATTACK = 8;
-  public static final int STATE_UAIR_ATTACK = 9;
 
   /** Player states */
   public static Array<State> states = null;
@@ -77,6 +78,19 @@ public class Player extends Entity {
   protected int jumpTime;
   /** How long the player held jump */
   protected int jumpDuration;
+
+  /** How long the player has been attacking */
+  protected int attackTime;
+  /** Remaining attack cooldown */
+  protected int attackCooldown;
+
+  /** Whether the player is attacking forward */
+  protected boolean forwardAttack;
+  /** Whether the player is attacking upward */
+  protected boolean upAttack;
+  /** Whether the player is attacking downward */
+  protected boolean downAttack;
+
   /** Amount of parrying resource */
   protected float parry;
   /** Whether the player is currently parrying */
@@ -96,6 +110,7 @@ public class Player extends Entity {
     super(x, y, STATE_IDLE);
     input = new Vector2();
     // TODO fix hardcoded dims
+    attackTime = -1;
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
@@ -104,7 +119,6 @@ public class Player extends Entity {
     alive = true;
     hasDash = false;
     dashDir = new Vector2();
-    parry = 0;
   }
 
   /**
@@ -143,7 +157,7 @@ public class Player extends Entity {
       hasDash = false;
       dashTime = 0;
       if (input.isZero()) {
-        dashDir.set(dir, 0f);
+        dashDir.set(getDirection(), 0f);
       } else {
         dashDir.set(input);
       }
@@ -154,27 +168,21 @@ public class Player extends Entity {
    * Tries to start a player attack.
    */
   public void tryAttack() {
-    if (!isAttacking() && !isDashing()) {
-      if (isGrounded()) {
-        if (input.y > 0) {
-          setState(STATE_UP_GND_ATTACK);
-        } else {
-          setState(STATE_GND_ATTACK);
-        }
+    if (!isAttacking() && attackCooldown <= 0) {
+      attackTime = 0;
+      attackCooldown = ATTACK_COOLDOWN;
+      if (input.y > 0) {
+        upAttack = true;
+      } else if (!isGrounded() && input.y < 0) {
+        downAttack = true;
       } else {
-        if (input.y > 0) {
-          setState(STATE_UAIR_ATTACK);
-        } else if (input.y < 0) {
-          setState(STATE_DAIR_ATTACK);
-        } else {
-          setState(STATE_AIR_ATTACK);
-        }
+        forwardAttack = true;
       }
     }
   }
 
   /**
-   * Tries to parry.
+   * Tries to parry
    */
   public void tryParry() {
     if (!isAttacking() && parry > 0) {
@@ -214,11 +222,7 @@ public class Player extends Entity {
    * Returns whether the player is attacking.
    */
   public boolean isAttacking() {
-    return stateIndex == STATE_GND_ATTACK
-      || stateIndex == STATE_UP_GND_ATTACK
-      || stateIndex == STATE_AIR_ATTACK
-      || stateIndex == STATE_DAIR_ATTACK
-      || stateIndex == STATE_UAIR_ATTACK;
+    return attackTime >= 0 && attackTime < attackDuration;
   }
 
   /**
@@ -233,7 +237,27 @@ public class Player extends Entity {
    */
   public void addParry(float amount) {
     parry = Math.min(parry + amount, parryCapacity);
-    System.out.println(parry);
+  }
+
+  /**
+   * Returns whether the player is attacking forward.
+   */
+  public boolean isAttackingForward() {
+    return forwardAttack;
+  }
+
+  /**
+   * Returns whether the player is attacking upwards.
+   */
+  public boolean isAttackingUp() {
+    return upAttack;
+  }
+
+  /**
+   * Returns whether the player is attacking downwards.
+   */
+  public boolean isAttackingDown() {
+    return downAttack;
   }
 
   /**
@@ -302,34 +326,12 @@ public class Player extends Entity {
       dashTime = -1;
       jumpTime = jumpDuration = -1;
       break;
-    case STATE_GND_ATTACK:
-    case STATE_UP_GND_ATTACK:
-    case STATE_AIR_ATTACK:
-    case STATE_DAIR_ATTACK:
-    case STATE_UAIR_ATTACK:
-      enemiesHit.clear();
-      break;
     }
   }
   
   @Override
   public void advanceState() {
     switch (stateIndex) {
-    case STATE_GND_ATTACK:
-    case STATE_UP_GND_ATTACK:
-      if (!getState().isLooping() && count >= getState().getLength()) {
-        setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
-      }
-      break;
-    case STATE_AIR_ATTACK:
-    case STATE_UAIR_ATTACK:
-    case STATE_DAIR_ATTACK:
-      if (isGrounded()) {
-        setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
-      } else if (count >= getState().getLength()) {
-        setState(STATE_FALL);
-      }
-      break;
     case STATE_DASH:
       if (dashTime >= dashDuration) {
         if (isGrounded()) {
@@ -397,6 +399,17 @@ public class Player extends Entity {
         }
       }
 
+      if (attackTime >= 0) {
+        if (attackTime < attackDuration) {
+          attackTime++;
+        } else {
+          attackTime = -1;
+          forwardAttack = upAttack = downAttack = false;
+          enemiesHit.clear();
+        }
+      } else if (attackCooldown > 0) {
+        attackCooldown--;
+      }
       vel.set(MathUtils.clamp(getVelocity().x, -maxXSpeed, maxXSpeed),
               MathUtils.clamp(getVelocity().y, -maxYSpeed, maxYSpeed));
     }
@@ -414,5 +427,18 @@ public class Player extends Entity {
     }
     
     body.setLinearVelocity(vel);
+  }
+
+  @Override
+  public void draw(GameCanvas canvas) {
+    super.draw(canvas);
+    if (isAttacking()) {
+      canvas.end();
+      canvas.beginDebug(Constants.PPM, Constants.PPM);
+      String key = isAttackingUp() ? "up" : (isAttackingDown() ? "down" : "forward");
+      drawPhysicsShape(canvas, sensors.get(key).getFixture().getShape(), Color.GREEN);
+      canvas.endDebug();
+      canvas.begin(Constants.PPM, Constants.PPM);
+    }
   }
 }

@@ -3,6 +3,9 @@
     "file": "0.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -15,6 +18,9 @@
     "file": "1.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -27,6 +33,9 @@
     "file": "2.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -39,6 +48,9 @@
     "file": "3.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [
@@ -51,6 +63,9 @@
     "file": "4.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
+      "forward": [0.4, 0, 0.5],
+      "up": [0, 0.4, 0.5],
+      "down": [0, -0.4, 0.5]
     },
     "hitboxes": [],
     "hurtboxes": [

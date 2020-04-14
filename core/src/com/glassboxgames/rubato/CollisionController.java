@@ -3,7 +3,6 @@ package com.glassboxgames.rubato;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
-//import com.sun.tools.sjavac.server.SysInfo;
 
 public class CollisionController implements ContactListener {
   /** The singleton instance of the collision controller */
@@ -87,17 +86,35 @@ public class CollisionController implements ContactListener {
   }
 
   /**
+   * Attacks the given enemy with the given player.
+   */
+  private void attack(Player player, Enemy enemy) {
+    ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
+    if (enemiesHit.add(enemy)) {
+      if (!enemy.isSuspended()) {
+        player.addParry(Player.parryGain);
+      }
+      enemy.lowerHealth(Player.ATTACK_DAMAGE);
+    }
+  }
+  
+  /**
    * Handles a collision starting between a player and an enemy.
    */
   private void startCollision(Player player, Collider playerCollider,
                               Enemy enemy, Collider enemyCollider) {
-    if (playerCollider.isHitbox() && enemyCollider.isHurtbox()) {
-      ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
-      if (enemiesHit.add(enemy)) {
-        if (!enemy.isSuspended()) {
-          player.addParry(Player.parryGain);
-        }
-        enemy.lowerHealth(Player.ATTACK_DAMAGE);
+
+    if (playerCollider.isForwardSensor() && enemyCollider.isHurtbox()) {
+      if (player.isAttackingForward()) {
+        attack(player, enemy);
+      }
+    } else if (playerCollider.isUpSensor() && enemyCollider.isHurtbox()) {
+      if (player.isAttackingUp()) {
+        attack(player, enemy);
+      }
+    } else if (playerCollider.isDownSensor() && enemyCollider.isHurtbox()) {
+      if (player.isAttackingDown()) {
+        attack(player, enemy);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
@@ -109,7 +126,7 @@ public class CollisionController implements ContactListener {
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.addUnderfoot(enemy);
-    } else if (playerCollider.isHurtbox() && enemyCollider.isAttackSensor()) {
+    } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       enemy.setTarget(player.getPosition());
     }
   }
@@ -121,7 +138,7 @@ public class CollisionController implements ContactListener {
                             Enemy enemy, Collider enemyCollider) {
     if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.removeUnderfoot(enemy);
-    } else if (playerCollider.isHurtbox() && enemyCollider.isAttackSensor()) {
+    } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       enemy.setTarget(null);
     }
   }
