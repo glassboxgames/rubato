@@ -56,8 +56,23 @@ public class LevelContainer {
     player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
     for (LevelData.EnemyData enemyData : data.enemies) {
-      // TODO logic for diff enemy types
-      enemies.add(new Enemy(enemyData.x, enemyData.y));
+      float x = enemyData.x;
+      float y = enemyData.y;
+      Enemy enemy = null;
+      switch (enemyData.type) {
+      case "spider":
+        enemy = new Spider(x, y);
+        break;
+      case "wisp":
+        enemy = new Wisp(x, y);
+        break;
+      case "wyrm":
+        enemy = new Wyrm(x, y);
+        break;
+      }
+      if (enemy != null) {
+        enemies.add(enemy);
+      }
     }
     platforms = new Array<Platform>();
     for (LevelData.PlatformData platformData : data.platforms) {

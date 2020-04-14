@@ -17,6 +17,8 @@ public class Collider {
     HITBOX,
     HURTBOX,
     GROUND,
+    EDGE,
+    ATTACK,
   }
 
   /** The entity involved in the collision */
@@ -71,6 +73,20 @@ public class Collider {
    */
   public boolean isGroundSensor() {
     return type == Type.GROUND;
+  }
+
+  /**
+   * Returns whether this collider is an edge sensor.
+   */
+  public boolean isEdgeSensor() {
+    return type == Type.EDGE;
+  }
+
+  /**
+   * Returns whether this collider is a attack sensor.
+   */
+  public boolean isAttackSensor() {
+    return type == Type.ATTACK;
   }
 }
   

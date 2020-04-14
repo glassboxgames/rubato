@@ -1,6 +1,9 @@
 {
   "player": "Adagio/01 Wait/0.png",
-  "drone": "Enemies/Drone/Hover/0.png",
   "simple": "Tilesets/Grass/tb_grass.png",
   "spikes": "Tilesets/Sakura/edge-n.png",
+  "spider": "Enemies/Spider/Wander/Armature_walk_00.png",
+  "projectile": "Enemies/Projectile/Idle/0.png",
+  "wisp": "Enemies/Wisp/Idle/Armature_idle_00.png",
+  "wyrm": "Enemies/Wyrm/Idle/Armature_idle_00.png",
 }

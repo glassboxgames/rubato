@@ -1,0 +1,14 @@
+[
+  {
+    "path": "Idle/",
+    "loop": true,
+  },
+  {
+    "path": "Windup/",
+    "loop": false,
+  },
+  {
+    "path": "Attack/",
+    "loop": false,
+  },
+]

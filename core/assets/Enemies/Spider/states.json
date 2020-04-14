@@ -1,0 +1,14 @@
+[
+  {
+    "path": "Wander/",
+    "loop": true,
+  },
+  {
+    "path": "Windup/",
+    "loop": false,
+  },
+  {
+    "path": "Attack/",
+    "loop": false,
+  }
+]

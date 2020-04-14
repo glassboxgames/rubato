@@ -1,56 +1,48 @@
 package com.glassboxgames.rubato.entity;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
+import com.glassboxgames.rubato.GameCanvas;
 
 /**
- * Class representing a simple path-following enemy in Rubato.
+ * Abstract class to represent any enemy in Rubato.
  */
-public class Enemy extends Entity {
-  /** Maximum health */
-  protected static final float MAX_HEALTH = 10;
-  /** Maximum speed */
-  protected static final float MAX_SPEED = 3f;
-  /** Movement range */
-  protected static final float MOVE_RANGE = 2f;
+public abstract class Enemy extends Entity {
+  /** Represent the previous position of the enemy */
+  protected Vector2 prevPosition = new Vector2(0, 0);
+  /** Represent the previous velocity of the enemy */
+  protected Vector2 prevVelocity = new Vector2(0, 0);
+  /** Cache for prevPosition calculation */
+  protected Vector2 prevPosCache = new Vector2(0, 0);
+  /** Cache for prevVelocity calculation */
+  protected Vector2 prevVelCache = new Vector2(0, 0);
+  /** Cache for targeting */
+  protected Vector2 targetCache = new Vector2(0, 0);
 
-  /** Enemy states */
-  public static Array<State> states = null;
-
+  /** Flag for removing the enemy */
+  protected boolean remove;
   /** Current health */
   protected float health;
-  /** Movement limits */
-  protected float minX, maxX;
-
-  /** Represent the previous position of the enemy */
-  protected Vector2 prevPosition;
-  /** Represent the previous velocity of the enemy */
-  protected Vector2 prevVelocity;
-  /** Cache for prevPosition Calculation */
-  protected Vector2 prevPosCache = new Vector2(0, 0);
-  /** Cache for prevVelocity Calculation */
-  protected Vector2 prevVelCache = new Vector2(0, 0);
+  /** Current target coordinates */
+  protected Vector2 target;
 
   /**
    * Initializes an enemy with the specified parameters.
    * @param x x-coordinate
    * @param y y-coordinate
+   * @param i initial state index
    */
-  public Enemy(float x, float y) {
-    super(x, y);
-    bodyDef.type = BodyDef.BodyType.KinematicBody;
-    health = MAX_HEALTH;
-    minX = x - MOVE_RANGE;
-    maxX = x + MOVE_RANGE;
-    prevPosition = getPosition();
-    prevVelocity = getVelocity();
+  public Enemy(float x, float y, int i) {
+    super(x, y, i);
+    health = getMaxHealth();
   }
 
-  @Override
-  public Array<State> getStates() {
-    return states;
-  }
+  /**
+   * Returns the maximum health of this enemy.
+   */
+  public abstract float getMaxHealth();
 
   /**
    * Damage this enemy by the given amount.
@@ -58,6 +50,8 @@ public class Enemy extends Entity {
    */
   public void lowerHealth(float damage) {
     health = Math.max(0, health - damage);
+    if (isSuspended()) {
+    }
   }
 
   /**
@@ -67,32 +61,54 @@ public class Enemy extends Entity {
     return health == 0;
   }
 
-  @Override
-  public void update(float delta) {
-    super.update(delta);
-    if (getPosition().x >= maxX) {
-      faceLeft();
-    } else if (getPosition().x <= minX) {
-      faceRight();
-    }
-    body.setLinearVelocity(MAX_SPEED * getDirection(), 0);
-    timeslow();
+  /**
+   * Sets the target of this enemy.
+   */
+  public void setTarget(Vector2 target) {
+    this.target = target == null ? null : new Vector2(target);
   }
 
   /**
-   * Applies the time slowing effect to this enemy based on the health fraction remaining.
+   * Returns this enemy's target.
    */
-  private void timeslow() {
-    float tsf = health / MAX_HEALTH;
-    prevPosCache.x = prevPosition.x * (1 - tsf) + getPosition().x * tsf;
-    prevPosCache.y = prevPosition.y * (1 - tsf) + getPosition().y * tsf;
-    prevVelCache.x = prevVelocity.x * (1 - tsf) + getVelocity().x * tsf;
-    prevVelCache.y = prevVelocity.y * (1 - tsf) + getVelocity().y * tsf;
+  public Vector2 getTarget() {
+    return target == null ? null : targetCache.set(target);
+  }
 
-    prevPosition = prevPosCache;
-    prevVelocity = prevVelCache;
+  @Override
+  public void update(float delta) {
+    float tsf = health / getMaxHealth();
+    super.update(delta, tsf);
 
-    body.setTransform(prevPosCache, body.getAngle());
-    body.setLinearVelocity(prevVelCache);
+    if (isSuspended() && body.getType() != BodyDef.BodyType.StaticBody) {
+      body.setType(BodyDef.BodyType.StaticBody);
+    } else {
+      prevPosCache.x = prevPosition.x * (1 - tsf) + getPosition().x * tsf;
+      prevPosCache.y = prevPosition.y * (1 - tsf) + getPosition().y * tsf;
+      prevVelCache.x = prevVelocity.x * (1 - tsf) + getVelocity().x * tsf;
+      prevVelCache.y = prevVelocity.y * (1 - tsf) + getVelocity().y * tsf;
+
+      prevPosition = prevPosCache;
+      prevVelocity = prevVelCache;
+
+      body.setTransform(prevPosCache, body.getAngle());
+      body.setLinearVelocity(prevVelCache);
+    }
+
+    advanceState();
+  }
+
+  /**
+   * Sets whether this enemy should be removed from the game.
+   */
+  public void setRemove(boolean remove) {
+    this.remove = remove;
+  }
+
+  /**
+   * Returns whether this enemy should be removed.
+   */
+  public boolean shouldRemove() {
+    return remove;
   }
 }

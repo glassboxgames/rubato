@@ -224,7 +224,7 @@ public class EditorMode implements Screen {
   public void initLevel(LevelData data, AssetManager manager) {
     clear();
 
-    String[] keys = new String[] {"player", "drone", "simple", "spikes"};
+    String[] keys = new String[] {"player", "simple", "spikes", "spider", "wisp", "wyrm"};
     for (int i = 0; i < keys.length; i++) {
       createUIButton(keys[i], 20, Gdx.graphics.getHeight() - 70 * (i + 1), 50, 50);
     }
@@ -273,7 +273,9 @@ public class EditorMode implements Screen {
           data.player.y = (button.getY() + button.getHeight() / 2) / Constants.PPM;
           break;
         }
-      case "drone":
+      case "spider":
+      case "wisp":
+      case "wyrm":
         {
           for (Button button : levelMap.get(key)) {
             LevelData.EnemyData enemy = new LevelData.EnemyData();

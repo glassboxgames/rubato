@@ -59,14 +59,15 @@ public class GameMode implements Screen {
   /** The Box2D world */
   protected World world;
 
+  /** List of all entity states currently loaded */
+  protected Array<State> states;
   /** The current level */
   protected LevelContainer level;
   /** The position of the camera */
   protected Vector2 cameraPos;
 
   /** The upper left corner of the visible canvas **/
-  protected Vector2 positionUI;
-
+  protected Vector2 uiPos;
   /** Whether debug mode is on */
   protected boolean debug = false;
   /** Whether dev mode is on */
@@ -86,17 +87,26 @@ public class GameMode implements Screen {
     assets = new Array();
     gameState = GameState.INTRO;
     cameraPos = new Vector2();
+    uiPos = new Vector2();
 
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(CollisionController.getInstance());
 
     // Initialize entity state machines
+    states = new Array<State>();
     Player.states = State.readStates("Adagio/");
+    states.addAll(Player.states);
     Platform.states = State.readStates("Tilesets/");
-    Enemy.states = State.readStates("Enemies/Drone/");
-
-    positionUI = new Vector2();
+    states.addAll(Platform.states);
+    Projectile.states = State.readStates("Enemies/Projectile/");
+    states.addAll(Projectile.states);
+    Spider.states = State.readStates("Enemies/Spider/");
+    states.addAll(Spider.states);
+    Wisp.states = State.readStates("Enemies/Wisp/");
+    states.addAll(Wisp.states);
+    Wyrm.states = State.readStates("Enemies/Wyrm/");
+    states.addAll(Wyrm.states);
   }
 
   /**
@@ -112,13 +122,7 @@ public class GameMode implements Screen {
     assets.add(FONT_FILE);
     manager.load(PARRY_METER_FILE, Texture.class);
     assets.add(PARRY_METER_FILE);
-    for (State state : Player.states) {
-      state.preloadContent(manager);
-    }
-    for (State state : Platform.states) {
-      state.preloadContent(manager);
-    }
-    for (State state : Enemy.states) {
+    for (State state : states) {
       state.preloadContent(manager);
     }
   }
@@ -130,13 +134,7 @@ public class GameMode implements Screen {
   public void loadContent(AssetManager manager) {
     parryMeter = manager.get(PARRY_METER_FILE, Texture.class);
     displayFont = manager.get(FONT_FILE, BitmapFont.class);
-    for (State state : Player.states) {
-      state.loadContent(manager);
-    }
-    for (State state : Platform.states) {
-      state.loadContent(manager);
-    }
-    for (State state : Enemy.states) {
+    for (State state : states) {
       state.loadContent(manager);
     }
   }
@@ -151,13 +149,7 @@ public class GameMode implements Screen {
         manager.unload(s);
       }
     }
-    for (State state : Player.states) {
-      state.unloadContent(manager);
-    }
-    for (State state : Platform.states) {
-      state.unloadContent(manager);
-    }
-    for (State state : Enemy.states) {
+    for (State state : states) {
       state.unloadContent(manager);
     }
   }
@@ -268,18 +260,46 @@ public class GameMode implements Screen {
         }
 
         player.update(delta);
-        player.sync();
       } else {
         player.deactivatePhysics(world);
       }
+
+      Array<Enemy> enemies = level.getEnemies();
+      Array<Enemy> toRemove = new Array<Enemy>();
+      Array<Enemy> toAdd = new Array<Enemy>();
+      for (Enemy enemy : enemies) {
+        if (enemy.shouldRemove()) {
+          enemy.deactivatePhysics(world);
+          toRemove.add(enemy);
+        } else {
+          enemy.update(delta);
+          if (enemy instanceof Wisp) {
+            Array<Enemy> spawned = ((Wisp)enemy).getSpawned();
+            for (Enemy spawn : spawned) {
+              spawn.activatePhysics(world);
+              toAdd.add(spawn);
+            }
+            spawned.clear();
+          }
+        }
+      }
+      enemies.removeAll(toRemove, true);
+      enemies.addAll(toAdd);
+
+      for (Platform platform : level.getPlatforms()) {
+        platform.update(delta);
+      }
+
+      if (player.isAlive()) {
+        player.sync();
+      }
       for (Enemy enemy : level.getEnemies()) {
-        enemy.update(delta);
         enemy.sync();
       }
       for (Platform platform : level.getPlatforms()) {
-        platform.update(delta);
         platform.sync();
       }
+      
       world.step(1 / 60f, 8, 3);
     }
   }
@@ -301,7 +321,7 @@ public class GameMode implements Screen {
       canvas.moveCamera(cameraPos,
                         level.getWidth() * Constants.PPM,
                         level.getHeight() * Constants.PPM);
-      positionUI.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2,
+      uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2,
                                      0,
                                      level.getWidth() * Constants.PPM
                                      - canvas.getWidth()) + DRAW_OFFSET,
@@ -317,18 +337,18 @@ public class GameMode implements Screen {
     float parryMeterHeight = parryMeterWidth * 1171/6274;
     canvas.begin();
     canvas.draw(parryMeter, Color.WHITE, 0, parryMeterHeight,
-                positionUI.x, positionUI.y, parryMeterWidth, parryMeterHeight);
+                uiPos.x, uiPos.y, parryMeterWidth, parryMeterHeight);
     // this is temp code (cuz the UI doesn't work):
     String resource = new DecimalFormat("#.##").format(player.getParry());
     String total = new DecimalFormat("#.##").format(player.PARRY_CAPACITY);
     canvas.drawText(resource + "/" + total, displayFont, Color.BLACK,
-                    positionUI.x + parryMeterWidth , positionUI.y - 2 * DRAW_OFFSET);
+                    uiPos.x + parryMeterWidth , uiPos.y - 2 * DRAW_OFFSET);
     // end temp code
     canvas.end();
 
     if (devMode) {
-      float xOffset = positionUI.x;
-      float yOffset = positionUI.y - parryMeterHeight - DRAW_OFFSET;
+      float xOffset = uiPos.x;
+      float yOffset = uiPos.y - parryMeterHeight - DRAW_OFFSET;
       float deltaOffset = 2 * DRAW_OFFSET;
       canvas.begin();
       drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,

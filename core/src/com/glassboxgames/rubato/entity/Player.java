@@ -83,9 +83,9 @@ public class Player extends Entity {
   protected boolean isParrying;
 
   /** Enemies that have been hit by the current active attack */
-  protected Array<Enemy> enemiesHit;
+  protected ObjectSet<Enemy> enemiesHit;
   /** Entities that the player is currently using as ground */
-  protected Array<Entity> entitiesUnderfoot;
+  protected ObjectSet<Entity> entitiesUnderfoot;
 
   /**
    * Instantiates a player with the given parameters.
@@ -93,32 +93,31 @@ public class Player extends Entity {
    * @param y y-coordinate of center
    */
   public Player(float x, float y) {
-    super(x, y);
-    alive = true;
+    super(x, y, STATE_IDLE);
     input = new Vector2();
     // TODO fix hardcoded dims
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
-    enemiesHit = new Array<>();
-    entitiesUnderfoot = new Array<>();
+    enemiesHit = new ObjectSet<Enemy>();
+    entitiesUnderfoot = new ObjectSet<Entity>();
+    alive = true;
     hasDash = false;
     dashDir = new Vector2();
     parry = 0;
   }
 
-  @Override
-  public Array<State> getStates() {
+  /**
+   * Initialize player states.
+   */
+  public Array<State> initStates() {
+    states = State.readStates("Adagio/");
     return states;
   }
 
   @Override
-  public boolean activatePhysics(World world) {
-    if (!super.activatePhysics(world)) {
-      return false;
-    }
-    setState(STATE_IDLE);
-    return true;
+  public Array<State> getStates() {
+    return states;
   }
 
   /**
@@ -238,6 +237,20 @@ public class Player extends Entity {
   }
 
   /**
+   * Adds an entity to the list of entities underfoot.
+   */
+  public void addUnderfoot(Entity entity) {
+    entitiesUnderfoot.add(entity);
+  }
+
+  /**
+   * Removes an entity from the list of entities underfoot.
+   */
+  public void removeUnderfoot(Entity entity) {
+    entitiesUnderfoot.remove(entity);
+  }
+
+  /**
    * Returns whether the player is grounded.
    */
   public boolean isGrounded() {
@@ -245,27 +258,9 @@ public class Player extends Entity {
   }
 
   /**
-   * Adds an entity to the list of entities underfoot.
+   * Returns the set of enemies hit by the current attack.
    */
-  public void addUnderfoot(Entity entity) {
-    if (!entitiesUnderfoot.contains(entity, true)) {
-      entitiesUnderfoot.add(entity);
-    }
-  }
-
-  /**
-   * Removes an entity from the list of entities underfoot.
-   */
-  public void removeUnderfoot(Entity entity) {
-    if (entitiesUnderfoot.contains(entity, true)) {
-      entitiesUnderfoot.removeValue(entity, true);
-    }
-  }
-
-  /**
-   * Returns the array of enemies hit by the current attack.
-   */
-  public Array<Enemy> getEnemiesHit() {
+  public ObjectSet<Enemy> getEnemiesHit() {
     return enemiesHit;
   }
 

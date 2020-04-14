@@ -27,7 +27,7 @@ public abstract class Entity {
   /** Current entity state, represented as an integer */
   protected int stateIndex;
   /** Number of frames spent in current state */
-  protected int count;
+  protected float count;
 
   /** Temp vector for calculations */
   protected Vector2 temp = new Vector2();
@@ -40,9 +40,11 @@ public abstract class Entity {
    * Instantiates a new entity with the given parameters.
    * @param x x-coordinate
    * @param y y-coordinate
+   * @param i initial state index
    */
-  public Entity(float x, float y) {
+  public Entity(float x, float y, int i) {
     dir = 1;
+    stateIndex = i;
     bodyDef = new BodyDef();
     bodyDef.position.set(x, y);
     bodyDef.active = true;
@@ -117,10 +119,18 @@ public abstract class Entity {
   }
 
   /**
+   * Turns this entity around.
+   */
+  public void turnAround() {
+    dir *= -1;
+  }
+
+  /**
    * Adds this entity as a physics object in the given world.
    */
   public boolean activatePhysics(World world) {
     body = world.createBody(bodyDef);
+    setState(stateIndex);
     return body != null;
   }
 
@@ -129,7 +139,6 @@ public abstract class Entity {
    */
   public void deactivatePhysics(World world) {
     if (body != null) {
-      // if we need to save the body info, we can do it here if we want
       world.destroyBody(body);
       body = null;
       bodyDef.active = false;
@@ -188,7 +197,17 @@ public abstract class Entity {
    * @param delta time since the last update
    */
   public void update(float delta) {
-    count++;
+    update(delta, 1);
+  }
+
+  /**
+   * Updates this entity's state.
+   * Call sync() before stepping again to ensure colliders match the state.
+   * @param delta time since the last update
+   * @param incr increment size for count
+   */
+  public void update(float delta, float incr) {
+    count += incr;
     advanceState();
   }
 
@@ -210,18 +229,29 @@ public abstract class Entity {
     sensors.clear();
 
     State state = getState();
-    for (FixtureDef def : state.getHitboxDefs(count)) {
+    for (FixtureDef def : state.getHitboxDefs(getCount())) {
       hitboxes.add(createCollider(def, Collider.Type.HITBOX));
     }
-    for (FixtureDef def : state.getHurtboxDefs(count)) {
+    for (FixtureDef def : state.getHurtboxDefs(getCount())) {
       hurtboxes.add(createCollider(def, Collider.Type.HURTBOX));
     }
-    ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(count);
+    ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(getCount());
     for (String name : sensorDefs.keys()) {
       if (name.equals("ground")) {
         sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.GROUND));
+      } else if (name.equals("edge")) {
+        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.EDGE));
+      } else if (name.equals("attack")) {
+        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.ATTACK));
       }
     }    
+  }
+
+  /**
+   * Returns the current count of the animation as an int.
+   */
+  public int getCount() {
+    return (int) count;
   }
 
   /**
@@ -238,15 +268,22 @@ public abstract class Entity {
   public void setState(int i) {
     leaveState();
     stateIndex = i;
+    enterState();
+  }
+
+  /**
+   * Executes any initial state changes before entering current state.
+   * Called when new state is set.
+   */
+  public void enterState() {
+    count = 0;
   }
 
   /**
    * Executes any final state changes before leaving current state.
    * Called before new state is set.
    */
-  public void leaveState() {
-    count = 0;
-  }
+  public void leaveState() {}
   
   /**
    * Transitions entity states based on current entity state.
@@ -258,7 +295,7 @@ public abstract class Entity {
    * Draws this entity to the given canvas.
    */
   public void draw(GameCanvas canvas) {
-    Texture texture = getState().getTexture(count);
+    Texture texture = getState().getTexture(getCount());
     float w = texture.getWidth() / Constants.PPM;
     float h = texture.getHeight() / Constants.PPM;
     Vector2 pos = getPosition();
@@ -271,7 +308,7 @@ public abstract class Entity {
   /**
    * Draws a hitbox/hurtbox shape to the canvas.
    */
-  private void drawPhysicsShape(GameCanvas canvas, Shape shape, Color color) {
+  protected void drawPhysicsShape(GameCanvas canvas, Shape shape, Color color) {
     Vector2 pos = getPosition();
     if (shape instanceof CircleShape) {
       Vector2 spos = ((CircleShape)shape).getPosition();

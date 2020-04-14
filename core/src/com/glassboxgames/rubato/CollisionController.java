@@ -3,6 +3,7 @@ package com.glassboxgames.rubato;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+//import com.sun.tools.sjavac.server.SysInfo;
 
 public class CollisionController implements ContactListener {
   /** The singleton instance of the collision controller */
@@ -59,6 +60,10 @@ public class CollisionController implements ContactListener {
       startCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
     } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
       startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
+    } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
+      startCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
+    } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
+      startCollision((Enemy)o2.entity, o2, (Platform) o1.entity, o1);
     }
   }
 
@@ -74,6 +79,10 @@ public class CollisionController implements ContactListener {
       endCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
     } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
       endCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
+    } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
+      endCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
+    } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
+      endCollision((Enemy)o2.entity, o2, (Platform) o1.entity, o1);
     }
   }
 
@@ -83,13 +92,12 @@ public class CollisionController implements ContactListener {
   private void startCollision(Player player, Collider playerCollider,
                               Enemy enemy, Collider enemyCollider) {
     if (playerCollider.isHitbox() && enemyCollider.isHurtbox()) {
-      Array<Enemy> enemiesHit = player.getEnemiesHit();
-      if (!enemiesHit.contains(enemy, true)) {
-        enemy.lowerHealth(Player.ATTACK_DAMAGE);
-        enemiesHit.add(enemy);
+      ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
+      if (enemiesHit.add(enemy)) {
         if (!enemy.isSuspended()) {
           player.addParry(Player.parryGain);
         }
+        enemy.lowerHealth(Player.ATTACK_DAMAGE);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
@@ -101,6 +109,8 @@ public class CollisionController implements ContactListener {
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.addUnderfoot(enemy);
+    } else if (playerCollider.isHurtbox() && enemyCollider.isAttackSensor()) {
+      enemy.setTarget(player.getPosition());
     }
   }
 
@@ -111,6 +121,8 @@ public class CollisionController implements ContactListener {
                             Enemy enemy, Collider enemyCollider) {
     if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.removeUnderfoot(enemy);
+    } else if (playerCollider.isHurtbox() && enemyCollider.isAttackSensor()) {
+      enemy.setTarget(null);
     }
   }
 
@@ -134,5 +146,37 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.removeUnderfoot(platform);
     }
+  }
+
+  /**
+   * Handles a collision starting between an Enemy and a platform
+   */
+  private void startCollision(Enemy enemy, Collider enemyCollider,
+                              Platform platform, Collider platformCollider) {
+    if (enemyCollider.isGroundSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).addUnderfoot(platform);
+      }
+    } else if (enemyCollider.isEdgeSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).setEdge(false);
+      }
+    }
+  }
+  /**
+   * Handles a collision ending between an Enemy and a platform
+   */
+  private void endCollision(Enemy enemy, Collider enemyCollider,
+                            Platform platform, Collider platformCollider) {
+    if (enemyCollider.isGroundSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).removeUnderfoot(platform);
+      }
+    } else if (enemyCollider.isEdgeSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).setEdge(true);
+      }
+    }
+
   }
 }

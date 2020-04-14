@@ -24,9 +24,16 @@ public class Platform extends Entity {
    * @param type the type index of the platform
    */
   public Platform(float x, float y, int type) {
-    super(x, y);
+    super(x, y, type);
     bodyDef.type = BodyDef.BodyType.StaticBody;
-    setState(type);
+  }
+
+  /**
+   * Initializes platform states.
+   */
+  public Array<State> initStates() {
+    states = State.readStates("Tilesets/");
+    return states;
   }
 
   @Override

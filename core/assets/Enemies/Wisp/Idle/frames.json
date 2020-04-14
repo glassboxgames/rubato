@@ -1,0 +1,722 @@
+[
+  {
+    "file": "Armature_idle_01.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_02.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_03.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_04.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_05.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_06.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_07.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_08.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_09.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_10.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_11.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_12.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_13.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_14.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_15.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_16.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_17.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_18.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_19.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_20.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_21.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_22.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_23.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_24.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_25.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_26.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_27.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_28.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_29.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_30.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_31.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_32.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_33.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_34.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_35.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_36.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_37.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_38.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_39.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_40.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_41.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_42.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_43.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_44.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_45.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_46.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_47.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_48.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_49.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_50.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_51.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_52.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_53.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_54.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_55.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_56.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_57.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_58.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_59.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+  {
+    "file": "Armature_idle_60.png",
+    "sensors": {
+      "attack": [0, 0, 3],
+    },
+    "hitboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+    "hurtboxes": [
+      [0, 0, 0.8, 1.9, 0],
+    ],
+  },
+]
