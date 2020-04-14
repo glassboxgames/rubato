@@ -60,9 +60,13 @@ public class CollisionController implements ContactListener {
     } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
       startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
     } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
-      startCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
+      startCollision((Enemy)o1.entity, o1, (Platform)o2.entity, o2);
     } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
-      startCollision((Enemy)o2.entity, o2, (Platform) o1.entity, o1);
+      startCollision((Enemy)o2.entity, o2, (Platform)o1.entity, o1);
+    } else if (o1.entity instanceof Player && o2.entity instanceof Checkpoint) {
+      startCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
+    } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
+      startCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
     }
   }
 
@@ -82,6 +86,10 @@ public class CollisionController implements ContactListener {
       endCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
     } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
       endCollision((Enemy)o2.entity, o2, (Platform) o1.entity, o1);
+    } else if (o1.entity instanceof Player && o2.entity instanceof Checkpoint) {
+      endCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
+    } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
+      endCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
     }
   }
 
@@ -166,7 +174,7 @@ public class CollisionController implements ContactListener {
   }
 
   /**
-   * Handles a collision starting between an Enemy and a platform
+   * Handles a collision starting between an enemy and a platform.
    */
   private void startCollision(Enemy enemy, Collider enemyCollider,
                               Platform platform, Collider platformCollider) {
@@ -180,8 +188,9 @@ public class CollisionController implements ContactListener {
       }
     }
   }
+
   /**
-   * Handles a collision ending between an Enemy and a platform
+   * Handles a collision ending between an enemy and a platform.
    */
   private void endCollision(Enemy enemy, Collider enemyCollider,
                             Platform platform, Collider platformCollider) {
@@ -194,6 +203,21 @@ public class CollisionController implements ContactListener {
         ((Spider)enemy).setEdge(true);
       }
     }
-
   }
+
+  /**
+   * Handles a collision starting between a player and a checkpoint.
+   */
+  private void startCollision(Player player, Collider playerCollider,
+                              Checkpoint checkpoint, Collider checkpointCollider) {
+    if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
+      checkpoint.activate();
+    }
+  }
+
+  /**
+   * Handles a collision ending between a player and a checkpoint.
+   */
+  private void endCollision(Player player, Collider playerCollider,
+                            Checkpoint checkpoint, Collider checkpointCollider) {}
 }

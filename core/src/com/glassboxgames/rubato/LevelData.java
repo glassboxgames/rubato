@@ -1,7 +1,5 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.*;
 
 /**
@@ -18,6 +16,8 @@ public class LevelData {
   public Array<EnemyData> enemies;
   /** Platform data array */
   public Array<PlatformData> platforms;
+  /** Checkpoint data array */
+  public Array<CheckpointData> checkpoints;
 
   /**
    * Simple player data serialization class.
@@ -39,6 +39,13 @@ public class LevelData {
    */
   public static class PlatformData {
     public String type;
+    public float x, y;
+  }
+
+  /**
+   * Simple checkpoint data serialization class.
+   */
+  public static class CheckpointData {
     public float x, y;
   }
 }

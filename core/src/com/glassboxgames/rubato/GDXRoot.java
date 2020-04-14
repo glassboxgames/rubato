@@ -93,7 +93,8 @@ public class GDXRoot extends Game implements ScreenListener {
     if (screen == loading) {
       if (exitCode == 0) {
         playing.loadContent(manager);
-        playing.setLevel(new LevelContainer(levels[levelIndex], manager));
+        playing.initLevel(levels[levelIndex], manager);
+        System.out.println("Starting level " + levelIndex + " loaded from file " + levelPaths[levelIndex]);
         setScreen(playing);
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode, new RuntimeException());
@@ -103,7 +104,6 @@ public class GDXRoot extends Game implements ScreenListener {
       if (exitCode == 0) {
         levelIndex++;
         if (levelIndex >= levels.length) {
-          dispose();
           Gdx.app.exit();
         } else {
           setScreen(loading);
@@ -122,9 +122,9 @@ public class GDXRoot extends Game implements ScreenListener {
       if (exitCode == 1) {
         LevelData data = editing.exportLevel();
         levels[levelIndex] = data;
-        Gdx.files.local(levelPaths[levelIndex])
-          .writeString(json.prettyPrint(data), false);
-        playing.setLevel(new LevelContainer(levels[levelIndex], manager));
+        Gdx.files.local(levelPaths[levelIndex]).writeString(json.prettyPrint(data), false);
+        System.out.println("Saved level to " + levelPaths[levelIndex]);
+        playing.initLevel(data, manager);
         setScreen(playing);
       } else {
         dispose();

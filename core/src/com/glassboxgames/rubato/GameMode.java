@@ -99,6 +99,8 @@ public class GameMode implements Screen {
     states.addAll(Player.states);
     Platform.states = State.readStates("Tilesets/");
     states.addAll(Platform.states);
+    Checkpoint.states = State.readStates("Objects/");
+    states.addAll(Checkpoint.states);
     Projectile.states = State.readStates("Enemies/Projectile/");
     states.addAll(Projectile.states);
     Spider.states = State.readStates("Enemies/Spider/");
@@ -155,10 +157,12 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Sets the world level.
+   * Creates the world level.
+   * @param data the serialized level data
+   * @param manager the asset manager to use
    */
-  public void setLevel(LevelContainer level) {
-    this.level = level;
+  public void initLevel(LevelData data, AssetManager manager) {
+    level = new LevelContainer(data, manager);
   }
 
   /**
@@ -240,6 +244,16 @@ public class GameMode implements Screen {
         }
       }
 
+      boolean complete = true;
+      for (Checkpoint checkpoint : level.getCheckpoints()) {
+        checkpoint.update(delta);
+        complete = complete && checkpoint.isActivated();
+      }
+      if (complete && input.didContinue()) {
+        listener.exitScreen(this, 0);
+        return;
+      }
+      
       Player player = level.getPlayer();
       if (player.isAlive()) {
         player.setInputVector(input.getHorizontal(), input.getVertical());
@@ -298,6 +312,9 @@ public class GameMode implements Screen {
       }
       for (Platform platform : level.getPlatforms()) {
         platform.sync();
+      }
+      for (Checkpoint checkpoint : level.getCheckpoints()) {
+        checkpoint.sync();
       }
       
       world.step(1 / 60f, 8, 3);

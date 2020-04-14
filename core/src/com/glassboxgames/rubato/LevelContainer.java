@@ -25,6 +25,8 @@ public class LevelContainer {
   private Array<Enemy> enemies;
   /** The platforms in this level */
   private Array<Platform> platforms;
+  /** The checkpoints in this level */
+  private Array<Checkpoint> checkpoints;
 
   /**
    * Instantiates a level container with the given parameters.
@@ -34,15 +36,17 @@ public class LevelContainer {
    * @param player the main player
    * @param enemies array of enemies
    * @param platforms array of platforms
+   * @param checkpoints array of checkpoints
    */
-  public LevelContainer(float width, float height, Texture background,
-                        Player player, Array<Enemy> enemies, Array<Platform> platforms) {
+  public LevelContainer(float width, float height, Texture background, Player player,
+                        Array<Enemy> enemies, Array<Platform> platforms, Array<Checkpoint> checkpoints) {
     this.width = width;
     this.height = height;
     this.background = background;
     this.player = player;
     this.enemies = enemies;
     this.platforms = platforms;
+    this.checkpoints = checkpoints;
   }
 
   /**
@@ -76,9 +80,22 @@ public class LevelContainer {
     }
     platforms = new Array<Platform>();
     for (LevelData.PlatformData platformData : data.platforms) {
-      platforms.add(new Platform(platformData.x, platformData.y,
-                                 platformData.type.equals("spikes")
-                                 ? Platform.TYPE_SPIKES : Platform.TYPE_SIMPLE));
+      int type = -1;
+      switch (platformData.type) {
+      case "simple":
+        type = Platform.TYPE_SIMPLE;
+        break;
+      case "spikes":
+        type = Platform.TYPE_SPIKES;
+        break;
+      }
+      if (type != -1) {
+        platforms.add(new Platform(platformData.x, platformData.y, type));
+      }
+    }
+    checkpoints = new Array<Checkpoint>();
+    for (LevelData.CheckpointData checkpointData : data.checkpoints) {
+      checkpoints.add(new Checkpoint(checkpointData.x, checkpointData.y));
     }
   }
 
@@ -93,6 +110,9 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.activatePhysics(world);
     }
+    for (Checkpoint checkpoint : checkpoints) {
+      checkpoint.activatePhysics(world);
+    }
   }
 
   /**
@@ -105,6 +125,9 @@ public class LevelContainer {
     }
     for (Platform platform : platforms) {
       platform.deactivatePhysics(world);
+    }
+    for (Checkpoint checkpoint : checkpoints) {
+      checkpoint.deactivatePhysics(world);
     }
   }
 
@@ -144,6 +167,13 @@ public class LevelContainer {
   }
 
   /**
+   * Returns the array of checkpoints in this level.
+   */
+  public Array<Checkpoint> getCheckpoints() {
+    return checkpoints;
+  }
+
+  /**
    * Draws this level to the given canvas.
    * @param canvas the canvas to draw on
    * @param debug whether to draw collider shapes
@@ -157,6 +187,9 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
+    for (Checkpoint checkpoint : checkpoints) {
+      checkpoint.draw(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
@@ -169,6 +202,9 @@ public class LevelContainer {
       canvas.beginDebug(Constants.PPM, Constants.PPM);
       for (Platform platform : platforms) {
         platform.drawPhysics(canvas);
+      }
+      for (Checkpoint checkpoint : checkpoints) {
+        checkpoint.drawPhysics(canvas);
       }
       for (Enemy enemy : enemies) {
         enemy.drawPhysics(canvas);

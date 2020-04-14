@@ -1,5 +1,6 @@
 {
   "player": "Adagio/01 Wait/0.png",
+  "checkpoint": "Objects/Inactive/pillar_off_50w.png",
   "simple": "Tilesets/Grass/tb_grass.png",
   "spikes": "Tilesets/Sakura/edge-n.png",
   "spider": "Enemies/Spider/Wander/Armature_walk_00.png",

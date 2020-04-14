@@ -22,6 +22,7 @@ public class Collider {
     FORWARD,
     UP,
     DOWN,
+    CENTER,
   }
 
   /** The entity involved in the collision */
@@ -97,6 +98,13 @@ public class Collider {
    */
   public boolean isDownSensor() {
     return type == Type.DOWN;
+  }
+
+  /**
+   * Returns whether this collider is a center sensor.
+   */
+  public boolean isCenterSensor() {
+    return type == Type.CENTER;
   }
 
   /**

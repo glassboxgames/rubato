@@ -148,8 +148,7 @@ public class EditorMode implements Screen {
    * @param h the button height
    */
   private void createUIButton(final String key, float x, float y, float w, float h) {
-    final ImageButton button =
-      new ImageButton(new TextureRegionDrawable(textureMap.get(key)));
+    final ImageButton button = new ImageButton(new TextureRegionDrawable(textureMap.get(key)));
     button.setPosition(x, y);
     button.setWidth(w);
     button.setHeight(h);
@@ -224,7 +223,7 @@ public class EditorMode implements Screen {
   public void initLevel(LevelData data, AssetManager manager) {
     clear();
 
-    String[] keys = new String[] {"player", "simple", "spikes", "spider", "wisp", "wyrm"};
+    String[] keys = new String[] {"player", "checkpoint", "simple", "spikes", "spider", "wisp", "wyrm"};
     for (int i = 0; i < keys.length; i++) {
       createUIButton(keys[i], 20, Gdx.graphics.getHeight() - 70 * (i + 1), 50, 50);
     }
@@ -248,11 +247,30 @@ public class EditorMode implements Screen {
                         platformData.x * Constants.PPM,
                         platformData.y * Constants.PPM);
     }
+    for (LevelData.CheckpointData checkpointData : data.checkpoints) {
+      createLevelButton("checkpoint",
+                        checkpointData.x * Constants.PPM,
+                        checkpointData.y * Constants.PPM);
+    }
     levelStage.getCamera().position.set(Gdx.graphics.getWidth() / 2,
                                         Gdx.graphics.getHeight() / 2,
                                         levelStage.getCamera().position.z);
   }
 
+  /**
+   * Returns the x coordinate of the center of an actor.
+   */
+  private float getCenterX(Actor actor) {
+    return actor.getX() + actor.getWidth() / 2;
+  }
+
+  /**
+   * Returns the y coordinate of the center of an actor.
+   */
+  private float getCenterY(Actor actor) {
+    return actor.getY() + actor.getHeight() / 2;
+  }
+  
   /**
    * Serializes the level being edited as a LevelData object.
    */
@@ -263,14 +281,15 @@ public class EditorMode implements Screen {
     data.height = height / Constants.PPM;
     data.enemies = new Array<LevelData.EnemyData>();
     data.platforms = new Array<LevelData.PlatformData>();
+    data.checkpoints = new Array<LevelData.CheckpointData>();
     for (String key : levelMap.keys()) {
       switch (key) {
       case "player":
         {
           Button button = levelMap.get(key).get(0);
           data.player = new LevelData.PlayerData();
-          data.player.x = (button.getX() + button.getWidth() / 2) / Constants.PPM;
-          data.player.y = (button.getY() + button.getHeight() / 2) / Constants.PPM;
+          data.player.x = getCenterX(button) / Constants.PPM;
+          data.player.y = getCenterY(button) / Constants.PPM;
           break;
         }
       case "spider":
@@ -280,8 +299,8 @@ public class EditorMode implements Screen {
           for (Button button : levelMap.get(key)) {
             LevelData.EnemyData enemy = new LevelData.EnemyData();
             enemy.type = key;
-            enemy.x = (button.getX() + button.getWidth() / 2) / Constants.PPM;
-            enemy.y = (button.getY() + button.getHeight() / 2) / Constants.PPM;
+            enemy.x = getCenterX(button) / Constants.PPM;
+            enemy.y = getCenterY(button) / Constants.PPM;
             data.enemies.add(enemy);
           }
           break;
@@ -292,9 +311,19 @@ public class EditorMode implements Screen {
           for (Button button : levelMap.get(key)) {
             LevelData.PlatformData platform = new LevelData.PlatformData();
             platform.type = key;
-            platform.x = (button.getX() + button.getWidth() / 2) / Constants.PPM;
-            platform.y = (button.getY() + button.getHeight() / 2) / Constants.PPM;
+            platform.x = getCenterX(button) / Constants.PPM;
+            platform.y = getCenterY(button) / Constants.PPM;
             data.platforms.add(platform);
+          }
+          break;
+        }
+      case "checkpoint":
+        {
+          for (Button button : levelMap.get(key)) {
+            LevelData.CheckpointData checkpoint = new LevelData.CheckpointData();
+            checkpoint.x = getCenterX(button) / Constants.PPM;
+            checkpoint.y = getCenterY(button) / Constants.PPM;
+            data.checkpoints.add(checkpoint);
           }
           break;
         }

@@ -27,6 +27,8 @@ public class InputController {
   private boolean attackPressed;
   /** Whether the parry button was pressed */
   private boolean parryPressed;
+  /** Whether the continue button was pressed */
+  private boolean continuePressed;
 
   /** Horizontal movement input */
   private int horizontal;
@@ -143,6 +145,13 @@ public class InputController {
   }
 
   /**
+   * Returns whether the player pressed continue.
+   */
+  public boolean didContinue() {
+    return continuePressed;
+  }
+
+  /**
    * Reads the input from the player.
    */
   public void readInput() {
@@ -195,6 +204,7 @@ public class InputController {
     attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
     dashPressed = Gdx.input.isKeyPressed(Input.Keys.D);
     jumpPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE);
+    continuePressed = Gdx.input.isKeyPressed(Input.Keys.C);
 
     horizontal = 0;
     if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {

@@ -237,19 +237,7 @@ public abstract class Entity {
     }
     ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(getCount());
     for (String name : sensorDefs.keys()) {
-      if (name.equals("ground")) {
-        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.GROUND));
-      } else if (name.equals("forward")) {
-        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.FORWARD));
-      } else if (name.equals("up")) {
-        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.UP));
-      } else if (name.equals("down")) {
-        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.DOWN));
-      } else if (name.equals("edge")) {
-        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.EDGE));
-      } else if (name.equals("vision")) {
-        sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.VISION));
-      }
+      sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.valueOf(name.toUpperCase())));
     }    
   }
 
