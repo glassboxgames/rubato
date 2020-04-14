@@ -72,15 +72,13 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void dispose() {
-    Screen screen = getScreen();
-    setScreen(null);
-    screen.dispose();
-    canvas.dispose();
-    canvas = null;
     editing.unloadContent(manager);
     playing.unloadContent(manager);
     editing.dispose();
     playing.dispose();
+    setScreen(null);
+    canvas.dispose();
+    canvas = null;
     for (LevelData data : levels) {
       if (manager.isLoaded(data.background)) {
         manager.unload(data.background);
