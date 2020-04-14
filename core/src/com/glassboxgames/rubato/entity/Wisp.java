@@ -43,6 +43,14 @@ public class Wisp extends Enemy {
     bodyDef.type = BodyDef.BodyType.StaticBody;
   }
 
+  /**
+   * Initializes wisp states.
+   */
+  public static Array<State> initStates() {
+    states = State.readStates("Enemies/Wisp/");
+    return states;
+  }
+
   @Override
   public Array<State> getStates() {
     return states;

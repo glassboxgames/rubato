@@ -25,6 +25,26 @@
 ],
 "platforms": [
 	{
+		"type": "crumbling",
+		"x": 2.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 3.25,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 3.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 4.25,
+		"y": 0.85
+	},
+	{
 		"type": "simple",
 		"x": 0.755,
 		"y": 0.835
@@ -53,31 +73,6 @@
 		"type": "simple",
 		"x": 2.155,
 		"y": 5.335
-	},
-	{
-		"type": "simple",
-		"x": 4.855,
-		"y": 0.835
-	},
-	{
-		"type": "simple",
-		"x": 5.355,
-		"y": 0.835
-	},
-	{
-		"type": "simple",
-		"x": 5.855,
-		"y": 0.835
-	},
-	{
-		"type": "simple",
-		"x": 6.355,
-		"y": 0.835
-	},
-	{
-		"type": "simple",
-		"x": 6.855,
-		"y": 0.835
 	},
 	{
 		"type": "simple",
@@ -128,6 +123,31 @@
 		"type": "simple",
 		"x": 18.855,
 		"y": 5.435
+	},
+	{
+		"type": "simple",
+		"x": 4.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 5.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 5.755,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 6.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 6.755,
+		"y": 0.835
 	}
 ],
 "checkpoints": [

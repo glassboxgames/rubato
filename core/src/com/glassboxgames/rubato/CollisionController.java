@@ -158,6 +158,7 @@ public class CollisionController implements ContactListener {
                               Platform platform, Collider platformCollider) {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.addUnderfoot(platform);
+      platform.visit();
     } else if (playerCollider.isHurtbox() && platformCollider.isHitbox()) {
       player.setAlive(false);
     }

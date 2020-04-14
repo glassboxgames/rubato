@@ -124,7 +124,7 @@ public class Player extends Entity {
   /**
    * Initialize player states.
    */
-  public Array<State> initStates() {
+  public static Array<State> initStates() {
     states = State.readStates("Adagio/");
     return states;
   }

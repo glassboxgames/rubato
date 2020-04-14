@@ -38,6 +38,14 @@ public class Spider extends Enemy {
     entitiesUnderfoot = new ObjectSet<Entity>();
   }
 
+  /**
+   * Initializes spider states.
+   */
+  public static Array<State> initStates() {
+    states = State.readStates("Enemies/Spider/");
+    return states;
+  }
+
   @Override
   public Array<State> getStates() {
     return states;

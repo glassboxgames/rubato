@@ -35,7 +35,7 @@ public class Projectile extends Enemy {
   /**
    * Initializes projectile states.
    */
-  public Array<State> initStates() {
+  public static Array<State> initStates() {
     states = State.readStates("Enemies/Projectile/");
     return states;
   }

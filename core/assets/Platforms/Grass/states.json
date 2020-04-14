@@ -1,0 +1,26 @@
+[
+  {
+    "path": "Simple/",
+    "loop": false,
+  },
+  {
+    "path": "Bottom Spikes/",
+    "loop": false,
+  },
+  {
+    "path": "Left Spikes/",
+    "loop": false,
+  },
+  {
+    "path": "Top Spikes/",
+    "loop": false,
+  },
+  {
+    "path": "Right Spikes/",
+    "loop": false,
+  },
+  {
+    "path": "Crumbling/",
+    "loop": false,
+  },
+]

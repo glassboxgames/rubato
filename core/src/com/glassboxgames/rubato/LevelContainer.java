@@ -85,9 +85,23 @@ public class LevelContainer {
       case "simple":
         type = Platform.TYPE_SIMPLE;
         break;
-      case "spikes":
-        type = Platform.TYPE_SPIKES;
+      case "crumbling":
+        type = Platform.TYPE_CRUMBLING;
         break;
+      case "bottom_spikes":
+        type = Platform.TYPE_BOTTOM_SPIKES;
+        break;
+      case "left_spikes":
+        type = Platform.TYPE_LEFT_SPIKES;
+        break;
+      case "top_spikes":
+        type = Platform.TYPE_TOP_SPIKES;
+        break;
+      case "right_spikes":
+        type = Platform.TYPE_RIGHT_SPIKES;
+        break;
+      default:
+        Gdx.app.error("LevelContainer", "Found unregistered platform type: " + platformData.type, new RuntimeException());
       }
       if (type != -1) {
         platforms.add(new Platform(platformData.x, platformData.y, type));

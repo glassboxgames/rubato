@@ -223,9 +223,18 @@ public class EditorMode implements Screen {
   public void initLevel(LevelData data, AssetManager manager) {
     clear();
 
-    String[] keys = new String[] {"player", "checkpoint", "simple", "spikes", "spider", "wisp", "wyrm"};
+    String[] keys = new String[] {
+      "player", "checkpoint", "simple", "crumbling",
+      "bottom_spikes", "left_spikes", "top_spikes", "right_spikes",
+      "spider", "wisp", "wyrm",
+    };
+    int buttonSize = 50;
+    int buttonSpacing = 20;
     for (int i = 0; i < keys.length; i++) {
-      createUIButton(keys[i], 20, Gdx.graphics.getHeight() - 70 * (i + 1), 50, 50);
+      createUIButton(keys[i],
+                     buttonSpacing + i * (buttonSize + buttonSpacing),
+                     Gdx.graphics.getHeight() - buttonSize - buttonSpacing,
+                     buttonSize, buttonSize);
     }
     
     backgroundPath = data.background;
@@ -306,7 +315,11 @@ public class EditorMode implements Screen {
           break;
         }
       case "simple":
-      case "spikes":
+      case "crumbling":
+      case "bottom_spikes":
+      case "left_spikes":
+      case "top_spikes":
+      case "right_spikes":
         {
           for (Button button : levelMap.get(key)) {
             LevelData.PlatformData platform = new LevelData.PlatformData();

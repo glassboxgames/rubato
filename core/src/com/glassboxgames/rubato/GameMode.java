@@ -95,20 +95,13 @@ public class GameMode implements Screen {
 
     // Initialize entity state machines
     states = new Array<State>();
-    Player.states = State.readStates("Adagio/");
-    states.addAll(Player.states);
-    Platform.states = State.readStates("Tilesets/");
-    states.addAll(Platform.states);
-    Checkpoint.states = State.readStates("Objects/");
-    states.addAll(Checkpoint.states);
-    Projectile.states = State.readStates("Enemies/Projectile/");
-    states.addAll(Projectile.states);
-    Spider.states = State.readStates("Enemies/Spider/");
-    states.addAll(Spider.states);
-    Wisp.states = State.readStates("Enemies/Wisp/");
-    states.addAll(Wisp.states);
-    Wyrm.states = State.readStates("Enemies/Wyrm/");
-    states.addAll(Wyrm.states);
+    states.addAll(Player.initStates());
+    states.addAll(Platform.initStates());
+    states.addAll(Checkpoint.initStates());
+    states.addAll(Projectile.initStates());
+    states.addAll(Spider.initStates());
+    states.addAll(Wisp.initStates());
+    states.addAll(Wyrm.initStates());
   }
 
   /**
@@ -279,30 +272,38 @@ public class GameMode implements Screen {
       }
 
       Array<Enemy> enemies = level.getEnemies();
-      Array<Enemy> toRemove = new Array<Enemy>();
-      Array<Enemy> toAdd = new Array<Enemy>();
+      Array<Enemy> removedEnemies = new Array<Enemy>();
+      Array<Enemy> addedEnemies = new Array<Enemy>();
       for (Enemy enemy : enemies) {
         if (enemy.shouldRemove()) {
           enemy.deactivatePhysics(world);
-          toRemove.add(enemy);
+          removedEnemies.add(enemy);
         } else {
           enemy.update(delta);
           if (enemy instanceof Wisp) {
             Array<Enemy> spawned = ((Wisp)enemy).getSpawned();
             for (Enemy spawn : spawned) {
               spawn.activatePhysics(world);
-              toAdd.add(spawn);
+              addedEnemies.add(spawn);
             }
             spawned.clear();
           }
         }
       }
-      enemies.removeAll(toRemove, true);
-      enemies.addAll(toAdd);
+      enemies.removeAll(removedEnemies, true);
+      enemies.addAll(addedEnemies);
 
-      for (Platform platform : level.getPlatforms()) {
-        platform.update(delta);
+      Array<Platform> platforms = level.getPlatforms();
+      Array<Platform> removedPlatforms = new Array<Platform>();
+      for (Platform platform : platforms) {
+        if (platform.shouldRemove()) {
+          platform.deactivatePhysics(world);
+          removedPlatforms.add(platform);
+        } else {
+          platform.update(delta);
+        }
       }
+      platforms.removeAll(removedPlatforms, true);
 
       if (player.isAlive()) {
         player.sync();

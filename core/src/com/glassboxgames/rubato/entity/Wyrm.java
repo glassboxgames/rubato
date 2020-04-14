@@ -44,6 +44,14 @@ public class Wyrm extends Enemy {
     temp = new Vector2();
   }
 
+  /**
+   * Initializes wyrm states.
+   */
+  public static Array<State> initStates() {
+    states = State.readStates("Enemies/Wyrm/");
+    return states;
+  }
+
   @Override
   public Array<State> getStates() {
     return states;
