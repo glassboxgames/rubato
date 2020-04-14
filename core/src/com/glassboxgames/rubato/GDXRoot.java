@@ -15,6 +15,7 @@ public class GDXRoot extends Game implements ScreenListener {
   public static final String[] levelPaths = new String[] {
     "data/easy.json",
     "data/medium.json",
+    "data/hard.json",
   };
 
   /** Drawing context to display graphics (VIEW CLASS) */
