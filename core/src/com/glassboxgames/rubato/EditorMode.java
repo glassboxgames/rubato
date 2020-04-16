@@ -19,7 +19,7 @@ import com.glassboxgames.util.*;
  */
 public class EditorMode implements Screen {
   /** UI font file */
-  protected static final String FONT_FILE = "User Interface/Rajdhani-Regular.ttf";
+  protected static final String FONT_FILE = "Fonts/Rajdhani-Regular.ttf";
   /** UI font size */
   protected static final int FONT_SIZE = 18;
   /** Map movement speed */

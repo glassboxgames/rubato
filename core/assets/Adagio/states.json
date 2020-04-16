@@ -1,22 +1,22 @@
 [
   {
-    "path": "01 Wait/",
+    "path": "Idle/",
     "loop": true,
   },
   {
-    "path": "02 Walk/",
+    "path": "Run/",
     "loop": true,
   },
   {
-    "path": "01 Wait/",
+    "path": "Idle/",
     "loop": true,
   },
   {
-    "path": "03 Jump/",
+    "path": "Jump/",
     "loop": false,
   },
   {
-    "path": "04 Dash/",
-    "loop": false,
+    "path": "Dash/",
+    "loop": true,
   },
 ]

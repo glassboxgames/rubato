@@ -1,7 +1,7 @@
 {
 "width": 30,
 "height": 10,
-"background": "Backgrounds/Realism Update/Realistic-Forest.png",
+"background": "Backgrounds/Desert/desert.png",
 "player": {
 	"x": 1.375,
 	"y": 1.585

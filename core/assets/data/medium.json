@@ -1,7 +1,7 @@
 {
 "width": 30,
 "height": 10,
-"background": "Backgrounds/Realism Update/Realistic-Forest.png",
+"background": "Backgrounds/Desert/desert.png",
 "player": {
 	"x": 1.375,
 	"y": 1.585
@@ -48,11 +48,6 @@
 		"type": "right_spikes",
 		"x": 4.85,
 		"y": 3.65
-	},
-	{
-		"type": "simple",
-		"x": 0.755,
-		"y": 0.835
 	},
 	{
 		"type": "simple",
@@ -148,6 +143,11 @@
 		"type": "simple",
 		"x": 1.155,
 		"y": 5.335
+	},
+	{
+		"type": "simple",
+		"x": 0.755,
+		"y": 0.835
 	}
 ],
 "checkpoints": [

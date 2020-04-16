@@ -1,7 +1,7 @@
 {
 "width": 30,
 "height": 10,
-"background": "Backgrounds/Realism Update/Realistic-Forest.png",
+"background": "Backgrounds/Mountains/mountains.png",
 "player": {
 	"x": 1.175,
 	"y": 3.185
@@ -16,89 +16,14 @@
 		"type": "spider",
 		"x": 10.7,
 		"y": 3.11
+	},
+	{
+		"type": "wisp",
+		"x": 4.13,
+		"y": 6.385
 	}
 ],
 "platforms": [
-	{
-		"type": "bottom_spikes",
-		"x": 2.75,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 3.15,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 3.55,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 3.95,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 4.35,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 4.75,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 5.25,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 4.95,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 3.05,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 3.85,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 5.65,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 5.85,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 5.45,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 6.15,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 6.55,
-		"y": 0.75
-	},
-	{
-		"type": "bottom_spikes",
-		"x": 6.75,
-		"y": 0.75
-	},
 	{
 		"type": "bottom_spikes",
 		"x": 12.15,
@@ -123,6 +48,51 @@
 		"type": "bottom_spikes",
 		"x": 13.65,
 		"y": 6.25
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 2.75,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 3.15,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 3.55,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 3.95,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 4.35,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 4.75,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 6.75,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 6.35,
+		"y": 0.85
+	},
+	{
+		"type": "bottom_spikes",
+		"x": 5.95,
+		"y": 0.85
 	},
 	{
 		"type": "top_spikes",

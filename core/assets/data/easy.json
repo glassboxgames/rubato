@@ -1,7 +1,7 @@
 {
 "width": 30,
 "height": 10,
-"background": "Backgrounds/Realism Update/Realistic-Forest.png",
+"background": "Backgrounds/Forest/forest.png",
 "player": {
 	"x": 3.275,
 	"y": 1.685
@@ -126,11 +126,6 @@
 	},
 	{
 		"type": "simple",
-		"x": 0.755,
-		"y": 0.835
-	},
-	{
-		"type": "simple",
 		"x": 1.255,
 		"y": 0.835
 	},
@@ -197,6 +192,11 @@
 	{
 		"type": "simple",
 		"x": 22.255,
+		"y": 0.835
+	},
+	{
+		"type": "simple",
+		"x": 0.755,
 		"y": 0.835
 	}
 ],

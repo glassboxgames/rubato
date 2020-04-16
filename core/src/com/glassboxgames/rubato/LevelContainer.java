@@ -194,7 +194,7 @@ public class LevelContainer {
    */
   public void draw(GameCanvas canvas, boolean debug) {
     canvas.begin();
-    canvas.drawBackground(background);
+    canvas.drawBackground(background, width * Constants.PPM, height * Constants.PPM);
     canvas.end();
 
     canvas.begin(Constants.PPM, Constants.PPM);
