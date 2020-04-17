@@ -43,8 +43,7 @@ public class Platform extends Entity {
    * Initializes platform states.
    */
   public static Array<State> initStates() {
-    states = State.readStates("Platforms/Grass/");
-    return states;
+    return states = State.readStates("Platforms/Grass/");
   }
 
   @Override

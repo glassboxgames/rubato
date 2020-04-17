@@ -65,7 +65,7 @@ public class EditorMode implements Screen {
   /** Array tracking loaded assets */
   protected Array<String> assets = new Array<String>();
   /** Background key */
-  protected String background;
+  protected String background = DEFAULT_BACKGROUND;
   /** Dimensions of the current level */
   protected float width, height;
   
@@ -124,9 +124,12 @@ public class EditorMode implements Screen {
                      Gdx.graphics.getHeight() - buttonSize - buttonSpacing,
                      buttonSize, buttonSize);
     }
-    levelStage.addActor(new Image(textureMap.get(DEFAULT_BACKGROUND)));
     width = DEFAULT_WIDTH;
     height = DEFAULT_HEIGHT;
+    Image img = new Image(textureMap.get(background));
+    img.setWidth(width);
+    img.setHeight(height);
+    levelStage.addActor(img);
   }
 
   /**
@@ -252,10 +255,13 @@ public class EditorMode implements Screen {
   public void loadLevel(LevelData data) {
     clear();
     
-    background = data.background;
-    levelStage.addActor(new Image(textureMap.get(background)));
     width = data.width * Constants.PPM;
     height = data.height * Constants.PPM;
+    background = data.background;
+    Image img = new Image(textureMap.get(background));
+    img.setWidth(width);
+    img.setHeight(height);
+    levelStage.addActor(img);
     if (data.player != null) {
       createLevelButton("player",
                         data.player.x * Constants.PPM,
@@ -386,7 +392,6 @@ public class EditorMode implements Screen {
           public void canceled() {}
 
           public void input(String text) {
-            System.out.println(text);
             Gdx.files.local(text).writeString(Constants.JSON.prettyPrint(exportLevel()), false);
           }
         }, "Save level to file", "Levels/", "");

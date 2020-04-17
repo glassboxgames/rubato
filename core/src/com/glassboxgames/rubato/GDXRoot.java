@@ -112,6 +112,7 @@ public class GDXRoot extends Game implements ScreenListener {
           setScreen(playing);
         } else if (nextScreen == editing) {
           editing.loadContent(manager);
+          playing.loadContent(manager);
           setScreen(editing);
         }
       } else {

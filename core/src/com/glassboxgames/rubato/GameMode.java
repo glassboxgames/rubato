@@ -111,6 +111,7 @@ public class GameMode implements Screen {
     // Initialize entity state machines
     states = new Array<State>();
     states.addAll(Player.initStates());
+    states.addAll(Shard.initStates());
     states.addAll(Platform.initStates());
     states.addAll(Checkpoint.initStates());
     states.addAll(Projectile.initStates());
@@ -351,11 +352,11 @@ public class GameMode implements Screen {
    * Draw the current game state to the canvas.
    */
   protected void draw() {
+    canvas.clear();
+
     if (level == null) {
       return;
     }
-
-    canvas.clear();
 
     Player player = level.getPlayer();
     if (player.isAlive()) {

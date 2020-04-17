@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.*;
 
-
 /**
  * Class representing a main player character in Rubato.
  */
@@ -108,6 +107,9 @@ public class Player extends Entity {
   /** Entities that the player is currently using as ground */
   protected ObjectSet<Entity> entitiesUnderfoot;
 
+  /** Time shard */
+  protected Shard shard;
+
   /**
    * Instantiates a player with the given parameters.
    * @param x x-coordinate of center
@@ -129,14 +131,14 @@ public class Player extends Entity {
     alive = true;
     hasDash = false;
     dashDir = new Vector2();
+    shard = new Shard(x, y);
   }
 
   /**
    * Initialize player states.
    */
   public static Array<State> initStates() {
-    states = State.readStates("Adagio/");
-    return states;
+    return states = State.readStates("Adagio/");
   }
 
   @Override
@@ -184,10 +186,13 @@ public class Player extends Entity {
       attackCooldown = ATTACK_COOLDOWN;
       if (input.y > 0) {
         upAttack = true;
+        shard.startUpAttack();
       } else if (!isGrounded() && input.y < 0) {
         downAttack = true;
+        shard.startDownAttack();
       } else {
         forwardAttack = true;
+        shard.startForwardAttack();
       }
     }
   }
@@ -396,7 +401,6 @@ public class Player extends Entity {
   public void update(float delta) {
     super.update(delta);
     Vector2 vel = new Vector2();
-
     if (isDashing()) {
       vel.set(dashDir).setLength(dashSpeed);
     } else {
@@ -429,10 +433,13 @@ public class Player extends Entity {
       if (attackTime >= 0) {
         if (attackTime < attackDuration) {
           attackTime++;
+
+
         } else {
           attackTime = -1;
           forwardAttack = upAttack = downAttack = false;
           enemiesHit.clear();
+          shard.stopAttack();
         }
       } else if (attackCooldown >= 0) {
         attackCooldown--;
@@ -458,18 +465,24 @@ public class Player extends Entity {
     if (invulnerableTime >= 0) {
       invulnerableTime--;
     }
+    
+    body.setLinearVelocity(vel);
+    shard.update(delta, getPosition(), getDirection());
+  }
+
+  @Override
+  public boolean activatePhysics(World world) {
+    if (super.activatePhysics(world)) {
+      return shard.activatePhysics(world);
+    }
+    return false;
   }
 
   @Override
   public void draw(GameCanvas canvas) {
     super.draw(canvas);
     if (isAttacking()) {
-      canvas.end();
-      canvas.beginDebug(Constants.PPM, Constants.PPM);
-      String key = isAttackingUp() ? "up" : (isAttackingDown() ? "down" : "forward");
-      drawPhysicsShape(canvas, sensors.get(key).getFixture().getShape(), Color.GREEN);
-      canvas.endDebug();
-      canvas.begin(Constants.PPM, Constants.PPM);
+      shard.draw(canvas);
     }
   }
 }

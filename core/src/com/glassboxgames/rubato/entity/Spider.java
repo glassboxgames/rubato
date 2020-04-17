@@ -89,7 +89,6 @@ public class Spider extends Enemy {
       }
       break;
     case STATE_ATTACK:
-      body.setGravityScale(0.2f);
       body.applyForce(temp.set(ATTACK_FORCE).scl(getDirection(), 1), getPosition(), true);
       break;
     }

@@ -64,6 +64,13 @@ public abstract class Entity {
   public abstract Array<State> getStates();
 
   /**
+   * Returns the angle.
+   */
+  public float getAngle() {
+    return body == null ? bodyDef.angle : body.getAngle();
+  }
+
+  /**
    * Returns the position vector. Always returns a copy in the same vector.
    */
   public Vector2 getPosition() {
@@ -78,7 +85,7 @@ public abstract class Entity {
     if (body == null) {
       bodyDef.position.set(pos);
     } else {
-      body.setTransform(pos, body.getAngle());
+      body.setTransform(pos, getAngle());
     }
   }
 
@@ -88,6 +95,13 @@ public abstract class Entity {
   public Vector2 getVelocity() {
     return velCache.set(body == null ?
                         bodyDef.linearVelocity : body.getLinearVelocity());
+  }
+
+  /**
+   * Sets the entity's direction.
+   */
+  public void setDirection(int dir) {
+    this.dir = dir;
   }
 
   /**
@@ -308,7 +322,7 @@ public abstract class Entity {
       Vector2 spos = ((CircleShape)shape).getPosition();
       canvas.drawPhysics((CircleShape)shape, color, pos.x + spos.x, pos.y + spos.y);
     } else if (shape instanceof PolygonShape) {
-      canvas.drawPhysics((PolygonShape)shape, color, pos.x, pos.y, 0f);
+      canvas.drawPhysics((PolygonShape)shape, color, pos.x, pos.y, 0);
     }
   }
   

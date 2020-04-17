@@ -380,9 +380,34 @@ public class GameCanvas {
       Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
       return;
     }
-
     holder.setRegion(image);
     draw(holder, tint, x - ox, y - oy, width, height);
+  }
+  /**
+   * Draws the tinted texture at the given position and angle.
+   * The texture colors will be multiplied by the given color.  This will turn
+   * any white into the given color.  Other colors will be similarly affected.
+   * Unless otherwise transformed by the global transform (@see begin(Affine2)),
+   * the texture will be unscaled.  The bottom left of the texture will be positioned
+   * at the given coordinates.
+   *
+   * @param image  The texture to draw
+   * @param tint   The color tint
+   * @param ox     The x-coordinate of texture origin (in pixels)
+   * @param oy     The y-coordinate of texture origin (in pixels)
+   * @param x      The x-coordinate of the texture origin (on screen)
+   * @param y      The y-coordinate of the texture origin (on screen)
+   * @param width  The texture width
+   * @param height The texture height
+   * @param angle  The angle of the texture
+   */
+  public void draw(Texture image, Color tint, float ox, float oy, float x, float y, float width, float height, float angle) {
+    if (active != DrawPass.STANDARD) {
+      Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+      return;
+    }
+    holder.setRegion(image);
+    draw(holder, tint, ox, oy, x, y, width, height, angle);
   }
 
   /**
@@ -394,7 +419,7 @@ public class GameCanvas {
    * at the given coordinates.
    * region
    *
-   * @param image  The texture to draw
+   * @param region  The texture to draw
    * @param tint   The color tint
    * @param x      The x-coordinate of the bottom left corner
    * @param y      The y-coordinate of the bottom left corner
@@ -437,6 +462,34 @@ public class GameCanvas {
     // Unlike Lab 1, we can shortcut without a master drawing method
     spriteBatch.setColor(tint);
     spriteBatch.draw(region, x - ox, y - oy, width, height);
+  }
+  /**
+   * Draws the tinted texture at the given position and angle.
+   * The texture colors will be multiplied by the given color.  This will turn
+   * any white into the given color.  Other colors will be similarly affected.
+   * Unless otherwise transformed by the global transform (@see begin(Affine2)),
+   * the texture will be unscaled.  The bottom left of the texture will be positioned
+   * at the given coordinates.
+   *
+   * @param region The texture to draw
+   * @param tint   The color tint
+   * @param ox     The x-coordinate of texture origin (in pixels)
+   * @param oy     The y-coordinate of texture origin (in pixels)
+   * @param x      The x-coordinate of the texture origin (on screen)
+   * @param y      The y-coordinate of the texture origin (on screen)
+   * @param width  The texture width
+   * @param height The texture height
+   * @param angle  The texture angle
+   */
+  public void draw(TextureRegion region, Color tint, float ox, float oy, float x, float y, float width, float height, float angle) {
+    if (active != DrawPass.STANDARD) {
+      Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+      return;
+    }
+
+    // Unlike Lab 1, we can shortcut without a master drawing method
+    spriteBatch.setColor(tint);
+    spriteBatch.draw(region, x, y, ox, oy, width, height, 1.0f, 1.0f, angle);
   }
 
   /**

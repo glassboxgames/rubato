@@ -85,6 +85,14 @@ public class State {
                      new Vector2(params.get(0), params.get(1)),
                      params.get(4));
       return shape;
+    } else if (params.size == 6) {
+      PolygonShape shape = new PolygonShape();
+      float[] vertices = new float[6];
+      for (int i = 0; i < 6; i++) {
+        vertices[i] = params.get(i);
+      }
+      shape.set(vertices);
+      return shape;
     } else {
       throw new RuntimeException("Found invalid parameters: " + params);
     }
