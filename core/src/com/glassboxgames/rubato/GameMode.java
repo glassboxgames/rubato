@@ -41,7 +41,7 @@ public class GameMode implements Screen {
   /** The file for the parry meter */
   private static final String PARRY_METER_FILE = "User Interface/Play Screen/parrying_meter_6274x1171.png";
   /** The file for the font */
-  private static final String FONT_FILE = "Fonts/LucidaGrande.ttf";
+  private static final String FONT_FILE = "Fonts/Rajdhani-Bold.ttf";
   /** The font size */
   private static final int FONT_SIZE = 24;
   /** The draw offset */
@@ -243,19 +243,19 @@ public class GameMode implements Screen {
               Player.maxJumpDuration += devChange * 1;
               break;
             case 6:
-              Player.dashCooldown += devChange * 1;
-              break;
-            case 7:
               Player.dashDuration += devChange * 1;
               break;
-            case 8:
+            case 7:
               Player.dashSpeed += devChange * 0.5;
               break;
-            case 9:
+            case 8:
               Player.parryCapacity += devChange * 10;
               break;
-            case 0:
+            case 9:
               Player.parryGain += devChange * 5;
+              break;
+            case 0:
+              Enemy.damage += devChange * 5;
               break;
           }
         }
@@ -375,17 +375,24 @@ public class GameMode implements Screen {
 
     level.draw(canvas, debug);
 
-    // TODO un-hardcode; parry meter UI
+    // TODO un-hardcode; parry meter UI (lot of this is temp code)
     float parryMeterWidth = canvas.getWidth() / 2.5f;
     float parryMeterHeight = parryMeterWidth * 1171/6274;
+    float parry = player.getParry();
+    String resource = new DecimalFormat("#.##").format(parry);
+    String total = new DecimalFormat("#.##").format(player.parryCapacity);
+    int lives = (int) Math.max(Math.ceil(parry / Enemy.DAMAGE), 1);
     canvas.begin();
     canvas.draw(parryMeter, Color.WHITE, 0, parryMeterHeight,
                 uiPos.x, uiPos.y, parryMeterWidth, parryMeterHeight);
-    // this is temp code (cuz the UI doesn't work):
-    String resource = new DecimalFormat("#.##").format(player.getParry());
-    String total = new DecimalFormat("#.##").format(player.PARRY_CAPACITY);
     canvas.drawText(resource + "/" + total, displayFont, Color.BLACK,
-                    uiPos.x + parryMeterWidth , uiPos.y - 2 * DRAW_OFFSET);
+                    uiPos.x + 4.5f * DRAW_OFFSET, uiPos.y - 2.2f * DRAW_OFFSET);
+    if (player.isAlive()) {
+      for (int i = 0; i < lives; i++) {
+        canvas.drawText("o", displayFont, Color.RED,
+          uiPos.x + parryMeterWidth - (2.6f + i) * DRAW_OFFSET, uiPos.y - 2.2f * DRAW_OFFSET);
+      }
+    }
     // end temp code
     canvas.end();
 
@@ -404,16 +411,16 @@ public class GameMode implements Screen {
                xOffset, yOffset - 3 * deltaOffset);
       drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION,
                xOffset, yOffset - 4 * deltaOffset);
-      drawText(6, "Dash Cooldown", Player.dashCooldown, Player.DASH_COOLDOWN,
+      drawText(6, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
                xOffset, yOffset - 5 * deltaOffset);
-      drawText(7, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
+      drawText(7, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
                xOffset, yOffset - 6 * deltaOffset);
-      drawText(8, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
+      drawText(8, "Parry Capacity", Player.parryCapacity, Player.PARRY_CAPACITY,
                xOffset, yOffset - 7 * deltaOffset);
-      drawText(9, "Parry Capacity", Player.parryCapacity, Player.PARRY_CAPACITY,
+      drawText(9, "Parry Gain", Player.parryGain, Player.PARRY_GAIN,
                xOffset, yOffset - 8 * deltaOffset);
-      drawText(0, "Parry Gain", Player.parryGain, Player.PARRY_GAIN,
-               xOffset, yOffset - 9 * deltaOffset);
+      drawText(0, "Enemy Damage", Enemy.damage, Enemy.DAMAGE,
+        xOffset, yOffset - 9 * deltaOffset);
       canvas.end();
     }
   }
@@ -446,7 +453,6 @@ public class GameMode implements Screen {
     String text =
       "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
     canvas.drawText(text, displayFont, color, x, y);
-    canvas.drawText(text, displayFont, color, x - 1, y); // bold effect
   }
 
   @Override

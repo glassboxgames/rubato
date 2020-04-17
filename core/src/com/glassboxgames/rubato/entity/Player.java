@@ -32,7 +32,6 @@ public class Player extends Entity {
   public static int maxJumpDuration = MAX_JUMP_DURATION;
   /** Dash cooldown */
   public static final int DASH_COOLDOWN = 40;
-  public static int dashCooldown = DASH_COOLDOWN;
   /** Dash duration */
   public static final int DASH_DURATION = 10;
   public static int dashDuration = DASH_DURATION;
@@ -47,11 +46,15 @@ public class Player extends Entity {
   /** Attack cooldown */
   public static final int ATTACK_COOLDOWN = 20;
   /** Parry capacity */
-  public static final float PARRY_CAPACITY = 100f;
+  public static final float PARRY_CAPACITY = 200f;
   public static float parryCapacity = PARRY_CAPACITY;
   /** Parry gain */
   public static final float PARRY_GAIN = 20f;
   public static float parryGain = PARRY_GAIN;
+  /** Invulnerability duration */
+  public static final float INVULNERABLE_DURATION = 30f;
+  public static float invulnerableDuration = INVULNERABLE_DURATION;
+
 
   /** Player state constants */
   public static final int STATE_IDLE = 0;
@@ -70,6 +73,8 @@ public class Player extends Entity {
   protected boolean alive;
   /** Whether the player has a dash available */
   protected boolean hasDash;
+  /** Time until next dash is available */
+  protected int dashCooldown;
   /** Current dash length so far */
   protected int dashTime;
   /** Dash direction */
@@ -95,6 +100,8 @@ public class Player extends Entity {
   protected float parry;
   /** Whether the player is currently parrying */
   protected boolean isParrying;
+  /** Invulnerability time after player is hit */
+  protected float invulnerableTime;
 
   /** Enemies that have been hit by the current active attack */
   protected ObjectSet<Enemy> enemiesHit;
@@ -114,6 +121,9 @@ public class Player extends Entity {
     jumpTime = -1;
     jumpDuration = -1;
     dashTime = -1;
+    invulnerableTime = -1;
+    dashCooldown = -1;
+    parry = parryCapacity / 2;
     enemiesHit = new ObjectSet<Enemy>();
     entitiesUnderfoot = new ObjectSet<Entity>();
     alive = true;
@@ -151,10 +161,11 @@ public class Player extends Entity {
    * Tries to start a player dash.
    */
   public void tryDash() {
-    if (hasDash && dashTime < 0 && !isAttacking()) {
+    if (!isAttacking() && hasDash && dashCooldown < 0 && dashTime < 0 ) {
       setState(STATE_DASH);
       body.setGravityScale(0f);
       hasDash = false;
+      dashCooldown = DASH_COOLDOWN;
       dashTime = 0;
       if (input.isZero()) {
         dashDir.set(getDirection(), 0f);
@@ -168,7 +179,7 @@ public class Player extends Entity {
    * Tries to start a player attack.
    */
   public void tryAttack() {
-    if (!isAttacking() && attackCooldown <= 0) {
+    if (!isAttacking() && attackCooldown < 0) {
       attackTime = 0;
       attackCooldown = ATTACK_COOLDOWN;
       if (input.y > 0) {
@@ -235,8 +246,21 @@ public class Player extends Entity {
   /**
    * Adds parry resource.
    */
-  public void addParry(float amount) {
-    parry = Math.min(parry + amount, parryCapacity);
+  public void changeParry(float amount) {
+    float newParry = parry + amount;
+    if (amount < 0) {
+      if (invulnerableTime < 0) {
+        if (newParry < 0) {
+          alive = false;
+          parry = 0;
+        } else {
+          invulnerableTime = invulnerableDuration;
+          parry = newParry;
+        }
+      }
+    } else {
+      parry = Math.min(newParry, parryCapacity);
+    }
   }
 
   /**
@@ -379,6 +403,9 @@ public class Player extends Entity {
       if (isGrounded()) {
         hasDash = true;
       }
+      if (dashCooldown >= 0) {
+        dashCooldown--;
+      }
       
       if (input.x != 0) {
         temp.set(MOVE_IMPULSE * Math.signum(input.x), 0);
@@ -407,12 +434,14 @@ public class Player extends Entity {
           forwardAttack = upAttack = downAttack = false;
           enemiesHit.clear();
         }
-      } else if (attackCooldown > 0) {
+      } else if (attackCooldown >= 0) {
         attackCooldown--;
       }
       vel.set(MathUtils.clamp(getVelocity().x, -maxXSpeed, maxXSpeed),
               MathUtils.clamp(getVelocity().y, -maxYSpeed, maxYSpeed));
     }
+
+    body.setLinearVelocity(vel);
     
     if (dashTime >= 0) {
       dashTime++;
@@ -425,8 +454,10 @@ public class Player extends Entity {
         parry--;
       }
     }
-    
-    body.setLinearVelocity(vel);
+
+    if (invulnerableTime >= 0) {
+      invulnerableTime--;
+    }
   }
 
   @Override

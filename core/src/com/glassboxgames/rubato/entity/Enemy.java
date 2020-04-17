@@ -28,6 +28,10 @@ public abstract class Enemy extends Entity {
   /** Current target coordinates */
   protected Vector2 target;
 
+  /** Default damage enemy does to player */
+  public static final float DAMAGE = 50f;
+  public static float damage = DAMAGE;
+
   /**
    * Initializes an enemy with the specified parameters.
    * @param x x-coordinate
