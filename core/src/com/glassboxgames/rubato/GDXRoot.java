@@ -11,29 +11,33 @@ import com.badlogic.gdx.utils.*;
 import com.glassboxgames.util.*;
 
 public class GDXRoot extends Game implements ScreenListener {
-  // TODO replace with JSON
   public static final String[] levelPaths = new String[] {
-    "data/easy.json",
-    "data/medium.json",
-    "data/hard.json",
+    "Levels/easy.json",
+    "Levels/medium.json",
+    "Levels/hard.json",
   };
 
   /** Drawing context to display graphics (VIEW CLASS) */
   private GameCanvas canvas;
   /** Manager for loading assets */
   private AssetManager manager;
+  /** Mode for the main menu */
+  private MainMenu mainMenu;
   /** Mode for loading assets */
   private LoadingMode loading;
   /** Mode for playing the game */
   private GameMode playing;
   /** Mode for editing levels */
   private EditorMode editing;
+  /** Which screen to switch to after loading */
+  private Screen nextScreen;
+  
   /** Level data array */
   private LevelData[] levels;
   /** Current level index */
   private int levelIndex;
-  /** Json conversion object */
-  private Json json;
+  /** Current level data */
+  private LevelData level;
 
   public GDXRoot() {
     manager = new AssetManager();
@@ -49,17 +53,19 @@ public class GDXRoot extends Game implements ScreenListener {
   @Override
   public void create() {
     canvas = new GameCanvas();
+    mainMenu = new MainMenu(this);
     loading = new LoadingMode(canvas, manager, this);
     playing = new GameMode(canvas, this);
     editing = new EditorMode(this);
-    json = new Json();
-    json.setOutputType(JsonWriter.OutputType.json);
+    mainMenu.preloadContent(manager);
     playing.preloadContent(manager);
     editing.preloadContent(manager);
+    for (String path : Constants.BACKGROUND_MAP.values()) {
+      manager.load(path, Texture.class);
+    }
     for (int i = 0; i < levelPaths.length; i++) {
-      levels[i] = json.fromJson(LevelData.class,
-                                Gdx.files.internal(levelPaths[i]));
-      manager.load(levels[i].background, Texture.class);
+      levels[i] = Constants.JSON.fromJson(LevelData.class,
+                                          Gdx.files.internal(levelPaths[i]));
     }
     levelIndex = 0;
     setScreen(loading);
@@ -73,8 +79,10 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void dispose() {
+    mainMenu.unloadContent(manager);
     editing.unloadContent(manager);
     playing.unloadContent(manager);
+    mainMenu.dispose();
     editing.dispose();
     playing.dispose();
     setScreen(null);
@@ -93,41 +101,57 @@ public class GDXRoot extends Game implements ScreenListener {
   @Override
   public void exitScreen(Screen screen, int exitCode) {
     if (screen == loading) {
-      if (exitCode == 0) {
-        playing.loadContent(manager);
-        playing.initLevel(levels[levelIndex], manager);
-        System.out.println("Starting level " + levelIndex + " loaded from file " + levelPaths[levelIndex]);
-        setScreen(playing);
+      if (exitCode == LoadingMode.EXIT_DONE) {
+        if (nextScreen == null) {
+          mainMenu.loadContent(manager);
+          setScreen(mainMenu);
+        } else if (nextScreen == playing) {
+          playing.loadContent(manager);
+          level = levels[levelIndex];
+          playing.initLevel(level, manager, false);
+          setScreen(playing);
+        } else if (nextScreen == editing) {
+          editing.loadContent(manager);
+          setScreen(editing);
+        }
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode, new RuntimeException());
         Gdx.app.exit();
       }
+    } else if (screen == mainMenu) {
+      if (exitCode == MainMenu.EXIT_PLAY) {
+        nextScreen = playing;
+        setScreen(loading);
+      } else if (exitCode == MainMenu.EXIT_EDITOR) {
+        nextScreen = editing;
+        setScreen(loading);
+      }
     } else if (screen == playing) {
-      if (exitCode == 0) {
+      if (exitCode == GameMode.EXIT_MENU) {
+        setScreen(mainMenu);
+      } else if (exitCode == GameMode.EXIT_COMPLETE) {
         levelIndex++;
         if (levelIndex >= levels.length) {
-          System.out.println("Congratulations! You have completed the currently available levels.");
           Gdx.app.exit();
         } else {
-          setScreen(loading);
+          level = levels[levelIndex];
+          playing.initLevel(level, manager, false);
         }
-      } else if (exitCode == 1) {
-        setScreen(loading);
-      } else if (exitCode == 2) {
-        editing.loadContent(manager);
-        editing.initLevel(levels[levelIndex], manager);
+      } else if (exitCode == GameMode.EXIT_RESET) {
+        playing.initLevel(level, manager, playing.isEditable());
+        setScreen(playing);
+      } else if (exitCode == GameMode.EXIT_EDIT) {
         setScreen(editing);
       } else {
         Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode, new RuntimeException());
         Gdx.app.exit();
       }
     } else if (screen == editing) {
-      if (exitCode == 1) {
-        LevelData data = editing.exportLevel();
-        levels[levelIndex] = data;
-        Gdx.files.local(levelPaths[levelIndex]).writeString(json.prettyPrint(data), false);
-        System.out.println("Saved level to " + levelPaths[levelIndex]);
-        playing.initLevel(data, manager);
+      if (exitCode == EditorMode.EXIT_MENU) {
+        setScreen(mainMenu);
+      } else if (exitCode == EditorMode.EXIT_TEST) {
+        level = editing.exportLevel();
+        playing.initLevel(level, manager, true);
         setScreen(playing);
       } else {
         Gdx.app.exit();

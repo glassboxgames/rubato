@@ -18,6 +18,9 @@ import com.glassboxgames.util.*;
  * Mode controller for the main gameplay loop.
  */
 public class GameMode implements Screen {
+  /**
+   * Enumeration of possible game states.
+   */
   public enum GameState {
     /** Before the game has started */
     INTRO,
@@ -25,9 +28,18 @@ public class GameMode implements Screen {
     PLAY,
   }
 
+  /** Exit code for returning to the menu */
+  public static final int EXIT_MENU = 0;
+  /** Exit code for completing the level */
+  public static final int EXIT_COMPLETE = 1;
+  /** Exit code for resetting the level */
+  public static final int EXIT_RESET = 2;
+  /** Exit code for editing the level */
+  public static final int EXIT_EDIT = 3;
+
   // GRAPHICS AND SOUND RESOURCES
   /** The file for the parry meter */
-  private static final String PARRY_METER_FILE = "User Interface/Parry Meter/empty.png";
+  private static final String PARRY_METER_FILE = "User Interface/Play Screen/parrying_meter_6274x1171.png";
   /** The file for the font */
   private static final String FONT_FILE = "Fonts/LucidaGrande.ttf";
   /** The font size */
@@ -69,11 +81,13 @@ public class GameMode implements Screen {
   /** The upper left corner of the visible canvas **/
   protected Vector2 uiPos;
   /** Whether debug mode is on */
-  protected boolean debug = false;
+  protected boolean debug;
   /** Whether dev mode is on */
-  protected boolean devMode = false;
+  protected boolean devMode;
   /** Numerical selector for devMode */
-  protected int devSelect = -1;
+  protected int devSelect;
+  /** Whether the current level is editable */
+  protected boolean editable;
 
   /**
    * Instantiate a GameMode.
@@ -88,6 +102,7 @@ public class GameMode implements Screen {
     gameState = GameState.INTRO;
     cameraPos = new Vector2();
     uiPos = new Vector2();
+    devSelect = -1;
 
     // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
@@ -153,12 +168,21 @@ public class GameMode implements Screen {
    * Creates the world level.
    * @param data the serialized level data
    * @param manager the asset manager to use
+   * @param editable whether the level is editable
    */
-  public void initLevel(LevelData data, AssetManager manager) {
+  public void initLevel(LevelData data, AssetManager manager, boolean editable) {
     level = new LevelContainer(data, manager);
     gameState = GameState.INTRO;
+    this.editable = editable;
   }
 
+  /**
+   * Returns whether the level is editable.
+   */
+  public boolean isEditable() {
+    return editable;
+  }
+  
   /**
    * Updates the state of the game.
    * @param delta time in seconds since last frame
@@ -173,17 +197,18 @@ public class GameMode implements Screen {
       InputController input = InputController.getInstance();
       input.readInput();
       if (input.didExit()) {
-        Gdx.app.exit();
+        level.deactivatePhysics(world);
+        listener.exitScreen(this, EXIT_MENU);
         return;
       }
       if (input.didReset()) {
         level.deactivatePhysics(world);
-        listener.exitScreen(this, 1);
+        listener.exitScreen(this, EXIT_RESET);
         return;
       }
-      if (input.didEdit()) {
+      if (editable && input.didEdit()) {
         level.deactivatePhysics(world);
-        listener.exitScreen(this, 2);
+        listener.exitScreen(this, EXIT_EDIT);
         return;
       }
       if (input.didDebug()) {
@@ -241,9 +266,9 @@ public class GameMode implements Screen {
         checkpoint.update(delta);
         complete = complete && checkpoint.isActivated();
       }
-      if (complete && input.didContinue()) {
+      if (complete && !editable && input.didContinue()) {
         level.deactivatePhysics(world);
-        listener.exitScreen(this, 0);
+        listener.exitScreen(this, EXIT_COMPLETE);
         return;
       }
       

@@ -197,7 +197,7 @@ public abstract class Entity {
    * @param delta time since the last update
    */
   public void update(float delta) {
-    update(delta, 1);
+    update(delta, 0.5f);
   }
 
   /**

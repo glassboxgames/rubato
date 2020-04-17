@@ -13,6 +13,9 @@ import com.glassboxgames.util.*;
  * Mode controller for loading assets.
  */
 public class LoadingMode implements Screen {
+  /** Exit code for finishing asset loading */
+  public static final int EXIT_DONE = 0;
+  
   /** Canvas to draw on */
   protected GameCanvas canvas;
   /** Asset manager for loading */
@@ -22,20 +25,21 @@ public class LoadingMode implements Screen {
 
   /**
    * Instantiate a LoadingMode.
-   * @param c the game canvas
-   * @param m the asset manager
+   * @param canvas the game canvas
+   * @param manager the asset manager
+   * @param listener the screen listener
    */
-  public LoadingMode(GameCanvas c, AssetManager m, ScreenListener l) {
-    canvas = c;
-    manager = m;
-    listener = l;
+  public LoadingMode(GameCanvas canvas, AssetManager manager, ScreenListener listener) {
+    this.canvas = canvas;
+    this.manager = manager;
+    this.listener = listener;
   }
 
   @Override
   public void render(float delta) {
     canvas.clear();
     if (manager.isFinished()) {
-      listener.exitScreen(this, 0);
+      listener.exitScreen(this, EXIT_DONE);
     } else {
       manager.update((int) (delta * 1000));
     }

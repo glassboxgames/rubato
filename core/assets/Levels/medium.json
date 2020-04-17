@@ -1,7 +1,7 @@
 {
 "width": 30,
 "height": 10,
-"background": "Backgrounds/Desert/desert.png",
+"background": "desert",
 "player": {
 	"x": 1.375,
 	"y": 1.585

@@ -1,10 +1,10 @@
 {
 "width": 30,
 "height": 10,
-"background": "Backgrounds/Forest/forest.png",
+"background": "forest",
 "player": {
 	"x": 3.275,
-	"y": 1.685
+	"y": 1.585
 },
 "enemies": [
 	{
@@ -19,11 +19,6 @@
 	}
 ],
 "platforms": [
-	{
-		"type": "crumbling",
-		"x": 3.75,
-		"y": 0.85
-	},
 	{
 		"type": "crumbling",
 		"x": 4.25,
@@ -122,6 +117,11 @@
 	{
 		"type": "crumbling",
 		"x": 9.75,
+		"y": 0.85
+	},
+	{
+		"type": "crumbling",
+		"x": 3.75,
 		"y": 0.85
 	},
 	{

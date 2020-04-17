@@ -56,7 +56,7 @@ public class LevelContainer {
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
     height = data.height;
-    background = manager.get(data.background, Texture.class);
+    background = manager.get(Constants.BACKGROUND_MAP.get(data.background), Texture.class);
     player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
     for (LevelData.EnemyData enemyData : data.enemies) {

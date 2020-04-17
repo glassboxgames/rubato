@@ -18,6 +18,20 @@ import com.glassboxgames.util.*;
  * Mode controller for the level editor.
  */
 public class EditorMode implements Screen {
+  /** Exit code for returning to menu */
+  public static final int EXIT_MENU = 0;
+  /** Exit code for playtesting */
+  public static final int EXIT_TEST = 1;
+
+  /** Default editor background */
+  protected static final String DEFAULT_BACKGROUND = "forest";
+  /** Default level width */
+  protected static final float DEFAULT_WIDTH = 3000f;
+  /** Default level height */
+  protected static final float DEFAULT_HEIGHT = 1000f;
+  
+  /** Editor image path file */
+  protected static final String EDITOR_FILE = "Config/editor.json";
   /** UI font file */
   protected static final String FONT_FILE = "Fonts/Rajdhani-Regular.ttf";
   /** UI font size */
@@ -50,13 +64,11 @@ public class EditorMode implements Screen {
   protected ObjectMap<String, Array<Button>> levelMap;
   /** Array tracking loaded assets */
   protected Array<String> assets = new Array<String>();
-  /** Background path */
-  protected String backgroundPath;
+  /** Background key */
+  protected String background;
   /** Dimensions of the current level */
   protected float width, height;
   
-  protected boolean initialized = false;
-
   /**
    * Instantiates the editor mode controller.
    * @param listener the screen exit listener
@@ -68,8 +80,8 @@ public class EditorMode implements Screen {
     levelStage = new Stage();
     Gdx.input.setInputProcessor(new InputMultiplexer(uiStage, levelStage));
     textureMap = new ObjectMap<String, Texture>();
-    Json json = new Json();
-    pathMap = json.fromJson(ObjectMap.class, Gdx.files.internal("data/editor.json"));
+    pathMap = Constants.JSON.fromJson(ObjectMap.class, Gdx.files.internal(EDITOR_FILE));
+    pathMap.putAll(Constants.BACKGROUND_MAP);
     uiMap = new ObjectMap<String, Button>();
     levelMap = new ObjectMap<String, Array<Button>>();
   }
@@ -98,6 +110,23 @@ public class EditorMode implements Screen {
     for (String key : pathMap.keys()) {
       textureMap.put(key, manager.get(pathMap.get(key), Texture.class));
     }
+
+    String[] keys = new String[] {
+      "player", "checkpoint", "simple", "crumbling",
+      "bottom_spikes", "left_spikes", "top_spikes", "right_spikes",
+      "spider", "wisp", "wyrm",
+    };
+    int buttonSize = 50;
+    int buttonSpacing = 20;
+    for (int i = 0; i < keys.length; i++) {
+      createUIButton(keys[i],
+                     buttonSpacing + i * (buttonSize + buttonSpacing),
+                     Gdx.graphics.getHeight() - buttonSize - buttonSpacing,
+                     buttonSize, buttonSize);
+    }
+    levelStage.addActor(new Image(textureMap.get(DEFAULT_BACKGROUND)));
+    width = DEFAULT_WIDTH;
+    height = DEFAULT_HEIGHT;
   }
 
   /**
@@ -214,33 +243,19 @@ public class EditorMode implements Screen {
     levelMap.get(key).add(button);
     levelStage.addActor(button);
   }
-
+  
   /**
-   * Initializes the level editor with the given level data.
+   * Loads the level from the given file.
    * @param data level data
    * @param manager asset manager to use
    */
-  public void initLevel(LevelData data, AssetManager manager) {
+  public void loadLevel(LevelData data) {
     clear();
-
-    String[] keys = new String[] {
-      "player", "checkpoint", "simple", "crumbling",
-      "bottom_spikes", "left_spikes", "top_spikes", "right_spikes",
-      "spider", "wisp", "wyrm",
-    };
-    int buttonSize = 50;
-    int buttonSpacing = 20;
-    for (int i = 0; i < keys.length; i++) {
-      createUIButton(keys[i],
-                     buttonSpacing + i * (buttonSize + buttonSpacing),
-                     Gdx.graphics.getHeight() - buttonSize - buttonSpacing,
-                     buttonSize, buttonSize);
-    }
     
-    backgroundPath = data.background;
+    background = data.background;
+    levelStage.addActor(new Image(textureMap.get(background)));
     width = data.width * Constants.PPM;
     height = data.height * Constants.PPM;
-    levelStage.addActor(new Image(manager.get(backgroundPath, Texture.class)));
     if (data.player != null) {
       createLevelButton("player",
                         data.player.x * Constants.PPM,
@@ -285,7 +300,7 @@ public class EditorMode implements Screen {
    */
   public LevelData exportLevel() {
     LevelData data = new LevelData();
-    data.background = backgroundPath;
+    data.background = background;
     data.width = width / Constants.PPM;
     data.height = height / Constants.PPM;
     data.enemies = new Array<LevelData.EnemyData>();
@@ -346,11 +361,10 @@ public class EditorMode implements Screen {
   }
 
   /**
-   * Clear the level map.
+   * Clear the editor state.
    */
   public void clear() {
-    uiMap.clear();
-    uiStage.clear();
+    ghost = null;
     levelMap.clear();
     levelStage.clear();
   }
@@ -359,12 +373,33 @@ public class EditorMode implements Screen {
   public void render(float delta) {
     if (active) {
       if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-        Gdx.app.exit();
+        listener.exitScreen(this, EXIT_MENU);
         return;
       }
       if (Gdx.input.isKeyPressed(Input.Keys.P)) {
-        listener.exitScreen(this, 1);
+        listener.exitScreen(this, EXIT_TEST);
         return;
+      }
+      if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+        // save
+        Gdx.input.getTextInput(new Input.TextInputListener() {
+          public void canceled() {}
+
+          public void input(String text) {
+            System.out.println(text);
+            Gdx.files.local(text).writeString(Constants.JSON.prettyPrint(exportLevel()), false);
+          }
+        }, "Save level to file", "Levels/", "");
+      }
+      if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+        // load
+        Gdx.input.getTextInput(new Input.TextInputListener() {
+          public void canceled() {}
+
+          public void input(String text) {
+            loadLevel(Constants.JSON.fromJson(LevelData.class, Gdx.files.local(text)));
+          }
+        }, "Load level from file", "Levels/", "");
       }
 
       if (ghost != null) {
@@ -398,7 +433,7 @@ public class EditorMode implements Screen {
                                           height - screenHeight / 2);
       camera.update();
 
-      Gdx.gl.glClearColor(0.39f, 0.58f, 0.93f, 1.0f);  // Homage to the XNA years
+      Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
       levelStage.act(delta);
       levelStage.draw();
