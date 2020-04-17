@@ -128,11 +128,13 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == playing) {
       if (exitCode == GameMode.EXIT_MENU) {
+        levelIndex = 0;
         setScreen(mainMenu);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
         levelIndex++;
         if (levelIndex >= levels.length) {
-          Gdx.app.exit();
+          levelIndex = 0;
+          setScreen(mainMenu);
         } else {
           level = levels[levelIndex];
           playing.initLevel(level, manager, false);
