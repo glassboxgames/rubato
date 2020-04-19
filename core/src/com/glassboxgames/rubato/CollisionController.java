@@ -29,7 +29,7 @@ public class CollisionController implements ContactListener {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    startCollision((Collider)d1, (Collider)d2);
+    startCollision((Entity.Collider)d1, (Entity.Collider)d2);
   }
   
   @Override
@@ -38,7 +38,7 @@ public class CollisionController implements ContactListener {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    endCollision((Collider)d1, (Collider)d2);
+    endCollision((Entity.Collider)d1, (Entity.Collider)d2);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class CollisionController implements ContactListener {
   /**
    * Process the start of a collision between the two given entities (with metadata).
    */
-  private void startCollision(Collider o1, Collider o2) {
+  private void startCollision(Entity.Collider o1, Entity.Collider o2) {
     if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
       startCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
     } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
@@ -73,7 +73,7 @@ public class CollisionController implements ContactListener {
   /**
    * Process the end of a collision between the two given entities (with metadata).
    */
-  private void endCollision(Collider o1, Collider o2) {
+  private void endCollision(Entity.Collider o1, Entity.Collider o2) {
     if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
       endCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
     } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
@@ -107,8 +107,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision starting between a player and an enemy.
    */
-  private void startCollision(Player player, Collider playerCollider,
-                              Enemy enemy, Collider enemyCollider) {
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Enemy enemy, Entity.Collider enemyCollider) {
 
     if (playerCollider.isForwardSensor() && enemyCollider.isHurtbox()) {
       if (player.isAttackingForward()) {
@@ -136,8 +136,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision ending between a player and an enemy.
    */
-  private void endCollision(Player player, Collider playerCollider,
-                            Enemy enemy, Collider enemyCollider) {
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Enemy enemy, Entity.Collider enemyCollider) {
     if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.removeUnderfoot(enemy);
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
@@ -148,8 +148,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision starting between a player and a platform.
    */
-  private void startCollision(Player player, Collider playerCollider,
-                              Platform platform, Collider platformCollider) {
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Platform platform, Entity.Collider platformCollider) {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.addUnderfoot(platform);
       platform.visit();
@@ -161,8 +161,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision ending between a player and a platform.
    */
-  private void endCollision(Player player, Collider playerCollider,
-                            Platform platform, Collider platformCollider) {
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Platform platform, Entity.Collider platformCollider) {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.removeUnderfoot(platform);
     }
@@ -171,8 +171,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision starting between an enemy and a platform.
    */
-  private void startCollision(Enemy enemy, Collider enemyCollider,
-                              Platform platform, Collider platformCollider) {
+  private void startCollision(Enemy enemy, Entity.Collider enemyCollider,
+                              Platform platform, Entity.Collider platformCollider) {
     if (enemyCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       if (enemy instanceof Spider) {
         ((Spider)enemy).addUnderfoot(platform);
@@ -187,8 +187,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision ending between an enemy and a platform.
    */
-  private void endCollision(Enemy enemy, Collider enemyCollider,
-                            Platform platform, Collider platformCollider) {
+  private void endCollision(Enemy enemy, Entity.Collider enemyCollider,
+                            Platform platform, Entity.Collider platformCollider) {
     if (enemyCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       if (enemy instanceof Spider) {
         ((Spider)enemy).removeUnderfoot(platform);
@@ -203,8 +203,8 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision starting between a player and a checkpoint.
    */
-  private void startCollision(Player player, Collider playerCollider,
-                              Checkpoint checkpoint, Collider checkpointCollider) {
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Checkpoint checkpoint, Entity.Collider checkpointCollider) {
     if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
       checkpoint.activate();
     }
@@ -213,6 +213,6 @@ public class CollisionController implements ContactListener {
   /**
    * Handles a collision ending between a player and a checkpoint.
    */
-  private void endCollision(Player player, Collider playerCollider,
-                            Checkpoint checkpoint, Collider checkpointCollider) {}
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Checkpoint checkpoint, Entity.Collider checkpointCollider) {}
 }
