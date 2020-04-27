@@ -229,7 +229,7 @@ public class GameMode implements Screen {
             case -1:
               break;
             case 1:
-              Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
+              // Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
               break;
             case 2:
               Player.maxXSpeed += devChange * 0.5;
@@ -276,9 +276,12 @@ public class GameMode implements Screen {
       Player player = level.getPlayer();
       if (player.isAlive()) {
         player.setInputVector(input.getHorizontal(), input.getVertical());
-        player.tryMove();
+        player.tryFace();
+        player.tryCling();
         if (input.didJump()) {
           player.tryJump();
+        } else if (input.didHoldJump()) {
+          player.tryExtendJump();
         }
         if (input.didDash()) {
           player.tryDash();
@@ -402,8 +405,8 @@ public class GameMode implements Screen {
       float yOffset = uiPos.y - parryMeterHeight - DRAW_OFFSET;
       float deltaOffset = 2 * DRAW_OFFSET;
       canvas.begin();
-      drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,
-               xOffset, yOffset);
+      // drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,
+      //          xOffset, yOffset);
       drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED,
                xOffset, yOffset - deltaOffset);
       drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED,

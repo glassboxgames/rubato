@@ -12,6 +12,7 @@ import com.glassboxgames.util.*;
 
 public class GDXRoot extends Game implements ScreenListener {
   public static final String[] levelPaths = new String[] {
+    "Levels/wall.json",
     "Levels/easy.json",
     "Levels/medium.json",
     "Levels/hard.json",

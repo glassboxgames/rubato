@@ -128,6 +128,8 @@ public class CollisionController implements ContactListener {
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.addUnderfoot(enemy);
+    } else if (playerCollider.isWallSensor() && enemyCollider.isHurtbox()) {
+      player.addAdjacent(enemy);
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       enemy.setTarget(player.getPosition());
     }
@@ -140,6 +142,8 @@ public class CollisionController implements ContactListener {
                             Enemy enemy, Entity.Collider enemyCollider) {
     if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.removeUnderfoot(enemy);
+    } else if (playerCollider.isWallSensor() && enemyCollider.isHurtbox()) {
+      player.removeAdjacent(enemy);
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       enemy.setTarget(null);
     }
@@ -153,6 +157,8 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.addUnderfoot(platform);
       platform.visit();
+    } else if (playerCollider.isWallSensor() && platformCollider.isHurtbox()) {
+      player.addAdjacent(platform);
     } else if (playerCollider.isHurtbox() && platformCollider.isHitbox()) {
       player.setAlive(false);
     }
@@ -165,6 +171,8 @@ public class CollisionController implements ContactListener {
                             Platform platform, Entity.Collider platformCollider) {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.removeUnderfoot(platform);
+    } else if (playerCollider.isWallSensor() && platformCollider.isHurtbox()) {
+      player.removeAdjacent(platform);
     }
   }
 

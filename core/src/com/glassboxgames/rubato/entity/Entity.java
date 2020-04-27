@@ -270,13 +270,16 @@ public abstract class Entity {
   }
 
   /**
-   * Sets the entity state to the given entity state index.
+   * Sets the entity state to the given entity state index,
+   * calling transition functions if the new state is different.
    * @param i entity state index
    */
   public void setState(int i) {
-    leaveState();
-    stateIndex = i;
-    enterState();
+    if (i != stateIndex) {
+      leaveState();
+      stateIndex = i;
+      enterState();
+    }
   }
 
   /**
@@ -350,6 +353,7 @@ public abstract class Entity {
       HITBOX,
       HURTBOX,
       GROUND,
+      WALL,
       EDGE,
       VISION,
       FORWARD,
@@ -410,6 +414,13 @@ public abstract class Entity {
      */
     public boolean isGroundSensor() {
       return type == Type.GROUND;
+    }
+
+    /**
+     * Returns whether this collider is a wall sensor.
+     */
+    public boolean isWallSensor() {
+      return type == Type.WALL;
     }
 
     /**

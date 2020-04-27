@@ -21,6 +21,8 @@ public class InputController {
   private boolean editPressed;
   /** Whether the jump button was pressed */
   private boolean jumpPressed;
+  /** Whether the jump button was held */
+  private boolean jumpHeld;
   /** Whether the dash button was pressed */
   private boolean dashPressed;
   /** Whether the attack button was pressed */
@@ -124,6 +126,13 @@ public class InputController {
   }
 
   /**
+   * Returns whether the player kept holding jump.
+   */
+  public boolean didHoldJump() {
+    return jumpHeld;
+  }
+
+  /**
    * Returns whether the player pressed dash.
    */
   public boolean didDash() {
@@ -201,9 +210,10 @@ public class InputController {
     resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
     editPressed = Gdx.input.isKeyPressed(Input.Keys.E);
     parryPressed = Gdx.input.isKeyPressed(Input.Keys.S);
-    attackPressed = Gdx.input.isKeyPressed(Input.Keys.F);
-    dashPressed = Gdx.input.isKeyPressed(Input.Keys.D);
-    jumpPressed = Gdx.input.isKeyPressed(Input.Keys.SPACE);
+    attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.F);
+    dashPressed = Gdx.input.isKeyJustPressed(Input.Keys.D);
+    jumpPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
+    jumpHeld = Gdx.input.isKeyPressed(Input.Keys.SPACE);
     continuePressed = Gdx.input.isKeyPressed(Input.Keys.C);
 
     horizontal = 0;

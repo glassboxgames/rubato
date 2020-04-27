@@ -1,6 +1,6 @@
 [
   {
-    "file": "0.png",
+    "file": "Armature_wall_jump_0.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],
@@ -18,7 +18,7 @@
     ],
   },
   {
-    "file": "1.png",
+    "file": "Armature_wall_jump_1.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],
@@ -36,7 +36,7 @@
     ],
   },
   {
-    "file": "2.png",
+    "file": "Armature_wall_jump_2.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],
@@ -54,7 +54,7 @@
     ],
   },
   {
-    "file": "3.png",
+    "file": "Armature_wall_jump_3.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],
@@ -72,7 +72,7 @@
     ],
   },
   {
-    "file": "4.png",
+    "file": "Armature_wall_jump_4.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],
@@ -90,7 +90,7 @@
     ],
   },
   {
-    "file": "5.png",
+    "file": "Armature_wall_jump_5.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],

@@ -19,4 +19,12 @@
     "path": "Dash/",
     "loop": true,
   },
+  {
+    "path": "Cling/",
+    "loop": true,
+  },
+  {
+    "path": "WallJump/",
+    "loop": false,
+  }
 ]

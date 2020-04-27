@@ -1,6 +1,6 @@
 [
   {
-    "file": "Armature_dash_00.png",
+    "file": "Armature_wall_climb_00.png",
     "sensors": {
       "ground": [0, -0.5, 0.15, 0.03, 0],
       "wall": [0.15, -0.2, 0.15, 0.46, 0],
