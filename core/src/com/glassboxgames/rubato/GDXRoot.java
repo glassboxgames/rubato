@@ -8,17 +8,11 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.utils.*;
+import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
 public class GDXRoot extends Game implements ScreenListener {
-  public static final String[] levelPaths = new String[] {
-    "Levels/wall.json",
-    "Levels/easy.json",
-    "Levels/medium.json",
-    "Levels/hard.json",
-  };
-
-  /** Drawing context to display graphics (VIEW CLASS) */
+  /** Drawing context to display graphics */
   private GameCanvas canvas;
   /** Manager for loading assets */
   private AssetManager manager;
@@ -30,11 +24,9 @@ public class GDXRoot extends Game implements ScreenListener {
   private GameMode playing;
   /** Mode for editing levels */
   private EditorMode editing;
-  /** Which screen to switch to after loading */
-  private Screen nextScreen;
-  
-  /** Level data array */
-  private LevelData[] levels;
+
+  /** Current chapter key */
+  private String chapter;
   /** Current level index */
   private int levelIndex;
   /** Current level data */
@@ -48,33 +40,31 @@ public class GDXRoot extends Game implements ScreenListener {
                       new FreeTypeFontGeneratorLoader(resolver));
 		manager.setLoader(BitmapFont.class, ".ttf",
                       new FreetypeFontLoader(resolver));
-    levels = new LevelData[levelPaths.length];
   }
 
   @Override
   public void create() {
     canvas = new GameCanvas();
-    mainMenu = new MainMenu(this);
     loading = new LoadingMode(canvas, manager, this);
+    mainMenu = new MainMenu(this);
     playing = new GameMode(canvas, this);
     editing = new EditorMode(this);
     mainMenu.preloadContent(manager);
     playing.preloadContent(manager);
     editing.preloadContent(manager);
-    for (String path : Constants.BACKGROUND_MAP.values()) {
+    for (String path : Shared.BACKGROUND_PATHS.values()) {
       manager.load(path, Texture.class);
     }
-    for (int i = 0; i < levelPaths.length; i++) {
-      levels[i] = Constants.JSON.fromJson(LevelData.class,
-                                          Gdx.files.internal(levelPaths[i]));
-    }
-    levelIndex = 0;
+    chapter = "forest";
     setScreen(loading);
   }
 
   @Override
   public void resize(int width, int height) {
     canvas.resize();
+    mainMenu.resize(width, height);
+    playing.resize(width, height);
+    editing.resize(width, height);
     super.resize(width, height);
   }
 
@@ -89,9 +79,9 @@ public class GDXRoot extends Game implements ScreenListener {
     setScreen(null);
     canvas.dispose();
     canvas = null;
-    for (LevelData data : levels) {
-      if (manager.isLoaded(data.background)) {
-        manager.unload(data.background);
+    for (String path : Shared.BACKGROUND_PATHS.values()) {
+      if (manager.isLoaded(path)) {
+        manager.unload(path);
       }
     }
     manager.clear();
@@ -101,44 +91,41 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void exitScreen(Screen screen, int exitCode) {
+    Array<LevelData> levels = Shared.CHAPTER_LEVELS.get(chapter);
     if (screen == loading) {
       if (exitCode == LoadingMode.EXIT_DONE) {
-        if (nextScreen == null) {
-          mainMenu.loadContent(manager);
-          setScreen(mainMenu);
-        } else if (nextScreen == playing) {
-          playing.loadContent(manager);
-          level = levels[levelIndex];
-          playing.initLevel(level, manager, false);
-          setScreen(playing);
-        } else if (nextScreen == editing) {
-          editing.loadContent(manager);
-          playing.loadContent(manager);
-          setScreen(editing);
-        }
+        mainMenu.loadContent(manager);
+        playing.loadContent(manager);
+        editing.loadContent(manager);
+        setScreen(mainMenu);
       } else {
-        Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode, new RuntimeException());
+        Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,
+                      new RuntimeException());
         Gdx.app.exit();
       }
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
-        nextScreen = playing;
-        setScreen(loading);
+        level = levels.get(levelIndex);
+        playing.initLevel(level, manager, false);
+        setScreen(playing);
       } else if (exitCode == MainMenu.EXIT_EDITOR) {
-        nextScreen = editing;
-        setScreen(loading);
+        setScreen(editing);
       }
     } else if (screen == playing) {
       if (exitCode == GameMode.EXIT_MENU) {
-        levelIndex = 0;
+        setScreen(mainMenu);
+      } else if (exitCode == GameMode.EXIT_LEVELS) {
+        // TODO add level selector
         setScreen(mainMenu);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
+        // TODO add chapter advance
         levelIndex++;
-        if (levelIndex >= levels.length) {
+        if (levelIndex >= levels.size) {
           levelIndex = 0;
+          level = levels.get(levelIndex);
           setScreen(mainMenu);
         } else {
-          level = levels[levelIndex];
+          level = levels.get(levelIndex);
           playing.initLevel(level, manager, false);
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
@@ -147,7 +134,8 @@ public class GDXRoot extends Game implements ScreenListener {
       } else if (exitCode == GameMode.EXIT_EDIT) {
         setScreen(editing);
       } else {
-        Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode, new RuntimeException());
+        Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode,
+                      new RuntimeException());
         Gdx.app.exit();
       }
     } else if (screen == editing) {

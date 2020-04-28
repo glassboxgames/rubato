@@ -307,9 +307,9 @@ public abstract class Entity {
    */
   public void draw(GameCanvas canvas) {
     Texture texture = getState().getTexture(getCount());
-    float w = texture.getWidth() / Constants.PPM;
-    float h = texture.getHeight() / Constants.PPM;
-    Vector2 pos = getPosition();
+    float w = texture.getWidth();
+    float h = texture.getHeight();
+    Vector2 pos = getPosition().scl(Shared.PPM);
     canvas.draw(texture, Color.WHITE,
                 dir * w / 2, h / 2,
                 pos.x, pos.y,
@@ -323,9 +323,11 @@ public abstract class Entity {
     Vector2 pos = getPosition();
     if (shape instanceof CircleShape) {
       Vector2 spos = ((CircleShape)shape).getPosition();
-      canvas.drawPhysics((CircleShape)shape, color, pos.x + spos.x, pos.y + spos.y);
+      canvas.drawPhysics((CircleShape)shape, color, pos.x + spos.x, pos.y + spos.y,
+                         Shared.PPM, Shared.PPM);
     } else if (shape instanceof PolygonShape) {
-      canvas.drawPhysics((PolygonShape)shape, color, pos.x, pos.y, 0);
+      canvas.drawPhysics((PolygonShape)shape, color, pos.x, pos.y, 0,
+                         Shared.PPM, Shared.PPM);
     }
   }
   

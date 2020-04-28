@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
 /**
@@ -25,8 +26,8 @@ public class LevelContainer {
   private Array<Enemy> enemies;
   /** The platforms in this level */
   private Array<Platform> platforms;
-  /** The checkpoints in this level */
-  private Array<Checkpoint> checkpoints;
+  /** The checkpoint in this level (optional) */
+  private Checkpoint checkpoint;
 
   /**
    * Instantiates a level container with the given parameters.
@@ -36,17 +37,18 @@ public class LevelContainer {
    * @param player the main player
    * @param enemies array of enemies
    * @param platforms array of platforms
-   * @param checkpoints array of checkpoints
+   * @param checkpoint the checkpoint, if it exists
    */
-  public LevelContainer(float width, float height, Texture background, Player player,
-                        Array<Enemy> enemies, Array<Platform> platforms, Array<Checkpoint> checkpoints) {
+  public LevelContainer(float width, float height, Texture background,
+                        Player player, Array<Enemy> enemies,
+                        Array<Platform> platforms, Checkpoint checkpoint) {
     this.width = width;
     this.height = height;
     this.background = background;
     this.player = player;
     this.enemies = enemies;
     this.platforms = platforms;
-    this.checkpoints = checkpoints;
+    this.checkpoint = checkpoint;
   }
 
   /**
@@ -56,10 +58,11 @@ public class LevelContainer {
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
     height = data.height;
-    background = manager.get(Constants.BACKGROUND_MAP.get(data.background), Texture.class);
+    background = manager.get(Shared.BACKGROUND_PATHS.get(data.background),
+                             Texture.class);
     player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
-    for (LevelData.EnemyData enemyData : data.enemies) {
+    for (EnemyData enemyData : data.enemies) {
       float x = enemyData.x;
       float y = enemyData.y;
       Enemy enemy = null;
@@ -79,7 +82,7 @@ public class LevelContainer {
       }
     }
     platforms = new Array<Platform>();
-    for (LevelData.PlatformData platformData : data.platforms) {
+    for (PlatformData platformData : data.platforms) {
       int type = -1;
       switch (platformData.type) {
       case "simple":
@@ -107,9 +110,8 @@ public class LevelContainer {
         platforms.add(new Platform(platformData.x, platformData.y, type));
       }
     }
-    checkpoints = new Array<Checkpoint>();
-    for (LevelData.CheckpointData checkpointData : data.checkpoints) {
-      checkpoints.add(new Checkpoint(checkpointData.x, checkpointData.y));
+    if (data.checkpoint != null) {
+      checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
     }
   }
 
@@ -124,7 +126,7 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.activatePhysics(world);
     }
-    for (Checkpoint checkpoint : checkpoints) {
+    if (checkpoint != null) {
       checkpoint.activatePhysics(world);
     }
   }
@@ -140,7 +142,7 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.deactivatePhysics(world);
     }
-    for (Checkpoint checkpoint : checkpoints) {
+    if (checkpoint != null) {
       checkpoint.deactivatePhysics(world);
     }
   }
@@ -181,10 +183,10 @@ public class LevelContainer {
   }
 
   /**
-   * Returns the array of checkpoints in this level.
+   * Returns the checkpoint in this level, if there is one.
    */
-  public Array<Checkpoint> getCheckpoints() {
-    return checkpoints;
+  public Checkpoint getCheckpoint() {
+    return checkpoint;
   }
 
   /**
@@ -193,15 +195,12 @@ public class LevelContainer {
    * @param debug whether to draw collider shapes
    */
   public void draw(GameCanvas canvas, boolean debug) {
-    canvas.begin();
-    canvas.drawBackground(background, width * Constants.PPM, height * Constants.PPM);
-    canvas.end();
-
-    canvas.begin(Constants.PPM, Constants.PPM);
+    canvas.begin(Shared.SCALE, Shared.SCALE);
+    canvas.drawBackground(background, width * Shared.PPM, height * Shared.PPM);
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
-    for (Checkpoint checkpoint : checkpoints) {
+    if (checkpoint != null) {
       checkpoint.draw(canvas);
     }
     for (Enemy enemy : enemies) {
@@ -213,11 +212,11 @@ public class LevelContainer {
     canvas.end();
 
     if (debug) {
-      canvas.beginDebug(Constants.PPM, Constants.PPM);
+      canvas.beginDebug(Shared.SCALE, Shared.SCALE);
       for (Platform platform : platforms) {
         platform.drawPhysics(canvas);
       }
-      for (Checkpoint checkpoint : checkpoints) {
+      if (checkpoint != null) {
         checkpoint.drawPhysics(canvas);
       }
       for (Enemy enemy : enemies) {

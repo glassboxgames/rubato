@@ -1,0 +1,27 @@
+[
+  {
+    "key": "forest",
+    "background": "Backgrounds/Forest/forest.png",
+    "maps": [
+      "Levels/wall.json",
+      "Levels/Forest/easy.json",
+      "Levels/Forest/medium.json",
+      "Levels/Forest/hard.json",
+    ],
+  },
+  {
+    "key": "plains",
+    "background": "Backgrounds/Plains/plains.png",
+    "maps": [],
+  },
+  {
+    "key": "desert",
+    "background": "Backgrounds/Desert/desert.png",
+    "maps": [],
+  },
+  {
+    "key": "mountains",
+    "background": "Backgrounds/Mountains/mountains.png",
+    "maps": [],
+  },
+]

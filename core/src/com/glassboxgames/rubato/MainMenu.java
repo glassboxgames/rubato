@@ -23,28 +23,34 @@ public class MainMenu implements Screen {
   public static final int EXIT_EDITOR = 1;
 
   /** Asset paths */
-  public static final String HIGHLIGHT_FILE = "User Interface/Highlight/highlight.png";
-  public static final String NO_HIGHLIGHT_FILE = "User Interface/Highlight/no_highlight.png";
-  public static final String ADAGIO_ICON_FILE = "User Interface/Main Menu/adagio_head_51x61.png";
-  public static final String SEMIBOLD_FONT_FILE = "Fonts/Rajdhani-SemiBold.ttf";
-  public static final String REGULAR_FONT_FILE = "Fonts/Rajdhani-Regular.ttf";
+  protected static final String HIGHLIGHT_FILE =
+    "User Interface/Highlight/highlight.png";
+  protected static final String DEFAULT_FILE =
+    "User Interface/Highlight/no_highlight.png";
+  protected static final String ADAGIO_ICON_FILE =
+    "User Interface/Main Menu/adagio_head_51x61.png";
 
-  /** Font keys */
-  public static final String TITLE_FONT = "title_font.ttf";
-  public static final String HIGHLIGHT_FONT = "highlight_font.ttf";
-  public static final String BUTTON_FONT = "button_font.ttf";
+  /** Font files */
+  protected static final String TITLE_FONT = "main_menu_title_font.ttf";
+  protected static final String HIGHLIGHT_FONT = "main_menu_highlight_font.ttf";
+  protected static final String OPTION_FONT = "main_menu_option_font.ttf";
+
+  /** UI element sizes */
+  protected static final int TITLE_FONT_SIZE = 96;
+  protected static final int HIGHLIGHT_FONT_SIZE = 48;
+  protected static final int OPTION_FONT_SIZE = 48;
+  protected static final int BUTTON_HEIGHT = 72;
+  protected static final int PADDING = 90;
 
   /** Loaded assets */
-  protected Texture highlightTexture, noHighlightTexture, adagioIconTexture;
-  protected BitmapFont titleFont, buttonFont, highlightFont;
+  protected Texture highlightBackground, optionBackground, adagioIcon;
+  protected BitmapFont titleFont, highlightFont, optionFont;
 
-  /** Constants */
-  protected static final int BUTTON_HEIGHT = 72;
 
   /** Array of loaded assets */
   protected Array<String> assets;
   /** Button styles */
-  TextButton.TextButtonStyle buttonStyle, highlightStyle;
+  TextButton.TextButtonStyle highlightStyle, optionStyle;
   /** Whether this mode is active */
   protected boolean active;
   /** Stage for the menu */
@@ -66,9 +72,9 @@ public class MainMenu implements Screen {
     this.listener = listener;
     assets = new Array<String>();
     stage = new Stage();
-    Gdx.input.setInputProcessor(stage);
     table = new Table();
     stage.addActor(table);
+    Gdx.input.setInputProcessor(stage);
     buttons = new Array<TextButton>();
   }
 
@@ -76,31 +82,25 @@ public class MainMenu implements Screen {
    * Preloads the assets for the main menu with the given manager.
    */
   public void preloadContent(AssetManager manager) {
-    FreetypeFontLoader.FreeTypeFontLoaderParameter titleParams =
-      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-    titleParams.fontFileName = SEMIBOLD_FONT_FILE;
-    titleParams.fontParameters.size = 96;
-    manager.load(TITLE_FONT, BitmapFont.class, titleParams);
+    manager.load(TITLE_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE,
+                                               TITLE_FONT_SIZE));
     assets.add(TITLE_FONT);
 
-    FreetypeFontLoader.FreeTypeFontLoaderParameter highlightParams =
-      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-    highlightParams.fontFileName = SEMIBOLD_FONT_FILE;
-    highlightParams.fontParameters.size = 48;
-    manager.load(HIGHLIGHT_FONT, BitmapFont.class, highlightParams);
+    manager.load(HIGHLIGHT_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE,
+                                               HIGHLIGHT_FONT_SIZE));
     assets.add(HIGHLIGHT_FONT);
 
-    FreetypeFontLoader.FreeTypeFontLoaderParameter buttonParams =
-      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-    buttonParams.fontFileName = REGULAR_FONT_FILE;
-    buttonParams.fontParameters.size = 48;
-    manager.load(BUTTON_FONT, BitmapFont.class, buttonParams);
-    assets.add(BUTTON_FONT);
+    manager.load(OPTION_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE,
+                                               OPTION_FONT_SIZE));
+    assets.add(OPTION_FONT);
 
     manager.load(HIGHLIGHT_FILE, Texture.class);
     assets.add(HIGHLIGHT_FILE);
-    manager.load(NO_HIGHLIGHT_FILE, Texture.class);
-    assets.add(NO_HIGHLIGHT_FILE);
+    manager.load(DEFAULT_FILE, Texture.class);
+    assets.add(DEFAULT_FILE);
     manager.load(ADAGIO_ICON_FILE, Texture.class);
     assets.add(ADAGIO_ICON_FILE);
   }
@@ -109,8 +109,8 @@ public class MainMenu implements Screen {
    * Adds a menu option at the given index.
    */
   private void addMenuOption(int index, String text) {
-    TextButton button = new TextButton(text, buttonStyle);
-    button.padRight(90);
+    TextButton button = new TextButton(text, optionStyle);
+    button.padRight(PADDING);
     button.getLabel().setAlignment(Align.right);
     button.setHeight(BUTTON_HEIGHT);
     if (index >= buttons.size) {
@@ -125,31 +125,31 @@ public class MainMenu implements Screen {
   public void loadContent(AssetManager manager) {
     titleFont = manager.get(TITLE_FONT, BitmapFont.class);
     highlightFont = manager.get(HIGHLIGHT_FONT, BitmapFont.class);
-    buttonFont = manager.get(BUTTON_FONT, BitmapFont.class);
+    optionFont = manager.get(OPTION_FONT, BitmapFont.class);
 
-    highlightTexture = manager.get(HIGHLIGHT_FILE, Texture.class);
-    noHighlightTexture = manager.get(NO_HIGHLIGHT_FILE, Texture.class);
-    adagioIconTexture = manager.get(ADAGIO_ICON_FILE, Texture.class);
+    highlightBackground = manager.get(HIGHLIGHT_FILE, Texture.class);
+    optionBackground = manager.get(DEFAULT_FILE, Texture.class);
+    adagioIcon = manager.get(ADAGIO_ICON_FILE, Texture.class);
 
     table.setFillParent(true);
-    table.right().bottom().padBottom(90);
+    table.right().bottom().padBottom(PADDING);
 
     highlightStyle = new TextButton.TextButtonStyle();
-    highlightStyle.up = new TextureRegionDrawable(highlightTexture);
+    highlightStyle.up = new TextureRegionDrawable(highlightBackground);
     highlightStyle.font = highlightFont;
     highlightStyle.fontColor = Color.WHITE;
-    buttonStyle = new TextButton.TextButtonStyle();
-    buttonStyle.up = new TextureRegionDrawable(noHighlightTexture);
-    buttonStyle.font = buttonFont;
-    buttonStyle.fontColor = Color.WHITE;
+    optionStyle = new TextButton.TextButtonStyle();
+    optionStyle.up = new TextureRegionDrawable(optionBackground);
+    optionStyle.font = optionFont;
+    optionStyle.fontColor = Color.WHITE;
 
-    addMenuOption(EXIT_PLAY, "p l a y");
-    addMenuOption(EXIT_EDITOR, "e d i t o r");
+    addMenuOption(EXIT_PLAY, "play");
+    addMenuOption(EXIT_EDITOR, "editor");
+
     HorizontalGroup title = new HorizontalGroup();
-    title.addActor(new Label("r u b a t ",
-                             new Label.LabelStyle(titleFont, Color.WHITE)));
-    title.addActor(new Image(adagioIconTexture));
-    title.padRight(90);
+    title.addActor(new Label("rubat", new Label.LabelStyle(titleFont, Color.WHITE)));
+    title.addActor(new Image(adagioIcon));
+    title.space(Shared.DEFAULT_FONT_SPACING).padRight(PADDING).right();
     table.add(title).right();
 
     for (TextButton button : buttons) {
@@ -176,7 +176,7 @@ public class MainMenu implements Screen {
         Gdx.app.exit();
         return;
       }
-      if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
         listener.exitScreen(this, index);
         return;
       }
@@ -187,7 +187,7 @@ public class MainMenu implements Screen {
       } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
         index = (index + 1) % buttons.size;
       }
-      buttons.get(last).setStyle(buttonStyle);
+      buttons.get(last).setStyle(optionStyle);
       buttons.get(index).setStyle(highlightStyle);
 
       Gdx.gl.glClearColor(0f, 0f, 0f, 1f);

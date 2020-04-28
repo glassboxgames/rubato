@@ -33,7 +33,7 @@ public class Player extends Entity {
   public static final int MAX_JUMP_DURATION = 12;
   public static int maxJumpDuration = MAX_JUMP_DURATION;
   /** Dash cooldown */
-  public static final int DASH_COOLDOWN = 25;
+  public static final int DASH_COOLDOWN = 17;
   /** Dash duration */
   public static final int DASH_DURATION = 12;
   public static int dashDuration = DASH_DURATION;
@@ -47,15 +47,6 @@ public class Player extends Entity {
   public static int attackDuration = ATTACK_DURATION;
   /** Attack cooldown */
   public static final int ATTACK_COOLDOWN = 20;
-  /** Parry capacity */
-  public static final float PARRY_CAPACITY = 200f;
-  public static float parryCapacity = PARRY_CAPACITY;
-  /** Parry gain */
-  public static final float PARRY_GAIN = 20f;
-  public static float parryGain = PARRY_GAIN;
-  /** Invulnerability duration */
-  public static final float INVULNERABLE_DURATION = 30f;
-  public static float invulnerableDuration = INVULNERABLE_DURATION;
   /** Cling time */
   public static final float CLING_DURATION = 5f;
   /** Slide velocity */
@@ -105,13 +96,6 @@ public class Player extends Entity {
   /** Whether the player is attacking downward */
   protected boolean downAttack;
 
-  /** Amount of parrying resource */
-  protected float parry;
-  /** Whether the player is currently parrying */
-  protected boolean isParrying;
-  /** Invulnerability time after player is hit */
-  protected float invulnerableTime;
-
   /** Enemies that have been hit by the current active attack */
   protected ObjectSet<Enemy> enemiesHit;
   /** Entities that the player is currently using as ground */
@@ -140,8 +124,6 @@ public class Player extends Entity {
     dashTime = -1;
     dashCooldown = -1;
     dashDir = new Vector2();
-    invulnerableTime = -1;
-    parry = parryCapacity / 2;
     enemiesHit = new ObjectSet<Enemy>();
     entitiesUnderfoot = new ObjectSet<Entity>();
     entitiesAdjacent = new ObjectSet<Entity>();
@@ -228,22 +210,6 @@ public class Player extends Entity {
   }
 
   /**
-   * Tries to parry.
-   */
-  public void tryParry() {
-    if (!isAttacking() && parry > 0) {
-      isParrying = true;
-    }
-  }
-
-  /**
-   * Stops parrying.
-   */
-  public void endParry() {
-    isParrying = false;
-  }
-
-  /**
    * Returns whether the player is alive.
    */
   public boolean isAlive() {
@@ -283,33 +249,6 @@ public class Player extends Entity {
    */
   public boolean isWallJumping() {
     return stateIndex == STATE_WALLJUMP;
-  }
-
-  /**
-   * Returns whether the player is parrying.
-   */
-  public boolean isParrying() {
-    return isParrying;
-  }
-
-  /**
-   * Adds parry resource.
-   */
-  public void changeParry(float amount) {
-    float newParry = parry + amount;
-    if (amount < 0) {
-      if (invulnerableTime < 0) {
-        if (newParry < 0) {
-          alive = false;
-          parry = 0;
-        } else {
-          invulnerableTime = invulnerableDuration;
-          parry = newParry;
-        }
-      }
-    } else {
-      parry = Math.min(newParry, parryCapacity);
-    }
   }
 
   /**
@@ -380,13 +319,6 @@ public class Player extends Entity {
    */
   public ObjectSet<Enemy> getEnemiesHit() {
     return enemiesHit;
-  }
-
-  /**
-   * Returns the player's parry resource.
-   */
-  public float getParry() {
-    return parry;
   }
 
   /**
@@ -510,10 +442,6 @@ public class Player extends Entity {
         dashCooldown--;
       }
       
-      if (isGrounded()) {
-        hasDash = true;
-      }
-
       if (input.x != 0) {
         if (!isClinging() || input.x * dir < 0) {
           temp.set(MOVE_IMPULSE * Math.signum(input.x), 0);
@@ -579,16 +507,8 @@ public class Player extends Entity {
 
     /* ------- all physics manipulations should be applied before this line! ------- */
 
-    if (isParrying) {
-      if (parry <= 0) {
-        endParry();
-      } else {
-        parry--;
-      }
-    }
-
-    if (invulnerableTime >= 0) {
-      invulnerableTime--;
+    if (isGrounded()) {
+      hasDash = true;
     }
 
     shard.update(delta, getPosition(), getDirection());

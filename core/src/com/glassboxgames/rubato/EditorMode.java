@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
 /**
@@ -80,8 +81,8 @@ public class EditorMode implements Screen {
     levelStage = new Stage();
     Gdx.input.setInputProcessor(new InputMultiplexer(uiStage, levelStage));
     textureMap = new ObjectMap<String, Texture>();
-    pathMap = Constants.JSON.fromJson(ObjectMap.class, Gdx.files.internal(EDITOR_FILE));
-    pathMap.putAll(Constants.BACKGROUND_MAP);
+    pathMap = Shared.JSON.fromJson(ObjectMap.class, Gdx.files.internal(EDITOR_FILE));
+    pathMap.putAll(Shared.BACKGROUND_PATHS);
     uiMap = new ObjectMap<String, Button>();
     levelMap = new ObjectMap<String, Array<Button>>();
   }
@@ -255,8 +256,8 @@ public class EditorMode implements Screen {
   public void loadLevel(LevelData data) {
     clear();
     
-    width = data.width * Constants.PPM;
-    height = data.height * Constants.PPM;
+    width = data.width * Shared.PPM;
+    height = data.height * Shared.PPM;
     background = data.background;
     Image img = new Image(textureMap.get(background));
     img.setWidth(width);
@@ -264,23 +265,23 @@ public class EditorMode implements Screen {
     levelStage.addActor(img);
     if (data.player != null) {
       createLevelButton("player",
-                        data.player.x * Constants.PPM,
-                        data.player.y * Constants.PPM);
+                        data.player.x * Shared.PPM,
+                        data.player.y * Shared.PPM);
     }
-    for (LevelData.EnemyData enemyData : data.enemies) {
+    for (EnemyData enemyData : data.enemies) {
       createLevelButton(enemyData.type,
-                        enemyData.x * Constants.PPM,
-                        enemyData.y * Constants.PPM);
+                        enemyData.x * Shared.PPM,
+                        enemyData.y * Shared.PPM);
     }
-    for (LevelData.PlatformData platformData : data.platforms) {
+    for (PlatformData platformData : data.platforms) {
       createLevelButton(platformData.type,
-                        platformData.x * Constants.PPM,
-                        platformData.y * Constants.PPM);
+                        platformData.x * Shared.PPM,
+                        platformData.y * Shared.PPM);
     }
-    for (LevelData.CheckpointData checkpointData : data.checkpoints) {
+    if (data.checkpoint != null) {
       createLevelButton("checkpoint",
-                        checkpointData.x * Constants.PPM,
-                        checkpointData.y * Constants.PPM);
+                        data.checkpoint.x * Shared.PPM,
+                        data.checkpoint.y * Shared.PPM);
     }
     levelStage.getCamera().position.set(Gdx.graphics.getWidth() / 2,
                                         Gdx.graphics.getHeight() / 2,
@@ -307,19 +308,18 @@ public class EditorMode implements Screen {
   public LevelData exportLevel() {
     LevelData data = new LevelData();
     data.background = background;
-    data.width = width / Constants.PPM;
-    data.height = height / Constants.PPM;
-    data.enemies = new Array<LevelData.EnemyData>();
-    data.platforms = new Array<LevelData.PlatformData>();
-    data.checkpoints = new Array<LevelData.CheckpointData>();
+    data.width = width / Shared.PPM;
+    data.height = height / Shared.PPM;
+    data.enemies = new Array<EnemyData>();
+    data.platforms = new Array<PlatformData>();
     for (String key : levelMap.keys()) {
       switch (key) {
       case "player":
         {
           Button button = levelMap.get(key).get(0);
-          data.player = new LevelData.PlayerData();
-          data.player.x = getCenterX(button) / Constants.PPM;
-          data.player.y = getCenterY(button) / Constants.PPM;
+          data.player = new PlayerData();
+          data.player.x = getCenterX(button) / Shared.PPM;
+          data.player.y = getCenterY(button) / Shared.PPM;
           break;
         }
       case "spider":
@@ -327,10 +327,10 @@ public class EditorMode implements Screen {
       case "wyrm":
         {
           for (Button button : levelMap.get(key)) {
-            LevelData.EnemyData enemy = new LevelData.EnemyData();
+            EnemyData enemy = new EnemyData();
             enemy.type = key;
-            enemy.x = getCenterX(button) / Constants.PPM;
-            enemy.y = getCenterY(button) / Constants.PPM;
+            enemy.x = getCenterX(button) / Shared.PPM;
+            enemy.y = getCenterY(button) / Shared.PPM;
             data.enemies.add(enemy);
           }
           break;
@@ -343,22 +343,20 @@ public class EditorMode implements Screen {
       case "right_spikes":
         {
           for (Button button : levelMap.get(key)) {
-            LevelData.PlatformData platform = new LevelData.PlatformData();
+            PlatformData platform = new PlatformData();
             platform.type = key;
-            platform.x = getCenterX(button) / Constants.PPM;
-            platform.y = getCenterY(button) / Constants.PPM;
+            platform.x = getCenterX(button) / Shared.PPM;
+            platform.y = getCenterY(button) / Shared.PPM;
             data.platforms.add(platform);
           }
           break;
         }
       case "checkpoint":
         {
-          for (Button button : levelMap.get(key)) {
-            LevelData.CheckpointData checkpoint = new LevelData.CheckpointData();
-            checkpoint.x = getCenterX(button) / Constants.PPM;
-            checkpoint.y = getCenterY(button) / Constants.PPM;
-            data.checkpoints.add(checkpoint);
-          }
+          Button button = levelMap.get(key).get(0);
+          data.checkpoint = new CheckpointData();
+          data.checkpoint.x = getCenterX(button) / Shared.PPM;
+          data.checkpoint.y = getCenterY(button) / Shared.PPM;
           break;
         }
       }
@@ -392,7 +390,7 @@ public class EditorMode implements Screen {
           public void canceled() {}
 
           public void input(String text) {
-            Gdx.files.local(text).writeString(Constants.JSON.prettyPrint(exportLevel()), false);
+            Gdx.files.local(text).writeString(Shared.JSON.prettyPrint(exportLevel()), false);
           }
         }, "Save level to file", "Levels/", "");
       }
@@ -402,7 +400,7 @@ public class EditorMode implements Screen {
           public void canceled() {}
 
           public void input(String text) {
-            loadLevel(Constants.JSON.fromJson(LevelData.class, Gdx.files.local(text)));
+            loadLevel(Shared.JSON.fromJson(LevelData.class, Gdx.files.local(text)));
           }
         }, "Load level from file", "Levels/", "");
       }

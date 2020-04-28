@@ -10,8 +10,10 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
 /**
@@ -30,36 +32,77 @@ public class GameMode implements Screen {
 
   /** Exit code for returning to the menu */
   public static final int EXIT_MENU = 0;
+  /** Exit code for returning to the level selector */
+  public static final int EXIT_LEVELS = 1;
   /** Exit code for completing the level */
-  public static final int EXIT_COMPLETE = 1;
+  public static final int EXIT_COMPLETE = 2;
   /** Exit code for resetting the level */
-  public static final int EXIT_RESET = 2;
+  public static final int EXIT_RESET = 3;
   /** Exit code for editing the level */
-  public static final int EXIT_EDIT = 3;
+  public static final int EXIT_EDIT = 4;
 
-  // GRAPHICS AND SOUND RESOURCES
-  /** The file for the parry meter */
-  private static final String PARRY_METER_FILE = "User Interface/Play Screen/parrying_meter_6274x1171.png";
-  /** The file for the font */
-  private static final String FONT_FILE = "Fonts/Rajdhani-Bold.ttf";
-  /** The font size */
-  private static final int FONT_SIZE = 24;
-  /** The draw offset */
-  private static final float DRAW_OFFSET = 20.0f;
+  /** Pause code for resuming */
+  public static final int PAUSE_RESUME = 0;
+  /** Pause code for resetting */
+  public static final int PAUSE_RESET = 1;
+  /** Pause code for returning to level selector */
+  public static final int PAUSE_LEVELS = 2;
+  /** Pause code for returning to main menu */
+  public static final int PAUSE_MENU = 3;
 
-  // Loaded assets
-  /** The background image */
-  private Texture background;
-  /** The parry meter image */
-  private Texture parryMeter;
-  /** The font for giving messages to the player */
-  private BitmapFont displayFont;
-  /** Array tracking all loaded assets (for unloading purposes) */
-  private Array<String> assets;
+  /** Dev mode font key */
+  private static final String DEV_FONT = "game_mode_dev_font.ttf";
+  /** Dev mode font size */
+  private static final int DEV_FONT_SIZE = 24;
+  /** Dev mode draw offset */
+  private static final float DEV_DRAW_OFFSET = 20f;
+
+  /** Pause menu overlay */
+  private static final String PAUSE_OVERLAY_FILE = "User Interface/Play Screen/pause_overlay.png";
+  /** Pause menu label font key */
+  private static final String PAUSE_LABEL_FONT = "game_mode_pause_label_font.ttf";
+  /** Pause menu label font size */
+  private static final int PAUSE_LABEL_FONT_SIZE = 36;
+  /** Pause menu subtext font key */
+  private static final String PAUSE_SUBTEXT_FONT = "game_mode_pause_subtext_font.ttf";
+  /** Pause menu subtext font size */
+  private static final int PAUSE_SUBTEXT_FONT_SIZE = 48;
+
+  /** Texture paths */
+  private static final String RESUME_DEFAULT_FILE = "User Interface/Buttons/resume_button.png";
+  private static final String RESUME_HIGHLIGHT_FILE = "User Interface/Buttons/resume_button_highlighted.png";
+  private static final String RESET_DEFAULT_FILE = "User Interface/Buttons/reset_button.png";
+  private static final String RESET_HIGHLIGHT_FILE = "User Interface/Buttons/reset_button_highlighted.png";
+  private static final String LEVELS_DEFAULT_FILE = "User Interface/Buttons/levels_button.png";
+  private static final String LEVELS_HIGHLIGHT_FILE = "User Interface/Buttons/levels_button_highlighted.png";
+  private static final String MENU_DEFAULT_FILE = "User Interface/Buttons/menu_button.png";
+  private static final String MENU_HIGHLIGHT_FILE = "User Interface/Buttons/menu_button_highlighted.png";
 
   /** Gravity **/
   private static final float GRAVITY = -50f;
+  /** Boundary thresholds */
+  private static final float X_BOUND = 1;
+  private static final float Y_BOUND = 2;
   
+  /** Pause overlay texture */
+  private Texture pauseOverlay;
+  /** Resume button textures */
+  private Texture resumeDefault, resumeHighlight;
+  /** Reset button textures */
+  private Texture resetDefault, resetHighlight;
+  /** Level selector button textures */
+  private Texture levelsDefault, levelsHighlight;
+  /** Back to menu button textures */
+  private Texture menuDefault, menuHighlight;
+  /** Fonts for pause menu */
+  private BitmapFont pauseLabelFont, pauseSubtextFont;
+  /** Font for displaying dev mode options */
+  private BitmapFont devModeFont;
+  /** The background image */
+  private Texture background;
+  /** Array tracking all loaded assets (for unloading purposes) */
+  private Array<String> assets;
+
   /** Canvas on which to draw content */
   protected GameCanvas canvas;
   /** Listener to handle exiting */
@@ -71,20 +114,31 @@ public class GameMode implements Screen {
   /** The Box2D world */
   protected World world;
 
+  /** Whether this game mode is paused */
+  protected boolean paused;
+  /** Pause menu stage */
+  protected Stage pauseStage;
+  /** Pause menu table */
+  protected Table pauseTable;
+  /** Pause menu button group */
+  protected HorizontalGroup pauseButtons;
+  /** Pause menu button index */
+  protected int pauseIndex;
+
   /** List of all entity states currently loaded */
   protected Array<State> states;
-  /** The current level */
+  /** Current level */
   protected LevelContainer level;
-  /** The position of the camera */
+  /** Position of the camera */
   protected Vector2 cameraPos;
 
-  /** The upper left corner of the visible canvas **/
+  /** Upper left corner of the visible canvas **/
   protected Vector2 uiPos;
   /** Whether debug mode is on */
   protected boolean debug;
   /** Whether dev mode is on */
   protected boolean devMode;
-  /** Numerical selector for devMode */
+  /** Numerical selector for dev mode */
   protected int devSelect;
   /** Whether the current level is editable */
   protected boolean editable;
@@ -125,14 +179,38 @@ public class GameMode implements Screen {
    * @param manager asset manager to use
    */
   public void preloadContent(AssetManager manager) {
-    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params =
-      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-    size2Params.fontFileName = FONT_FILE;
-    size2Params.fontParameters.size = FONT_SIZE;
-    manager.load(FONT_FILE, BitmapFont.class, size2Params);
-    assets.add(FONT_FILE);
-    manager.load(PARRY_METER_FILE, Texture.class);
-    assets.add(PARRY_METER_FILE);
+    manager.load(DEV_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE,
+                                               DEV_FONT_SIZE));
+    assets.add(DEV_FONT);
+    manager.load(PAUSE_LABEL_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE,
+                                               PAUSE_LABEL_FONT_SIZE));
+    assets.add(PAUSE_LABEL_FONT);
+    manager.load(PAUSE_SUBTEXT_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE,
+                                               DEV_FONT_SIZE));
+    assets.add(PAUSE_SUBTEXT_FONT);
+
+    manager.load(PAUSE_OVERLAY_FILE, Texture.class);
+    assets.add(PAUSE_OVERLAY_FILE);
+    manager.load(RESUME_DEFAULT_FILE, Texture.class);
+    assets.add(RESUME_DEFAULT_FILE);
+    manager.load(RESUME_HIGHLIGHT_FILE, Texture.class);
+    assets.add(RESUME_HIGHLIGHT_FILE);
+    manager.load(RESET_DEFAULT_FILE, Texture.class);
+    assets.add(RESET_DEFAULT_FILE);
+    manager.load(RESET_HIGHLIGHT_FILE, Texture.class);
+    assets.add(RESET_HIGHLIGHT_FILE);
+    manager.load(LEVELS_DEFAULT_FILE, Texture.class);
+    assets.add(LEVELS_DEFAULT_FILE);
+    manager.load(LEVELS_HIGHLIGHT_FILE, Texture.class);
+    assets.add(LEVELS_HIGHLIGHT_FILE);
+    manager.load(MENU_DEFAULT_FILE, Texture.class);
+    assets.add(MENU_DEFAULT_FILE);
+    manager.load(MENU_HIGHLIGHT_FILE, Texture.class);
+    assets.add(MENU_HIGHLIGHT_FILE);
+
     for (State state : states) {
       state.preloadContent(manager);
     }
@@ -140,14 +218,56 @@ public class GameMode implements Screen {
 
   /**
    * Pulls the loaded textures from the asset manager for the game.
+   * Initializes UI elements that depend on those textures.
    * @param manager the asset manager to use
    */
   public void loadContent(AssetManager manager) {
-    parryMeter = manager.get(PARRY_METER_FILE, Texture.class);
-    displayFont = manager.get(FONT_FILE, BitmapFont.class);
+    devModeFont = manager.get(DEV_FONT, BitmapFont.class);
+    pauseOverlay = manager.get(PAUSE_OVERLAY_FILE, Texture.class);
+    pauseLabelFont = manager.get(PAUSE_LABEL_FONT, BitmapFont.class);
+    pauseSubtextFont = manager.get(PAUSE_SUBTEXT_FONT, BitmapFont.class);
+    resumeDefault = manager.get(RESUME_DEFAULT_FILE, Texture.class);
+    resumeHighlight = manager.get(RESUME_HIGHLIGHT_FILE, Texture.class);
+    resetDefault = manager.get(RESET_DEFAULT_FILE, Texture.class);
+    resetHighlight = manager.get(RESET_HIGHLIGHT_FILE, Texture.class);
+    levelsDefault = manager.get(LEVELS_DEFAULT_FILE, Texture.class);
+    levelsHighlight = manager.get(LEVELS_HIGHLIGHT_FILE, Texture.class);
+    menuDefault = manager.get(MENU_DEFAULT_FILE, Texture.class);
+    menuHighlight = manager.get(MENU_HIGHLIGHT_FILE, Texture.class);
+
+    // Initialize pause menu
+    pauseStage = new Stage();
+    pauseTable = new Table();
+    pauseTable.setFillParent(true);
+    pauseTable.add(new Label("paused", new Label.LabelStyle(pauseLabelFont, Color.WHITE)));
+    pauseTable.row();
+
+    pauseButtons = new HorizontalGroup();
+    addPauseButton("resume", resumeDefault, resumeHighlight);
+    addPauseButton("reset", resetDefault, resetHighlight);
+    addPauseButton("levels", levelsDefault, levelsHighlight);
+    addPauseButton("menu", menuDefault, menuHighlight);
+    pauseButtons.space(50).padTop(50).rowBottom();
+
+    pauseTable.add(pauseButtons);
+    pauseStage.addActor(pauseTable);
+
     for (State state : states) {
       state.loadContent(manager);
     }
+  }
+
+  /**
+   * Adds a button with the given label and texture to the pause menu.
+   */
+  private void addPauseButton(String text, Texture defaultTexture, Texture highlightTexture) {
+    ImageButton button = new ImageButton(new TextureRegionDrawable(defaultTexture),
+                                         null,
+                                         new TextureRegionDrawable(highlightTexture));
+    button.row();
+    button.add(new Label(text, new Label.LabelStyle(pauseLabelFont, Color.WHITE))).padTop(20);
+    button.setWidth(100);
+    pauseButtons.addActor(button);
   }
 
   /**
@@ -195,37 +315,57 @@ public class GameMode implements Screen {
         gameState = GameState.PLAY;
       }
     } else if (gameState == GameState.PLAY) {
-      InputController input = InputController.getInstance();
-      input.readInput();
-      if (input.didExit()) {
-        level.deactivatePhysics(world);
-        listener.exitScreen(this, EXIT_MENU);
-        return;
-      }
-      if (input.didReset()) {
-        level.deactivatePhysics(world);
-        listener.exitScreen(this, EXIT_RESET);
-        return;
-      }
-      if (editable && input.didEdit()) {
-        level.deactivatePhysics(world);
-        listener.exitScreen(this, EXIT_EDIT);
-        return;
-      }
-      if (input.didDebug()) {
-        debug = !debug;
-      }
-      if (input.didDevMode()) {
-        devMode = !devMode;
-        devSelect = -1;
-      }
-      if (devMode) {
-        if (input.getDevSelect() != -1) {
-          devSelect = input.getDevSelect();
+      if (paused) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+          switch (pauseIndex) {
+          case PAUSE_RESUME:
+            paused = false;
+            break;
+          case PAUSE_RESET:
+            listener.exitScreen(this, EXIT_RESET);
+            break;
+          case PAUSE_LEVELS:
+            listener.exitScreen(this, EXIT_LEVELS);
+            break;
+          case PAUSE_MENU:
+            listener.exitScreen(this, EXIT_MENU);
+            break;
+          }
         }
-        int devChange = input.getDevChange();
-        if (devChange != 0) {
-          switch (devSelect) {
+        ((Button)pauseButtons.getChild(pauseIndex)).setChecked(false);
+        int n = pauseButtons.getChildren().size;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+          pauseIndex = (pauseIndex + n - 1) % n;
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+          pauseIndex = (pauseIndex + 1) % n;
+        }
+        ((Button)pauseButtons.getChild(pauseIndex)).setChecked(true);
+        pauseStage.act(delta);
+      } else {
+        InputController input = InputController.getInstance();
+        input.readInput();
+        if (input.didExit()) {
+          if (editable) {
+            listener.exitScreen(this, EXIT_EDIT);
+          } else {
+            pauseGame();
+          }          
+          return;
+        }
+        if (input.didDebug()) {
+          debug = !debug;
+        }
+        if (input.didDevMode()) {
+          devMode = !devMode;
+          devSelect = -1;
+        }
+        if (devMode) {
+          if (input.getDevSelect() != -1) {
+            devSelect = input.getDevSelect();
+          }
+          int devChange = input.getDevChange();
+          if (devChange != 0) {
+            switch (devSelect) {
             case -1:
               break;
             case 1:
@@ -250,104 +390,98 @@ public class GameMode implements Screen {
               Player.dashSpeed += devChange * 0.5;
               break;
             case 8:
-              Player.parryCapacity += devChange * 10;
               break;
             case 9:
-              Player.parryGain += devChange * 5;
               break;
             case 0:
               Enemy.damage += devChange * 5;
               break;
-          }
-        }
-      }
-
-      boolean complete = true;
-      for (Checkpoint checkpoint : level.getCheckpoints()) {
-        checkpoint.update(delta);
-        complete = complete && checkpoint.isActivated();
-      }
-      if (complete && !editable && input.didContinue()) {
-        level.deactivatePhysics(world);
-        listener.exitScreen(this, EXIT_COMPLETE);
-        return;
-      }
-      
-      Player player = level.getPlayer();
-      if (player.isAlive()) {
-        player.setInputVector(input.getHorizontal(), input.getVertical());
-        player.tryFace();
-        player.tryCling();
-        if (input.didJump()) {
-          player.tryJump();
-        } else if (input.didHoldJump()) {
-          player.tryExtendJump();
-        }
-        if (input.didDash()) {
-          player.tryDash();
-        }
-        if (input.didAttack()) {
-          player.tryAttack();
-        }
-        if (input.didParry()) {
-          player.tryParry();
-        } else {
-          player.endParry();
-        }
-
-        player.update(delta);
-      } else {
-        player.deactivatePhysics(world);
-      }
-
-      Array<Enemy> enemies = level.getEnemies();
-      Array<Enemy> removedEnemies = new Array<Enemy>();
-      Array<Enemy> addedEnemies = new Array<Enemy>();
-      for (Enemy enemy : enemies) {
-        if (enemy.shouldRemove()) {
-          enemy.deactivatePhysics(world);
-          removedEnemies.add(enemy);
-        } else {
-          enemy.update(delta);
-          if (enemy instanceof Wisp) {
-            Array<Enemy> spawned = ((Wisp)enemy).getSpawned();
-            for (Enemy spawn : spawned) {
-              spawn.activatePhysics(world);
-              addedEnemies.add(spawn);
             }
-            spawned.clear();
           }
         }
-      }
-      enemies.removeAll(removedEnemies, true);
-      enemies.addAll(addedEnemies);
 
-      Array<Platform> platforms = level.getPlatforms();
-      Array<Platform> removedPlatforms = new Array<Platform>();
-      for (Platform platform : platforms) {
-        if (platform.shouldRemove()) {
-          platform.deactivatePhysics(world);
-          removedPlatforms.add(platform);
+        Player player = level.getPlayer();
+        if (player.isAlive()) {
+          Vector2 pos = player.getPosition();
+          if (pos.x >= level.getWidth() + X_BOUND) {
+            listener.exitScreen(this, EXIT_COMPLETE);
+            return;
+          }
+          if (pos.x < -X_BOUND || pos.y < -Y_BOUND) {
+            listener.exitScreen(this, EXIT_RESET);
+            return;
+          }
+
+          player.setInputVector(input.getHorizontal(), input.getVertical());
+          player.tryFace();
+          player.tryCling();
+          if (input.didJump()) {
+            player.tryJump();
+          } else if (input.didHoldJump()) {
+            player.tryExtendJump();
+          }
+          if (input.didDash()) {
+            player.tryDash();
+          }
+          if (input.didAttack()) {
+            player.tryAttack();
+          }
+
+          player.update(delta);
         } else {
-          platform.update(delta);
+          player.deactivatePhysics(world);
         }
-      }
-      platforms.removeAll(removedPlatforms, true);
 
-      if (player.isAlive()) {
-        player.sync();
-      }
-      for (Enemy enemy : level.getEnemies()) {
-        enemy.sync();
-      }
-      for (Platform platform : level.getPlatforms()) {
-        platform.sync();
-      }
-      for (Checkpoint checkpoint : level.getCheckpoints()) {
-        checkpoint.sync();
-      }
+        Array<Enemy> enemies = level.getEnemies();
+        Array<Enemy> removedEnemies = new Array<Enemy>();
+        Array<Enemy> addedEnemies = new Array<Enemy>();
+        for (Enemy enemy : enemies) {
+          if (enemy.shouldRemove()) {
+            enemy.deactivatePhysics(world);
+            removedEnemies.add(enemy);
+          } else {
+            enemy.update(delta);
+            if (enemy instanceof Wisp) {
+              Array<Enemy> spawned = ((Wisp)enemy).getSpawned();
+              for (Enemy spawn : spawned) {
+                spawn.activatePhysics(world);
+                addedEnemies.add(spawn);
+              }
+              spawned.clear();
+            }
+          }
+        }
+        enemies.removeAll(removedEnemies, true);
+        enemies.addAll(addedEnemies);
+
+        Array<Platform> platforms = level.getPlatforms();
+        Array<Platform> removedPlatforms = new Array<Platform>();
+        for (Platform platform : platforms) {
+          if (platform.shouldRemove()) {
+            platform.deactivatePhysics(world);
+            removedPlatforms.add(platform);
+          } else {
+            platform.update(delta);
+          }
+        }
+        platforms.removeAll(removedPlatforms, true);
+
+        if (player.isAlive()) {
+          player.sync();
+        }
+        for (Enemy enemy : level.getEnemies()) {
+          enemy.sync();
+        }
+        for (Platform platform : level.getPlatforms()) {
+          platform.sync();
+        }
+        Checkpoint checkpoint = level.getCheckpoint();
+        if (checkpoint != null) {
+          checkpoint.sync();
+        }
       
-      world.step(1 / 60f, 8, 3);
+        world.step(1 / 60f, 8, 3);
+      }
     }
   }
 
@@ -363,47 +497,30 @@ public class GameMode implements Screen {
 
     Player player = level.getPlayer();
     if (player.isAlive()) {
-      Vector2 pos = player.getPosition().scl(Constants.PPM);
+      Vector2 pos = player.getPosition().scl(Shared.SCALED_PPM);
+      float width = level.getWidth() * Shared.SCALED_PPM;
+      float height = level.getHeight() * Shared.SCALED_PPM;
       cameraPos.set(pos);
-      canvas.moveCamera(cameraPos,
-                        level.getWidth() * Constants.PPM,
-                        level.getHeight() * Constants.PPM);
-      uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2,
-                                     0,
-                                     level.getWidth() * Constants.PPM
-                                     - canvas.getWidth()) + DRAW_OFFSET,
-                     MathUtils.clamp(pos.y + canvas.getHeight() / 2,
-                                     canvas.getHeight(),
-                                     level.getHeight() * Constants.PPM) - DRAW_OFFSET);
+      canvas.moveCamera(cameraPos, width, height);
+      uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2, 0, width - canvas.getWidth()) + DEV_DRAW_OFFSET,
+                MathUtils.clamp(pos.y + canvas.getHeight() / 2, canvas.getHeight(), height) - DEV_DRAW_OFFSET);
     }
 
     level.draw(canvas, debug);
 
-    // TODO un-hardcode; parry meter UI (lot of this is temp code)
-    float parryMeterWidth = canvas.getWidth() / 2.5f;
-    float parryMeterHeight = parryMeterWidth * 1171/6274;
-    float parry = player.getParry();
-    String resource = new DecimalFormat("#.##").format(parry);
-    String total = new DecimalFormat("#.##").format(player.parryCapacity);
-    int lives = (int) Math.max(Math.ceil(parry / Enemy.DAMAGE), 1);
-    canvas.begin();
-    canvas.draw(parryMeter, Color.WHITE, 0, parryMeterHeight,
-                uiPos.x, uiPos.y, parryMeterWidth, parryMeterHeight);
-    canvas.drawText(resource + "/" + total, displayFont, Color.BLACK,
-                    uiPos.x + 4.5f * DRAW_OFFSET, uiPos.y - 2.2f * DRAW_OFFSET);
-    if (player.isAlive()) {
-      for (int i = 0; i < lives; i++) {
-        canvas.drawText("o", displayFont, Color.RED,
-          uiPos.x + parryMeterWidth - (2.6f + i) * DRAW_OFFSET, uiPos.y - 2.2f * DRAW_OFFSET);
-      }
+    if (paused) {
+      canvas.begin();
+      canvas.drawBackground(pauseOverlay,
+                            Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+      canvas.end();
+      
+      pauseStage.draw();
     }
-    // end temp code
-    canvas.end();
 
     if (devMode) {
       float xOffset = uiPos.x;
-      float yOffset = uiPos.y - parryMeterHeight - DRAW_OFFSET;
-      float deltaOffset = 2 * DRAW_OFFSET;
+      float yOffset = uiPos.y - DEV_DRAW_OFFSET;
+      float deltaOffset = 2 * DEV_DRAW_OFFSET;
       canvas.begin();
       // drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,
       //          xOffset, yOffset);
@@ -419,10 +536,6 @@ public class GameMode implements Screen {
                xOffset, yOffset - 5 * deltaOffset);
       drawText(7, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
                xOffset, yOffset - 6 * deltaOffset);
-      drawText(8, "Parry Capacity", Player.parryCapacity, Player.PARRY_CAPACITY,
-               xOffset, yOffset - 7 * deltaOffset);
-      drawText(9, "Parry Gain", Player.parryGain, Player.PARRY_GAIN,
-               xOffset, yOffset - 8 * deltaOffset);
       drawText(0, "Enemy Damage", Enemy.damage, Enemy.DAMAGE,
         xOffset, yOffset - 9 * deltaOffset);
       canvas.end();
@@ -456,7 +569,7 @@ public class GameMode implements Screen {
     }
     String text =
       "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
-    canvas.drawText(text, displayFont, color, x, y);
+    canvas.drawText(text, devModeFont, color, x, y);
   }
 
   @Override
@@ -465,6 +578,22 @@ public class GameMode implements Screen {
       update(delta);
       draw();
     }
+  }
+
+  /**
+   * Pauses the game.
+   */
+  private void pauseGame() {
+    Gdx.input.setInputProcessor(pauseStage);
+    paused = true;
+  }
+
+  /**
+   * Resumes the game.
+   */
+  private void resumeGame() {
+    Gdx.input.setInputProcessor(null);
+    paused = false;
   }
 
   @Override
@@ -479,15 +608,23 @@ public class GameMode implements Screen {
   @Override
   public void show() {
     active = true;
+    if (level != null) {
+      level.activatePhysics(world);
+    }
   }
 
   @Override
   public void hide() {
     active = false;
+    paused = false;
+    if (level != null) {
+      level.deactivatePhysics(world);
+    }
   }
 
   @Override
   public void dispose() {
+    pauseStage.dispose();
     if (world != null) {
       world.dispose();
     }

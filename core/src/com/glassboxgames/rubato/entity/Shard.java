@@ -98,10 +98,10 @@ public class Shard extends Entity {
   @Override
   public void draw(GameCanvas canvas) {
     Texture texture = getState().getTexture(getCount());
-    float w = texture.getWidth() / Constants.PPM;
-    float h = texture.getHeight() / Constants.PPM;
-    temp.set(1, 1).setLength(SHARD_DIST).setAngleRad(getAngle());
-    Vector2 pos = getPosition();
+    float w = texture.getWidth();
+    float h = texture.getHeight();
+    temp.set(1, 1).setLength(SHARD_DIST * Shared.PPM).setAngleRad(getAngle());
+    Vector2 pos = getPosition().scl(Shared.PPM);
     canvas.draw(texture, Color.WHITE,
                 0, h / 2,
                 temp.x + pos.x, temp.y + pos.y,

@@ -99,7 +99,6 @@ public class CollisionController implements ContactListener {
   private void attack(Player player, Enemy enemy) {
     ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
     if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
-      player.changeParry(Player.parryGain);
       enemy.lowerHealth(Player.ATTACK_DAMAGE);
     }
   }
@@ -124,7 +123,7 @@ public class CollisionController implements ContactListener {
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
-        player.changeParry(-Enemy.DAMAGE);
+        player.setAlive(false);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.addUnderfoot(enemy);
