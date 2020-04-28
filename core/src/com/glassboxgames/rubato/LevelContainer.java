@@ -58,9 +58,10 @@ public class LevelContainer {
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
     height = data.height;
-    background = manager.get(Shared.BACKGROUND_PATHS.get(data.background),
-                             Texture.class);
-    player = new Player(data.player.x, data.player.y);
+    background = manager.get(Shared.BACKGROUND_PATHS.get(data.background), Texture.class);
+    if (data.player != null) {
+      player = new Player(data.player.x, data.player.y);
+    }
     enemies = new Array<Enemy>();
     for (EnemyData enemyData : data.enemies) {
       float x = enemyData.x;
@@ -119,7 +120,9 @@ public class LevelContainer {
    * Activates physics for this level.
    */
   public void activatePhysics(World world) {
-    player.activatePhysics(world);
+    if (player != null) {
+      player.activatePhysics(world);
+    }
     for (Enemy enemy : enemies) {
       enemy.activatePhysics(world);
     }
@@ -135,7 +138,9 @@ public class LevelContainer {
    * Deactivates physics for this level.
    */
   public void deactivatePhysics(World world) {
-    player.deactivatePhysics(world);
+    if (player != null) {
+      player.deactivatePhysics(world);
+    }
     for (Enemy enemy : enemies) {
       enemy.deactivatePhysics(world);
     }
@@ -206,7 +211,7 @@ public class LevelContainer {
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
-    if (player.isAlive()) {
+    if (player != null && player.isAlive()) {
       player.draw(canvas);
     }
     canvas.end();
@@ -222,7 +227,7 @@ public class LevelContainer {
       for (Enemy enemy : enemies) {
         enemy.drawPhysics(canvas);
       }
-      if (player.isAlive()) {
+      if (player != null && player.isAlive()) {
         player.drawPhysics(canvas);
       }
       canvas.endDebug();

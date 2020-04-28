@@ -188,9 +188,9 @@ public class InputController {
 
     // TODO: maybe secondary to allow gamepad override
 
-    exitPressed = Gdx.input.isKeyPressed(Input.Keys.ESCAPE);
+    exitPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
-    editPressed = Gdx.input.isKeyPressed(Input.Keys.E);
+    editPressed = Gdx.input.isKeyJustPressed(Input.Keys.E);
     attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.F);
     dashPressed = Gdx.input.isKeyJustPressed(Input.Keys.D);
     jumpPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);

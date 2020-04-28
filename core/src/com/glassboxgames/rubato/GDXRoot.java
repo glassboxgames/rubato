@@ -110,6 +110,8 @@ public class GDXRoot extends Game implements ScreenListener {
         setScreen(playing);
       } else if (exitCode == MainMenu.EXIT_EDITOR) {
         setScreen(editing);
+      } else if (exitCode == MainMenu.EXIT_QUIT) {
+        Gdx.app.exit();
       }
     } else if (screen == playing) {
       if (exitCode == GameMode.EXIT_MENU) {

@@ -98,8 +98,6 @@ public class GameMode implements Screen {
   private BitmapFont pauseLabelFont, pauseSubtextFont;
   /** Font for displaying dev mode options */
   private BitmapFont devModeFont;
-  /** The background image */
-  private Texture background;
   /** Array tracking all loaded assets (for unloading purposes) */
   private Array<String> assets;
 
@@ -120,8 +118,10 @@ public class GameMode implements Screen {
   protected Stage pauseStage;
   /** Pause menu table */
   protected Table pauseTable;
+  /** Pause menu buttons */
+  protected Array<Button> pauseButtons;
   /** Pause menu button group */
-  protected HorizontalGroup pauseButtons;
+  protected HorizontalGroup pauseButtonGroup;
   /** Pause menu button index */
   protected int pauseIndex;
 
@@ -242,14 +242,15 @@ public class GameMode implements Screen {
     pauseTable.add(new Label("paused", new Label.LabelStyle(pauseLabelFont, Color.WHITE)));
     pauseTable.row();
 
-    pauseButtons = new HorizontalGroup();
+    pauseButtons = new Array<Button>();
+    pauseButtonGroup = new HorizontalGroup();
     addPauseButton("resume", resumeDefault, resumeHighlight);
     addPauseButton("reset", resetDefault, resetHighlight);
     addPauseButton("levels", levelsDefault, levelsHighlight);
     addPauseButton("menu", menuDefault, menuHighlight);
-    pauseButtons.space(50).padTop(50).rowBottom();
+    pauseButtonGroup.space(50).padTop(50).rowBottom();
 
-    pauseTable.add(pauseButtons);
+    pauseTable.add(pauseButtonGroup);
     pauseStage.addActor(pauseTable);
 
     for (State state : states) {
@@ -267,7 +268,8 @@ public class GameMode implements Screen {
     button.row();
     button.add(new Label(text, new Label.LabelStyle(pauseLabelFont, Color.WHITE))).padTop(20);
     button.setWidth(100);
-    pauseButtons.addActor(button);
+    pauseButtonGroup.addActor(button);
+    pauseButtons.add(button);
   }
 
   /**
@@ -316,6 +318,9 @@ public class GameMode implements Screen {
       }
     } else if (gameState == GameState.PLAY) {
       if (paused) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+          paused = false;
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
           switch (pauseIndex) {
           case PAUSE_RESUME:
@@ -332,14 +337,14 @@ public class GameMode implements Screen {
             break;
           }
         }
-        ((Button)pauseButtons.getChild(pauseIndex)).setChecked(false);
-        int n = pauseButtons.getChildren().size;
+        pauseButtons.get(pauseIndex).setChecked(false);
+        int n = pauseButtons.size;
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
           pauseIndex = (pauseIndex + n - 1) % n;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
           pauseIndex = (pauseIndex + 1) % n;
         }
-        ((Button)pauseButtons.getChild(pauseIndex)).setChecked(true);
+        pauseButtons.get(pauseIndex).setChecked(true);
         pauseStage.act(delta);
       } else {
         InputController input = InputController.getInstance();
@@ -401,37 +406,39 @@ public class GameMode implements Screen {
         }
 
         Player player = level.getPlayer();
-        if (player.isAlive()) {
-          Vector2 pos = player.getPosition();
-          if (pos.x >= level.getWidth() + X_BOUND) {
-            listener.exitScreen(this, EXIT_COMPLETE);
-            return;
-          }
-          if (pos.x < -X_BOUND || pos.y < -Y_BOUND) {
-            listener.exitScreen(this, EXIT_RESET);
-            return;
-          }
+        if (player != null) {
+          if (player.isAlive()) {
+            Vector2 pos = player.getPosition();
+            if (pos.x >= level.getWidth() + X_BOUND) {
+              listener.exitScreen(this, EXIT_COMPLETE);
+              return;
+            }
+            if (pos.x < -X_BOUND || pos.y < -Y_BOUND) {
+              listener.exitScreen(this, EXIT_RESET);
+              return;
+            }
 
-          player.setInputVector(input.getHorizontal(), input.getVertical());
-          player.tryFace();
-          player.tryCling();
-          if (input.didJump()) {
-            player.tryJump();
-          } else if (input.didHoldJump()) {
-            player.tryExtendJump();
-          }
-          if (input.didDash()) {
-            player.tryDash();
-          }
-          if (input.didAttack()) {
-            player.tryAttack();
-          }
+            player.setInputVector(input.getHorizontal(), input.getVertical());
+            player.tryFace();
+            player.tryCling();
+            if (input.didJump()) {
+              player.tryJump();
+            } else if (input.didHoldJump()) {
+              player.tryExtendJump();
+            }
+            if (input.didDash()) {
+              player.tryDash();
+            }
+            if (input.didAttack()) {
+              player.tryAttack();
+            }
 
-          player.update(delta);
-        } else {
-          player.deactivatePhysics(world);
+            player.update(delta);
+          } else {
+            player.deactivatePhysics(world);
+          }
         }
-
+        
         Array<Enemy> enemies = level.getEnemies();
         Array<Enemy> removedEnemies = new Array<Enemy>();
         Array<Enemy> addedEnemies = new Array<Enemy>();
@@ -466,7 +473,7 @@ public class GameMode implements Screen {
         }
         platforms.removeAll(removedPlatforms, true);
 
-        if (player.isAlive()) {
+        if (player != null && player.isAlive()) {
           player.sync();
         }
         for (Enemy enemy : level.getEnemies()) {
@@ -496,7 +503,7 @@ public class GameMode implements Screen {
     }
 
     Player player = level.getPlayer();
-    if (player.isAlive()) {
+    if (player != null && player.isAlive()) {
       Vector2 pos = player.getPosition().scl(Shared.SCALED_PPM);
       float width = level.getWidth() * Shared.SCALED_PPM;
       float height = level.getHeight() * Shared.SCALED_PPM;

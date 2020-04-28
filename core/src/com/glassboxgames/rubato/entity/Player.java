@@ -358,6 +358,7 @@ public class Player extends Entity {
       if (input.isZero()) {
         dashDir.set(getDirection(), 0f);
       } else {
+        setDirection((int)Math.signum(input.x));
         dashDir.set(input);
       }
       break;

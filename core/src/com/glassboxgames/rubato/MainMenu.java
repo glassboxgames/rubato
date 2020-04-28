@@ -21,6 +21,8 @@ public class MainMenu implements Screen {
   public static final int EXIT_PLAY = 0;
   /** Exit code for editor screen */
   public static final int EXIT_EDITOR = 1;
+  /** Exit code to quit */
+  public static final int EXIT_QUIT = 2;
 
   /** Asset paths */
   protected static final String HIGHLIGHT_FILE =
@@ -145,6 +147,7 @@ public class MainMenu implements Screen {
 
     addMenuOption(EXIT_PLAY, "play");
     addMenuOption(EXIT_EDITOR, "editor");
+    addMenuOption(EXIT_QUIT, "quit");
 
     HorizontalGroup title = new HorizontalGroup();
     title.addActor(new Label("rubat", new Label.LabelStyle(titleFont, Color.WHITE)));
@@ -173,7 +176,7 @@ public class MainMenu implements Screen {
   public void render(float delta) {
     if (active) {
       if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-        Gdx.app.exit();
+        listener.exitScreen(this, EXIT_QUIT);
         return;
       }
       if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
