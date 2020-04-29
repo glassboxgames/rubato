@@ -2,6 +2,7 @@
   {
     "key": "forest",
     "maps": [
+      "Levels/Forest/Jackie/1.json",
       "Levels/Forest/Ben/1.json",
       "Levels/Forest/Ben/2.json",
       "Levels/Forest/Jackie/2.json",
