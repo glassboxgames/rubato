@@ -1,0 +1,10 @@
+[
+  {
+    "file": "tb_desert.png",
+    "sensors": {},
+    "hitboxes": [],
+    "hurtboxes": [
+      [0, 0, 0.77, 0.67, 0],
+    ],
+  },
+]

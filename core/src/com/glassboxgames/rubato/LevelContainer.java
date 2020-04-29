@@ -105,6 +105,18 @@ public class LevelContainer {
       case "right_spikes":
         type = Platform.TYPE_RIGHT_SPIKES;
         break;
+      case "plains_pf":
+        type = Platform.TYPE_PLAINS;
+        break;
+      case "forest_pf":
+        type = Platform.TYPE_FOREST;
+        break;
+      case "mountain_pf":
+        type = Platform.TYPE_MOUNTAIN;
+        break;
+      case "desert_pf":
+        type = Platform.TYPE_DESERT;
+        break;
       default:
         Gdx.app.error("LevelContainer", "Found unregistered platform type: " + platformData.type, new RuntimeException());
       }

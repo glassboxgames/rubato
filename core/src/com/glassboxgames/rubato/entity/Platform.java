@@ -16,6 +16,11 @@ public class Platform extends Entity {
   public static final int TYPE_TOP_SPIKES = 3;
   public static final int TYPE_RIGHT_SPIKES = 4;
   public static final int TYPE_CRUMBLING = 5;
+  public static final int TYPE_PLAINS = 6;
+  public static final int TYPE_FOREST = 7;
+  public static final int TYPE_MOUNTAIN = 8;
+  public static final int TYPE_DESERT = 9;
+
   
   /** Number of frames for a crumbling block to crumble */
   public static final int CRUMBLING_TIME = 60;

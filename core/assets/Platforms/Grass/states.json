@@ -23,4 +23,20 @@
     "path": "Crumbling/",
     "loop": false,
   },
+  {
+    "path": "Plains/",
+    "loop": false,
+  },
+  {
+    "path": "Forest/",
+    "loop": false,
+  },
+  {
+    "path": "Mountain/",
+    "loop": false,
+  },
+  {
+    "path": "Desert/",
+    "loop": false,
+  },
 ]

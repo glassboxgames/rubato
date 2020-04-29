@@ -98,6 +98,7 @@ public class EditorMode implements Screen {
     String[] keys = new String[] {
       "player", "checkpoint", "simple", "crumbling",
       "bottom_spikes", "left_spikes", "top_spikes", "right_spikes",
+      "plains_pf", "forest_pf", "mountain_pf", "desert_pf",
       "spider", "wisp", "wyrm", "blob",
     };
     int buttonSize = 50;
@@ -232,7 +233,6 @@ public class EditorMode implements Screen {
   /**
    * Loads the level from the given file.
    * @param data level data
-   * @param manager asset manager to use
    */
   public void loadLevel(LevelData data) {
     clear();
@@ -323,6 +323,10 @@ public class EditorMode implements Screen {
       case "left_spikes":
       case "top_spikes":
       case "right_spikes":
+      case "plains_pf":
+      case "forest_pf":
+      case "mountain_pf":
+      case "desert_pf":
         {
           for (ImageButton button : levelMap.get(key)) {
             PlatformData platform = new PlatformData();
