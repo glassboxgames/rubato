@@ -1,7 +1,7 @@
 {
 "width": 30,
 "height": 10,
-"background": "mountains",
+"chapter": "forest",
 "player": {
 	"x": 1.175,
 	"y": 3.185

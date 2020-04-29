@@ -58,10 +58,8 @@ public class LevelContainer {
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
     height = data.height;
-    background = manager.get(Shared.BACKGROUND_PATHS.get(data.background), Texture.class);
-    if (data.player != null) {
-      player = new Player(data.player.x, data.player.y);
-    }
+    background = Shared.TEXTURE_MAP.get(data.chapter);
+    player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
     for (EnemyData enemyData : data.enemies) {
       float x = enemyData.x;
@@ -114,45 +112,35 @@ public class LevelContainer {
         platforms.add(new Platform(platformData.x, platformData.y, type));
       }
     }
-    if (data.checkpoint != null) {
-      checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
-    }
+    checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
   }
 
   /**
    * Activates physics for this level.
    */
   public void activatePhysics(World world) {
-    if (player != null) {
-      player.activatePhysics(world);
-    }
+    player.activatePhysics(world);
     for (Enemy enemy : enemies) {
       enemy.activatePhysics(world);
     }
     for (Platform platform : platforms) {
       platform.activatePhysics(world);
     }
-    if (checkpoint != null) {
-      checkpoint.activatePhysics(world);
-    }
+    checkpoint.activatePhysics(world);
   }
 
   /**
    * Deactivates physics for this level.
    */
   public void deactivatePhysics(World world) {
-    if (player != null) {
-      player.deactivatePhysics(world);
-    }
+    player.deactivatePhysics(world);
     for (Enemy enemy : enemies) {
       enemy.deactivatePhysics(world);
     }
     for (Platform platform : platforms) {
       platform.deactivatePhysics(world);
     }
-    if (checkpoint != null) {
-      checkpoint.deactivatePhysics(world);
-    }
+    checkpoint.deactivatePhysics(world);
   }
 
   /**
@@ -203,34 +191,30 @@ public class LevelContainer {
    * @param debug whether to draw collider shapes
    */
   public void draw(GameCanvas canvas, boolean debug) {
-    canvas.begin(Shared.SCALE, Shared.SCALE);
+    canvas.begin();
     canvas.drawBackground(background, width * Shared.PPM, height * Shared.PPM);
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
-    if (checkpoint != null) {
-      checkpoint.draw(canvas);
-    }
+    checkpoint.draw(canvas);
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
-    if (player != null && player.isAlive()) {
+    if (player.isAlive()) {
       player.draw(canvas);
     }
     canvas.end();
 
     if (debug) {
-      canvas.beginDebug(Shared.SCALE, Shared.SCALE);
+      canvas.beginDebug();
       for (Platform platform : platforms) {
         platform.drawPhysics(canvas);
       }
-      if (checkpoint != null) {
-        checkpoint.drawPhysics(canvas);
-      }
+      checkpoint.drawPhysics(canvas);
       for (Enemy enemy : enemies) {
         enemy.drawPhysics(canvas);
       }
-      if (player != null && player.isAlive()) {
+      if (player.isAlive()) {
         player.drawPhysics(canvas);
       }
       canvas.endDebug();

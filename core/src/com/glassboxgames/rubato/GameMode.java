@@ -102,46 +102,46 @@ public class GameMode implements Screen {
   private Array<String> assets;
 
   /** Canvas on which to draw content */
-  protected GameCanvas canvas;
+  private GameCanvas canvas;
   /** Listener to handle exiting */
-  protected ScreenListener listener;
+  private ScreenListener listener;
   /** Current state of the game */
-  protected GameState gameState;
+  private GameState gameState;
   /** Whether this game mode is active */
-  protected boolean active;
+  private boolean active;
   /** The Box2D world */
-  protected World world;
+  private World world;
 
   /** Whether this game mode is paused */
-  protected boolean paused;
+  private boolean paused;
   /** Pause menu stage */
-  protected Stage pauseStage;
+  private Stage pauseStage;
   /** Pause menu table */
-  protected Table pauseTable;
+  private Table pauseTable;
   /** Pause menu buttons */
-  protected Array<Button> pauseButtons;
+  private Array<Button> pauseButtons;
   /** Pause menu button group */
-  protected HorizontalGroup pauseButtonGroup;
+  private HorizontalGroup pauseButtonGroup;
   /** Pause menu button index */
-  protected int pauseIndex;
+  private int pauseIndex;
 
   /** List of all entity states currently loaded */
-  protected Array<State> states;
+  private Array<State> states;
   /** Current level */
-  protected LevelContainer level;
+  private LevelContainer level;
   /** Position of the camera */
-  protected Vector2 cameraPos;
+  private Vector2 cameraPos;
 
   /** Upper left corner of the visible canvas **/
-  protected Vector2 uiPos;
+  private Vector2 uiPos;
   /** Whether debug mode is on */
-  protected boolean debug;
+  private boolean debug;
   /** Whether dev mode is on */
-  protected boolean devMode;
+  private boolean devMode;
   /** Numerical selector for dev mode */
-  protected int devSelect;
+  private int devSelect;
   /** Whether the current level is editable */
-  protected boolean editable;
+  private boolean editable;
 
   /**
    * Instantiate a GameMode.
@@ -407,37 +407,35 @@ public class GameMode implements Screen {
         }
 
         Player player = level.getPlayer();
-        if (player != null) {
-          if (player.isAlive()) {
-            Vector2 pos = player.getPosition();
-            if (pos.x >= level.getWidth() + X_BOUND) {
-              listener.exitScreen(this, EXIT_COMPLETE);
-              return;
-            }
-            if (pos.x < -X_BOUND || pos.y < -Y_BOUND) {
-              listener.exitScreen(this, EXIT_RESET);
-              return;
-            }
-
-            player.setInputVector(input.getHorizontal(), input.getVertical());
-            player.tryFace();
-            player.tryCling();
-            if (input.didJump()) {
-              player.tryJump();
-            } else if (input.didHoldJump()) {
-              player.tryExtendJump();
-            }
-            if (input.didDash()) {
-              player.tryDash();
-            }
-            if (input.didAttack()) {
-              player.tryAttack();
-            }
-
-            player.update(delta);
-          } else {
-            player.deactivatePhysics(world);
+        if (player.isAlive()) {
+          Vector2 pos = player.getPosition();
+          if (pos.x >= level.getWidth() + X_BOUND) {
+            listener.exitScreen(this, EXIT_COMPLETE);
+            return;
           }
+          if (pos.x < -X_BOUND || pos.y < -Y_BOUND) {
+            listener.exitScreen(this, EXIT_RESET);
+            return;
+          }
+
+          player.setInputVector(input.getHorizontal(), input.getVertical());
+          player.tryFace();
+          player.tryCling();
+          if (input.didJump()) {
+            player.tryJump();
+          } else if (input.didHoldJump()) {
+            player.tryExtendJump();
+          }
+          if (input.didDash()) {
+            player.tryDash();
+          }
+          if (input.didAttack()) {
+            player.tryAttack();
+          }
+
+          player.update(delta);
+        } else {
+          player.deactivatePhysics(world);
         }
         
         Array<Enemy> enemies = level.getEnemies();
@@ -473,8 +471,9 @@ public class GameMode implements Screen {
           }
         }
         platforms.removeAll(removedPlatforms, true);
+        level.getCheckpoint().update(delta);
 
-        if (player != null && player.isAlive()) {
+        if (player.isAlive()) {
           player.sync();
         }
         for (Enemy enemy : level.getEnemies()) {
@@ -483,10 +482,7 @@ public class GameMode implements Screen {
         for (Platform platform : level.getPlatforms()) {
           platform.sync();
         }
-        Checkpoint checkpoint = level.getCheckpoint();
-        if (checkpoint != null) {
-          checkpoint.sync();
-        }
+        level.getCheckpoint().sync();
       
         world.step(1 / 60f, 8, 3);
       }
@@ -504,10 +500,10 @@ public class GameMode implements Screen {
     }
 
     Player player = level.getPlayer();
-    if (player != null && player.isAlive()) {
-      Vector2 pos = player.getPosition().scl(Shared.SCALED_PPM);
-      float width = level.getWidth() * Shared.SCALED_PPM;
-      float height = level.getHeight() * Shared.SCALED_PPM;
+    if (player.isAlive()) {
+      Vector2 pos = player.getPosition().scl(Shared.PPM);
+      float width = level.getWidth() * Shared.PPM;
+      float height = level.getHeight() * Shared.PPM;
       cameraPos.set(pos);
       canvas.moveCamera(cameraPos, width, height);
       uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2, 0, width - canvas.getWidth()) + DEV_DRAW_OFFSET,
@@ -517,9 +513,8 @@ public class GameMode implements Screen {
     level.draw(canvas, debug);
 
     if (paused) {
-      canvas.begin();
-      canvas.drawBackground(pauseOverlay,
-                            Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+      canvas.begin(Shared.PPM, Shared.PPM);
+      canvas.drawBackground(pauseOverlay, level.getWidth(), level.getHeight());
       canvas.end();
       
       pauseStage.draw();
@@ -616,6 +611,7 @@ public class GameMode implements Screen {
   @Override
   public void show() {
     active = true;
+    paused = false;
     if (level != null) {
       level.activatePhysics(world);
     }
@@ -624,7 +620,6 @@ public class GameMode implements Screen {
   @Override
   public void hide() {
     active = false;
-    paused = false;
     if (level != null) {
       level.deactivatePhysics(world);
     }

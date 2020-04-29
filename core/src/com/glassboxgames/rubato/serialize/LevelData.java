@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.*;
 public class LevelData {
   /** Dimensions of the level */
   public float width, height;
-  /** Background path */
-  public String background;
+  /** Chapter name */
+  public String chapter;
   /** Player data */
   public PlayerData player;
   /** Enemy data array */

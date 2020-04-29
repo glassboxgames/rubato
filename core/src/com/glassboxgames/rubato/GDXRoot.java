@@ -19,14 +19,18 @@ public class GDXRoot extends Game implements ScreenListener {
   /** Mode for the main menu */
   private MainMenu mainMenu;
   /** Mode for loading assets */
-  private LoadingMode loading;
+  private LoadingMode loadingMode;
   /** Mode for playing the game */
-  private GameMode playing;
+  private GameMode gameMode;
   /** Mode for editing levels */
-  private EditorMode editing;
+  private EditorMode editorMode;
+  /** Mode for selecting level */
+  private SelectMode selectMode;
+  /** Mode for settings screen */
+  private SettingsMode settingsMode;
 
-  /** Current chapter key */
-  private String chapter;
+  /** Current chapter index */
+  private int chapterIndex;
   /** Current level index */
   private int levelIndex;
   /** Current level data */
@@ -44,46 +48,53 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void create() {
-    canvas = new GameCanvas();
-    loading = new LoadingMode(canvas, manager, this);
-    mainMenu = new MainMenu(this);
-    playing = new GameMode(canvas, this);
-    editing = new EditorMode(this);
-    mainMenu.preloadContent(manager);
-    playing.preloadContent(manager);
-    editing.preloadContent(manager);
-    for (String path : Shared.BACKGROUND_PATHS.values()) {
+    for (String path : Shared.TEXTURE_PATHS.values()) {
       manager.load(path, Texture.class);
     }
-    chapter = "forest";
-    setScreen(loading);
+    canvas = new GameCanvas();
+    loadingMode = new LoadingMode(canvas, manager, this);
+    mainMenu = new MainMenu(this);
+    gameMode = new GameMode(canvas, this);
+    editorMode = new EditorMode(this);
+    selectMode = new SelectMode(this);
+    settingsMode = new SettingsMode(this);
+    mainMenu.preloadContent(manager);
+    gameMode.preloadContent(manager);
+    editorMode.preloadContent(manager);
+    selectMode.preloadContent(manager);
+    settingsMode.preloadContent(manager);
+    setScreen(loadingMode);
   }
 
   @Override
   public void resize(int width, int height) {
     canvas.resize();
     mainMenu.resize(width, height);
-    playing.resize(width, height);
-    editing.resize(width, height);
+    gameMode.resize(width, height);
+    editorMode.resize(width, height);
     super.resize(width, height);
   }
 
   @Override
   public void dispose() {
-    mainMenu.unloadContent(manager);
-    editing.unloadContent(manager);
-    playing.unloadContent(manager);
-    mainMenu.dispose();
-    editing.dispose();
-    playing.dispose();
-    setScreen(null);
-    canvas.dispose();
-    canvas = null;
-    for (String path : Shared.BACKGROUND_PATHS.values()) {
+    for (String path : Shared.TEXTURE_PATHS.values()) {
       if (manager.isLoaded(path)) {
         manager.unload(path);
       }
     }
+    mainMenu.unloadContent(manager);
+    editorMode.unloadContent(manager);
+    gameMode.unloadContent(manager);
+    selectMode.unloadContent(manager);
+    settingsMode.unloadContent(manager);
+    mainMenu.dispose();
+    editorMode.dispose();
+    gameMode.dispose();
+    selectMode.dispose();
+    settingsMode.dispose();
+    setScreen(null);
+    canvas.dispose();
+    canvas = null;
     manager.clear();
     manager.dispose();
     super.dispose();
@@ -91,12 +102,17 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void exitScreen(Screen screen, int exitCode) {
-    Array<LevelData> levels = Shared.CHAPTER_LEVELS.get(chapter);
-    if (screen == loading) {
+    Array<LevelData> levels = Shared.CHAPTER_LEVELS.get(chapterIndex);
+    if (screen == loadingMode) {
       if (exitCode == LoadingMode.EXIT_DONE) {
+        for (String key : Shared.TEXTURE_PATHS.keys()) {
+          Shared.TEXTURE_MAP.put(key, manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class));
+        }
         mainMenu.loadContent(manager);
-        playing.loadContent(manager);
-        editing.loadContent(manager);
+        gameMode.loadContent(manager);
+        editorMode.loadContent(manager);
+        selectMode.loadContent(manager);
+        settingsMode.loadContent(manager);
         setScreen(mainMenu);
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,
@@ -105,20 +121,29 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
-        level = levels.get(levelIndex);
-        playing.initLevel(level, manager, false);
-        setScreen(playing);
+        setScreen(selectMode);
       } else if (exitCode == MainMenu.EXIT_EDITOR) {
-        setScreen(editing);
+        setScreen(editorMode);
+      } else if (exitCode == MainMenu.EXIT_SETTINGS) {
+        setScreen(settingsMode);
       } else if (exitCode == MainMenu.EXIT_QUIT) {
         Gdx.app.exit();
       }
-    } else if (screen == playing) {
+    } else if (screen == selectMode) {
+      if (exitCode == SelectMode.EXIT_MENU) {
+        setScreen(mainMenu);
+      } else if (exitCode == SelectMode.EXIT_PLAY) {
+        chapterIndex = selectMode.getChapter();
+        levelIndex = selectMode.getLevel();
+        level = Shared.CHAPTER_LEVELS.get(chapterIndex).get(levelIndex);
+        gameMode.initLevel(level, manager, false);
+        setScreen(gameMode);
+      }
+    } else if (screen == gameMode) {
       if (exitCode == GameMode.EXIT_MENU) {
         setScreen(mainMenu);
       } else if (exitCode == GameMode.EXIT_LEVELS) {
-        // TODO add level selector
-        setScreen(mainMenu);
+        setScreen(selectMode);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
         // TODO add chapter advance
         levelIndex++;
@@ -128,25 +153,42 @@ public class GDXRoot extends Game implements ScreenListener {
           setScreen(mainMenu);
         } else {
           level = levels.get(levelIndex);
-          playing.initLevel(level, manager, false);
+          gameMode.initLevel(level, manager, false);
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
-        playing.initLevel(level, manager, playing.isEditable());
-        setScreen(playing);
+        gameMode.initLevel(level, manager, gameMode.isEditable());
+        setScreen(gameMode);
       } else if (exitCode == GameMode.EXIT_EDIT) {
-        setScreen(editing);
+        setScreen(editorMode);
       } else {
         Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode,
                       new RuntimeException());
         Gdx.app.exit();
       }
-    } else if (screen == editing) {
+    } else if (screen == editorMode) {
       if (exitCode == EditorMode.EXIT_MENU) {
         setScreen(mainMenu);
       } else if (exitCode == EditorMode.EXIT_TEST) {
-        level = editing.exportLevel();
-        playing.initLevel(level, manager, true);
-        setScreen(playing);
+        level = editorMode.exportLevel();
+        gameMode.initLevel(level, manager, true);
+        setScreen(gameMode);
+      } else {
+        Gdx.app.exit();
+      }
+    } else if (screen == selectMode) {
+      if (exitCode == SelectMode.EXIT_MENU) {
+        setScreen(mainMenu);
+      } else if (exitCode == SelectMode.EXIT_PLAY) {
+        // TODO: convert pillar index into level index
+        // levelIndex = selectMode.getSelectedCheckpoint();
+        setScreen(gameMode);
+      } else {
+        Gdx.app.exit();
+      }
+    }
+    else if (screen == settingsMode) {
+      if (exitCode == SelectMode.EXIT_MENU) {
+        setScreen(mainMenu);
       } else {
         Gdx.app.exit();
       }

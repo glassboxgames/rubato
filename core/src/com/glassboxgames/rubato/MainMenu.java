@@ -21,8 +21,10 @@ public class MainMenu implements Screen {
   public static final int EXIT_PLAY = 0;
   /** Exit code for editor screen */
   public static final int EXIT_EDITOR = 1;
+  /** Exit code for settings screen */
+  public static final int EXIT_SETTINGS = 2;
   /** Exit code to quit */
-  public static final int EXIT_QUIT = 2;
+  public static final int EXIT_QUIT = 3;
 
   /** Asset paths */
   protected static final String HIGHLIGHT_FILE =
@@ -76,7 +78,6 @@ public class MainMenu implements Screen {
     stage = new Stage();
     table = new Table();
     stage.addActor(table);
-    Gdx.input.setInputProcessor(stage);
     buttons = new Array<TextButton>();
   }
 
@@ -147,6 +148,7 @@ public class MainMenu implements Screen {
 
     addMenuOption(EXIT_PLAY, "play");
     addMenuOption(EXIT_EDITOR, "editor");
+    addMenuOption(EXIT_SETTINGS, "settings");
     addMenuOption(EXIT_QUIT, "quit");
 
     HorizontalGroup title = new HorizontalGroup();
@@ -212,11 +214,13 @@ public class MainMenu implements Screen {
   @Override
   public void show() {
     active = true;
+    Gdx.input.setInputProcessor(stage);
   }
 
   @Override
   public void hide() {
     active = false;
+    Gdx.input.setInputProcessor(null);
   }
 
   @Override

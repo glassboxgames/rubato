@@ -1,6 +1,7 @@
 package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.serialize.*;
@@ -10,11 +11,7 @@ import com.glassboxgames.rubato.serialize.*;
  */
 public final class Shared {
   /** Screen pixels per Box2D meter */
-  public static final float PPM = 100f;
-  /** Final scaling factor */
-  public static final float SCALE = 0.75f;
-  /** Final scaled PPM */
-  public static final float SCALED_PPM = PPM * SCALE;
+  public static final float PPM = 75f;
 
   /** Bold font file path */
   public static final String BOLD_FONT_FILE = "Fonts/Rajdhani-Bold.ttf";
@@ -25,21 +22,31 @@ public final class Shared {
   /** Default font spacing */
   public static final int DEFAULT_FONT_SPACING = 8;
 
+  /** Chapter constants */
+  public static final int CHAPTER_FOREST = 0;
+  public static final int CHAPTER_PLAINS = 1;
+  public static final int CHAPTER_DESERT = 2;
+  public static final int CHAPTER_MOUNTAINS = 3;
+  public static final Array<String> CHAPTER_NAMES = new Array<String>();
+
   /** JSON serializer/deserializer */
   public static final Json JSON = new Json();
   /** Path to chapters */
-  public static final String CHAPTERS_FILE = "Config/chapters.json";
+  public static final String CHAPTERS_FILE = "Data/chapters.json";
 
-  /** Map of chapter names to background paths */
-  public static final ObjectMap<String, String> BACKGROUND_PATHS =
-    new ObjectMap<String, String>();
-  /** Map of chapter names to level data arrays */
-  public static final ObjectMap<String, Array<LevelData>> CHAPTER_LEVELS =
-    new ObjectMap<String, Array<LevelData>>();
+  /** File containing the texture shortname map */
+  public static final String TEXTURE_MAP_FILE = "Data/textures.json";
+  /** Map of texture shortnames to file paths */
+  public static final ObjectMap<String, String> TEXTURE_PATHS =
+    JSON.fromJson(ObjectMap.class, Gdx.files.internal(TEXTURE_MAP_FILE));
+  /** Map of texture shortnames to textures */
+  public static final ObjectMap<String, Texture> TEXTURE_MAP =
+    new ObjectMap<String, Texture>();
+  /** Array of level data arrays, ordered by chapter */
+  public static final Array<Array<LevelData>> CHAPTER_LEVELS = new Array<Array<LevelData>>();
 
   static {
     JSON.setOutputType(JsonWriter.OutputType.json);
-
     Array<ChapterData> chapters = JSON.fromJson(Array.class, ChapterData.class,
                                                 Gdx.files.internal(CHAPTERS_FILE));
     for (ChapterData chapter : chapters) {
@@ -47,8 +54,8 @@ public final class Shared {
       for (String mapPath : chapter.maps) {
         maps.add(JSON.fromJson(LevelData.class, Gdx.files.internal(mapPath)));
       }
-      CHAPTER_LEVELS.put(chapter.key, maps);
-      BACKGROUND_PATHS.put(chapter.key, chapter.background);
+      CHAPTER_NAMES.add(chapter.key);
+      CHAPTER_LEVELS.add(maps);
     }
   }
 

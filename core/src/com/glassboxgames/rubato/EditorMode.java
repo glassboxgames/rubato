@@ -24,53 +24,45 @@ public class EditorMode implements Screen {
   /** Exit code for playtesting */
   public static final int EXIT_TEST = 1;
 
-  /** Default editor background */
-  protected static final String DEFAULT_BACKGROUND = "forest";
   /** Default level width */
-  protected static final float DEFAULT_WIDTH = 30f;
+  private static final float DEFAULT_WIDTH = 30f;
   /** Default level height */
-  protected static final float DEFAULT_HEIGHT = 10f;
-  
-  /** Editor image path file */
-  protected static final String EDITOR_FILE = "Config/editor.json";
-  /** UI font file */
-  protected static final String FONT_FILE = "Fonts/Rajdhani-Regular.ttf";
-  /** UI font size */
-  protected static final int FONT_SIZE = 18;
-  /** Map movement speed */
-  protected static final int MAP_MOVE_SPEED = 15;
+  private static final float DEFAULT_HEIGHT = 10f;
   /** Ghost grid size */
-  protected static final int GRID_SIZE = 10;
+  private static final int GRID_SIZE = 10;
+
+  /** UI font key */
+  private static final String FONT = "level_editor_font.ttf";
+  /** UI font size */
+  private static final int FONT_SIZE = 18;
+  /** Map movement speed */
+  private static final int MAP_MOVE_SPEED = 15;
 
   /** Listener for exit events */
-  protected ScreenListener listener;
+  private ScreenListener listener;
   /** Font for the UI */
-  protected BitmapFont font;
+  private BitmapFont font;
   /** Whether this mode is active */
-  protected boolean active;
+  private boolean active;
   /** Stage for the level */
-  protected Stage levelStage;
+  private Stage levelStage;
   /** Stage for the editor UI */
-  protected Stage uiStage;
+  private Stage uiStage;
   /** Input processor for the editor */
-  protected InputProcessor inputProcessor;
+  private InputProcessor inputProcessor;
 
-  /** Texture path map */
-  protected ObjectMap<String, String> pathMap;
-  /** Texture map */
-  protected ObjectMap<String, Texture> textureMap;
   /** Button map for the UI */
-  protected ObjectMap<String, ImageButton> uiMap;
+  private ObjectMap<String, ImageButton> uiMap;
   /** Current ghost button */
-  protected ImageButton ghost;
+  private ImageButton ghost;
   /** Button map for the level */
-  protected ObjectMap<String, Array<ImageButton>> levelMap;
+  private ObjectMap<String, Array<ImageButton>> levelMap;
   /** Array tracking loaded assets */
-  protected Array<String> assets = new Array<String>();
-  /** Background key */
-  protected String background = DEFAULT_BACKGROUND;
+  private Array<String> assets = new Array<String>();
+  /** Current chapter name */
+  private String chapterName;
   /** Dimensions of the current level */
-  protected float width, height;
+  private float width, height;
   
   /**
    * Instantiates the editor mode controller.
@@ -82,37 +74,26 @@ public class EditorMode implements Screen {
     uiStage = new Stage();
     levelStage = new Stage();
     inputProcessor = new InputMultiplexer(uiStage, levelStage);
-    textureMap = new ObjectMap<String, Texture>();
-    pathMap = Shared.JSON.fromJson(ObjectMap.class, Gdx.files.internal(EDITOR_FILE));
-    pathMap.putAll(Shared.BACKGROUND_PATHS);
     uiMap = new ObjectMap<String, ImageButton>();
     levelMap = new ObjectMap<String, Array<ImageButton>>();
+    chapterName = Shared.CHAPTER_NAMES.get(Shared.CHAPTER_FOREST);
+    width = DEFAULT_WIDTH;
+    height = DEFAULT_HEIGHT;
   }
 
   /**
    * Preloads the assets for the level editor with the given manager.
    */
   public void preloadContent(AssetManager manager) {
-    FreetypeFontLoader.FreeTypeFontLoaderParameter size2Params =
-      new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-    size2Params.fontFileName = FONT_FILE;
-    size2Params.fontParameters.size = FONT_SIZE;
-    manager.load(FONT_FILE, BitmapFont.class, size2Params);
-    assets.add(FONT_FILE);
-    for (String path : pathMap.values()) {
-      manager.load(path, Texture.class);
-      assets.add(path);
-    }
+    manager.load(FONT, BitmapFont.class, Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE, FONT_SIZE));
+    assets.add(FONT);
   }
 
   /**
    * Loads the assets for the level editor with the given manager.
    */
   public void loadContent(AssetManager manager) {
-    font = manager.get(FONT_FILE, BitmapFont.class);
-    for (String key : pathMap.keys()) {
-      textureMap.put(key, manager.get(pathMap.get(key), Texture.class));
-    }
+    font = manager.get(FONT, BitmapFont.class);
 
     String[] keys = new String[] {
       "player", "checkpoint", "simple", "crumbling",
@@ -127,11 +108,9 @@ public class EditorMode implements Screen {
                      Gdx.graphics.getHeight() - buttonSize - buttonSpacing,
                      buttonSize, buttonSize);
     }
-    width = DEFAULT_WIDTH * Shared.SCALED_PPM;
-    height = DEFAULT_HEIGHT * Shared.SCALED_PPM;
-    Image img = new Image(textureMap.get(background));
-    img.setWidth(width);
-    img.setHeight(height);
+    Image img = new Image(Shared.TEXTURE_MAP.get(chapterName));
+    img.setWidth(width * Shared.PPM);
+    img.setHeight(height * Shared.PPM);
     levelStage.addActor(img);
   }
 
@@ -183,7 +162,7 @@ public class EditorMode implements Screen {
    * @param h the button height
    */
   private void createUIButton(final String key, float x, float y, float w, float h) {
-    final ImageButton button = new ImageButton(new TextureRegionDrawable(textureMap.get(key)));
+    final ImageButton button = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key)));
     button.setPosition(x, y);
     button.setWidth(w);
     button.setHeight(h);
@@ -202,8 +181,7 @@ public class EditorMode implements Screen {
    */
   private void createGhostButton(final String key) {
     if (ghost == null) {
-      ghost = new ImageButton(new TextureRegionDrawable(textureMap.get(key)));
-      ghost.getImage().setScale(Shared.SCALE);
+      ghost = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key)));
       ghost.getColor().a = 0.5f;
       ghost.addListener(new ClickListener(Input.Buttons.LEFT) {
         public void clicked(InputEvent event, float x, float y) {
@@ -229,9 +207,8 @@ public class EditorMode implements Screen {
    * @param y the y coordinate
    */
   private void createLevelButton(final String key, float x, float y) {
-    final ImageButton button = new ImageButton(new TextureRegionDrawable(textureMap.get(key)));
+    final ImageButton button = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key)));
     button.setPosition(x - button.getWidth() / 2, y - button.getHeight() / 2);
-    button.getImage().setScale(Shared.SCALE);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent event, float x, float y) {
         createGhostButton(key);
@@ -260,32 +237,32 @@ public class EditorMode implements Screen {
   public void loadLevel(LevelData data) {
     clear();
     
-    width = data.width * Shared.SCALED_PPM;
-    height = data.height * Shared.SCALED_PPM;
-    background = data.background;
-    Image img = new Image(textureMap.get(background));
-    img.setWidth(width);
-    img.setHeight(height);
+    width = data.width;
+    height = data.height;
+    chapterName = data.chapter;
+    Image img = new Image(Shared.TEXTURE_MAP.get(chapterName));
+    img.setWidth(width * Shared.PPM);
+    img.setHeight(height * Shared.PPM);
     levelStage.addActor(img);
     if (data.player != null) {
       createLevelButton("player",
-                        data.player.x * Shared.SCALED_PPM,
-                        data.player.y * Shared.SCALED_PPM);
+                        data.player.x * Shared.PPM,
+                        data.player.y * Shared.PPM);
     }
     for (EnemyData enemyData : data.enemies) {
       createLevelButton(enemyData.type,
-                        enemyData.x * Shared.SCALED_PPM,
-                        enemyData.y * Shared.SCALED_PPM);
+                        enemyData.x * Shared.PPM,
+                        enemyData.y * Shared.PPM);
     }
     for (PlatformData platformData : data.platforms) {
       createLevelButton(platformData.type,
-                        platformData.x * Shared.SCALED_PPM,
-                        platformData.y * Shared.SCALED_PPM);
+                        platformData.x * Shared.PPM,
+                        platformData.y * Shared.PPM);
     }
     if (data.checkpoint != null) {
       createLevelButton("checkpoint",
-                        data.checkpoint.x * Shared.SCALED_PPM,
-                        data.checkpoint.y * Shared.SCALED_PPM);
+                        data.checkpoint.x * Shared.PPM,
+                        data.checkpoint.y * Shared.PPM);
     }
     levelStage.getCamera().position.set(Gdx.graphics.getWidth() / 2,
                                         Gdx.graphics.getHeight() / 2,
@@ -311,9 +288,9 @@ public class EditorMode implements Screen {
    */
   public LevelData exportLevel() {
     LevelData data = new LevelData();
-    data.background = background;
-    data.width = width / Shared.SCALED_PPM;
-    data.height = height / Shared.SCALED_PPM;
+    data.chapter = chapterName;
+    data.width = width;
+    data.height = height;
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
     for (String key : levelMap.keys()) {
@@ -322,8 +299,8 @@ public class EditorMode implements Screen {
         {
           ImageButton button = levelMap.get(key).get(0);
           data.player = new PlayerData();
-          data.player.x = getCenterX(button) / Shared.SCALED_PPM;
-          data.player.y = getCenterY(button) / Shared.SCALED_PPM;
+          data.player.x = getCenterX(button) / Shared.PPM;
+          data.player.y = getCenterY(button) / Shared.PPM;
           break;
         }
       case "spider":
@@ -334,8 +311,8 @@ public class EditorMode implements Screen {
           for (ImageButton button : levelMap.get(key)) {
             EnemyData enemy = new EnemyData();
             enemy.type = key;
-            enemy.x = getCenterX(button) / Shared.SCALED_PPM;
-            enemy.y = getCenterY(button) / Shared.SCALED_PPM;
+            enemy.x = getCenterX(button) / Shared.PPM;
+            enemy.y = getCenterY(button) / Shared.PPM;
             data.enemies.add(enemy);
           }
           break;
@@ -350,8 +327,8 @@ public class EditorMode implements Screen {
           for (ImageButton button : levelMap.get(key)) {
             PlatformData platform = new PlatformData();
             platform.type = key;
-            platform.x = getCenterX(button) / Shared.SCALED_PPM;
-            platform.y = getCenterY(button) / Shared.SCALED_PPM;
+            platform.x = getCenterX(button) / Shared.PPM;
+            platform.y = getCenterY(button) / Shared.PPM;
             data.platforms.add(platform);
           }
           break;
@@ -360,8 +337,8 @@ public class EditorMode implements Screen {
         {
           ImageButton button = levelMap.get(key).get(0);
           data.checkpoint = new CheckpointData();
-          data.checkpoint.x = getCenterX(button) / Shared.SCALED_PPM;
-          data.checkpoint.y = getCenterY(button) / Shared.SCALED_PPM;
+          data.checkpoint.x = getCenterX(button) / Shared.PPM;
+          data.checkpoint.y = getCenterY(button) / Shared.PPM;
           break;
         }
       }
@@ -438,10 +415,10 @@ public class EditorMode implements Screen {
       }
       camera.position.x = MathUtils.clamp(camera.position.x,
                                           screenWidth / 2,
-                                          width - screenWidth / 2);
+                                          width * Shared.PPM - screenWidth / 2);
       camera.position.y = MathUtils.clamp(camera.position.y,
                                           screenHeight / 2,
-                                          height - screenHeight / 2);
+                                          height * Shared.PPM - screenHeight / 2);
       camera.update();
 
       Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
