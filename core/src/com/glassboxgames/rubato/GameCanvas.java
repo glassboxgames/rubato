@@ -745,7 +745,6 @@ public class GameCanvas {
    * @param effect the particle effect to draw
    */
   public void drawParticleEffect(ParticleEffect effect) {
-    System.out.println("drawing effect");
     effect.draw(spriteBatch);
   }
 
