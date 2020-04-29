@@ -26,6 +26,8 @@ public abstract class Entity {
   protected int dir;
   /** Current entity state, represented as an integer */
   protected int stateIndex;
+  /** Initial entity state */
+  protected int initIndex;
   /** Number of frames spent in current state */
   protected float count;
 
@@ -44,7 +46,8 @@ public abstract class Entity {
    */
   public Entity(float x, float y, int i) {
     dir = 1;
-    stateIndex = i;
+    initIndex = i;
+    stateIndex = -1;
     bodyDef = new BodyDef();
     bodyDef.position.set(x, y);
     bodyDef.active = true;
@@ -144,7 +147,7 @@ public abstract class Entity {
    */
   public boolean activatePhysics(World world) {
     body = world.createBody(bodyDef);
-    setState(stateIndex);
+    setState(initIndex);
     return body != null;
   }
 
