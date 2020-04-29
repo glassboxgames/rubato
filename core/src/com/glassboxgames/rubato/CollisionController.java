@@ -1,5 +1,6 @@
 package com.glassboxgames.rubato;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
@@ -7,6 +8,8 @@ import com.glassboxgames.rubato.entity.*;
 public class CollisionController implements ContactListener {
   /** The singleton instance of the collision controller */
   private static CollisionController controller = null;
+
+  SoundController soundController = SoundController.getInstance();
 
   /**
    * Returns the singleton instance of the collision controller.
@@ -100,6 +103,7 @@ public class CollisionController implements ContactListener {
     ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
     if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
       enemy.lowerHealth(Player.ATTACK_DAMAGE);
+      soundController.play(Shared.ATTACK_HIT_SOUND, Shared.ATTACK_HIT_SOUND, false, 0.25f);
     }
   }
   
@@ -124,6 +128,7 @@ public class CollisionController implements ContactListener {
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
         player.setAlive(false);
+        soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.03f);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       if (enemy.isSuspended()) {
@@ -217,7 +222,10 @@ public class CollisionController implements ContactListener {
   private void startCollision(Player player, Entity.Collider playerCollider,
                               Checkpoint checkpoint, Entity.Collider checkpointCollider) {
     if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
-      checkpoint.activate();
+      if (!checkpoint.isActivated()) {
+        checkpoint.activate();
+        soundController.play(Shared.CHECKPOINT_SOUND, Shared.CHECKPOINT_SOUND, false, 0.25f);
+      }
     }
   }
 

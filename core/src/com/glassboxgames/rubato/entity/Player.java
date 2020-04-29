@@ -241,7 +241,14 @@ public class Player extends Entity {
   public boolean isDashing() {
     return stateIndex == STATE_DASH;
   }
-  
+
+  /**
+   * Returns whether the player is running
+   */
+  public boolean isRunning() {
+    return isGrounded() && input.x != 0;
+  }
+
   /**
    * Returns whether the player is attacking.
    */
