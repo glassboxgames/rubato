@@ -1,6 +1,7 @@
 package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
@@ -108,6 +109,10 @@ public class Player extends Entity {
   /** Time shard */
   protected Shard shard;
 
+  /** Particle effects */
+  public ParticleEffect deathEffect;
+  public ParticleEffect dashEffect;
+
   /**
    * Instantiates a player with the given parameters.
    * @param x x-coordinate of center
@@ -131,6 +136,12 @@ public class Player extends Entity {
     alive = true;
     hasDash = false;
     shard = new Shard(x, y);
+
+    deathEffect = new ParticleEffect();
+    deathEffect.load(Gdx.files.internal("Particles/fire.pe"), Gdx.files.internal("Particles"));
+    dashEffect = new ParticleEffect();
+    dashEffect.load(Gdx.files.internal("Particles/dash.pe"), Gdx.files.internal("Particles"));
+    dashEffect.scaleEffect(0.01f);
   }
 
   /**
@@ -177,6 +188,7 @@ public class Player extends Entity {
   public void tryDash() {
     if (hasDash && dashCooldown < 0 && dashTime < 0) {
       setState(STATE_DASH);
+      dashEffect.start();
     }
   }
 
@@ -435,6 +447,12 @@ public class Player extends Entity {
 
   @Override
   public void update(float delta) {
+    dashEffect.update(delta);
+    dashEffect.getEmitters().first().setPosition(getPosition().x, getPosition().y);
+
+    if (!isAlive()) {
+      return;
+    }
     super.update(delta);
     Vector2 vel = new Vector2();
     if (isDashing()) {
@@ -527,9 +545,17 @@ public class Player extends Entity {
 
   @Override
   public void draw(GameCanvas canvas) {
-    super.draw(canvas);
-    if (isAttacking()) {
-      shard.draw(canvas);
+    if (isAlive()) {
+      super.draw(canvas);
+      if (isAttacking()) {
+        shard.draw(canvas);
+      }
+      if (isDashing()) {
+        canvas.drawParticleEffect(dashEffect);
+      }
+    } else {
+      canvas.setShader(Shared.DESAT_SHADER);
     }
+
   }
 }

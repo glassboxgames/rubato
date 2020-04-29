@@ -157,7 +157,6 @@ public class GDXRoot extends Game implements ScreenListener {
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
         gameMode.initLevel(level, manager, gameMode.isEditable());
-        setScreen(gameMode);
       } else if (exitCode == GameMode.EXIT_EDIT) {
         setScreen(editorMode);
       } else {

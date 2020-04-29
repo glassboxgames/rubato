@@ -3,6 +3,7 @@ package com.glassboxgames.rubato;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.serialize.*;
 
@@ -44,6 +45,9 @@ public final class Shared {
     new ObjectMap<String, Texture>();
   /** Array of level data arrays, ordered by chapter */
   public static final Array<Array<LevelData>> CHAPTER_LEVELS = new Array<Array<LevelData>>();
+
+  /** The desaturation shader */
+  public static final ShaderProgram DESAT_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/desat.vsr"), Gdx.files.internal("Shaders/desat.fsr"));
 
   static {
     JSON.setOutputType(JsonWriter.OutputType.json);

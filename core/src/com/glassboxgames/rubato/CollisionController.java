@@ -126,9 +126,13 @@ public class CollisionController implements ContactListener {
         player.setAlive(false);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
-      player.addUnderfoot(enemy);
+      if (enemy.isSuspended()) {
+        player.addUnderfoot(enemy);
+      }
     } else if (playerCollider.isWallSensor() && enemyCollider.isHurtbox()) {
-      player.addAdjacent(enemy);
+      if (enemy.isSuspended()) {
+        player.addAdjacent(enemy);
+      }
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       enemy.setTarget(player.getPosition());
     }

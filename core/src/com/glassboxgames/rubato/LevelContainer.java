@@ -5,6 +5,8 @@ import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
+import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
@@ -28,6 +30,7 @@ public class LevelContainer {
   private Array<Platform> platforms;
   /** The checkpoint in this level (optional) */
   private Checkpoint checkpoint;
+
 
   /**
    * Instantiates a level container with the given parameters.
@@ -53,7 +56,7 @@ public class LevelContainer {
 
   /**
    * Instantiates a LevelContainer from a LevelData object.
-   * @param levelData the level data container
+   * @param data the level data container
    */
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
@@ -203,6 +206,7 @@ public class LevelContainer {
    * @param debug whether to draw collider shapes
    */
   public void draw(GameCanvas canvas, boolean debug) {
+    canvas.removeShader();
     canvas.begin();
     canvas.drawBackground(background, width * Shared.PPM, height * Shared.PPM);
     for (Platform platform : platforms) {

@@ -1,6 +1,6 @@
 [
   {
-    "file": "pillar_off_50w.png",
+    "file": "pillar_off.png",
     "sensors": {
       "center": [0, 0, 0.5, 1.3, 0],
     },

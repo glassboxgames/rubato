@@ -1,10 +1,10 @@
 package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.GameCanvas;
+import com.glassboxgames.rubato.Shared;
 
 /**
  * Abstract class to represent any enemy in Rubato.
@@ -114,5 +114,19 @@ public abstract class Enemy extends Entity {
    */
   public boolean shouldRemove() {
     return remove;
+  }
+
+  /**
+   * Draws the enemy to the canvas
+   */
+  public void draw(GameCanvas canvas) {
+    if(isSuspended()) {
+      ShaderProgram temp = canvas.getShader();
+      canvas.setShader(Shared.DESAT_SHADER);
+      super.draw(canvas);
+      canvas.setShader(temp);
+    } else {
+      super.draw(canvas);
+    }
   }
 }

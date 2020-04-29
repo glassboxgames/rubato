@@ -158,7 +158,6 @@ public class GameMode implements Screen {
     uiPos = new Vector2();
     devSelect = -1;
 
-    // Initialize game world
     world = new World(new Vector2(0, GRAVITY), false);
     world.setContactListener(CollisionController.getInstance());
 
@@ -295,9 +294,13 @@ public class GameMode implements Screen {
    * @param editable whether the level is editable
    */
   public void initLevel(LevelData data, AssetManager manager, boolean editable) {
+    if (level != null) {
+      level.deactivatePhysics(world);
+    }
     level = new LevelContainer(data, manager);
     gameState = GameState.INTRO;
     this.editable = editable;
+    paused = false;
   }
 
   /**
@@ -338,14 +341,15 @@ public class GameMode implements Screen {
             break;
           }
         }
-        pauseButtons.get(pauseIndex).setChecked(false);
         int n = pauseButtons.size;
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
           pauseIndex = (pauseIndex + n - 1) % n;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
           pauseIndex = (pauseIndex + 1) % n;
         }
-        pauseButtons.get(pauseIndex).setChecked(true);
+        for (Button button : pauseButtons) {
+          button.setChecked(button == pauseButtons.get(pauseIndex));
+        }
         pauseStage.act(delta);
       } else {
         InputController input = InputController.getInstance();
@@ -435,7 +439,8 @@ public class GameMode implements Screen {
 
           player.update(delta);
         } else {
-          player.deactivatePhysics(world);
+          listener.exitScreen(this, EXIT_RESET);
+          return;
         }
         
         Array<Enemy> enemies = level.getEnemies();
@@ -495,7 +500,7 @@ public class GameMode implements Screen {
   protected void draw() {
     canvas.clear();
 
-    if (level == null) {
+    if (gameState == GameState.INTRO) {
       return;
     }
 
@@ -589,6 +594,7 @@ public class GameMode implements Screen {
   private void pauseGame() {
     Gdx.input.setInputProcessor(pauseStage);
     paused = true;
+    pauseIndex = 0;
   }
 
   /**
@@ -611,18 +617,11 @@ public class GameMode implements Screen {
   @Override
   public void show() {
     active = true;
-    paused = false;
-    if (level != null) {
-      level.activatePhysics(world);
-    }
   }
 
   @Override
   public void hide() {
     active = false;
-    if (level != null) {
-      level.deactivatePhysics(world);
-    }
   }
 
   @Override
@@ -630,6 +629,7 @@ public class GameMode implements Screen {
     pauseStage.dispose();
     if (world != null) {
       world.dispose();
+      world = null;
     }
     level = null;
   }

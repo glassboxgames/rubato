@@ -359,7 +359,7 @@ public class GameCanvas {
   }
 
   /**
-   * Draws the tinted texture at the given position.
+   * Draws the tinted texture at the given position with the following shader.
    * The texture colors will be multiplied by the given color.  This will turn
    * any white into the given color.  Other colors will be similarly affected.
    * Unless otherwise transformed by the global transform (@see begin(Affine2)),
@@ -738,5 +738,36 @@ public class GameCanvas {
     float h = shape.getRadius() * sy;
     debugRender.setColor(color);
     debugRender.ellipse(x0 - w, y0 - h, 2 * w, 2 * h, 12);
+  }
+
+  /**
+   * Draws a particle effect.
+   * @param effect the particle effect to draw
+   */
+  public void drawParticleEffect(ParticleEffect effect) {
+    System.out.println("drawing effect");
+    effect.draw(spriteBatch);
+  }
+
+  /**
+   * Sets the shader for the sprite batch for the current draw cycle.
+   * @param shader
+   */
+  public void setShader(ShaderProgram shader) {
+    spriteBatch.setShader(shader);
+  }
+
+  /**
+   * Removes the shader for the sprite batch for the current draw cycle.
+   */
+  public void removeShader() {
+      spriteBatch.setShader(null);
+  }
+
+  /**
+   * Returns the current shader of the sprite batch.
+   */
+  public ShaderProgram getShader() {
+    return spriteBatch.getShader();
   }
 }

@@ -1,0 +1,16 @@
+#ifdef GL_ES
+precision mediump float;
+#endif 
+ 
+// varying (shared) inputs
+varying vec4 v_color;
+varying vec2 v_texCoords;
+ 
+// a special uniform for textures 
+uniform sampler2D u_texture;
+ 
+void main() {
+	vec4 color = v_color * texture2D(u_texture, v_texCoords); 
+	color.rgb = vec3(color.r * 0.3 + color.g * 0.59 + color.b * 0.11);
+	gl_FragColor = color;
+}

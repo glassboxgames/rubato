@@ -1,0 +1,26 @@
+{
+"width": 30,
+"height": 10,
+"background": "forest",
+"player": {
+	"x": 3.0933332,
+	"y": 2.9933333
+},
+"enemies": [],
+"platforms": [
+	{
+		"type": "simple",
+		"x": 3.2733333,
+		"y": 2.0466666
+	},
+	{
+		"type": "simple",
+		"x": 4.74,
+		"y": 2.0466666
+	}
+],
+"checkpoint": {
+	"x": 4.72,
+	"y": 2.9933333
+}
+}
