@@ -3,10 +3,16 @@
 "height": 10,
 "chapter": "forest",
 "player": {
-	"x": 0.62,
-	"y": 4.173333
+	"x": 0.22,
+	"y": 4.04
 },
-"enemies": [],
+"enemies": [
+	{
+		"type": "blob",
+		"x": 8.733334,
+		"y": 3.9333334
+	}
+],
 "platforms": [
 	{
 		"type": "plains_pf",
@@ -729,49 +735,39 @@
 		"y": 3.2466667
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 3.18
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 0.44666666
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 2.78
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 0.98
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 2.38
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 1.5133333
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 1.98
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 2.0466666
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 1.58
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 2.58
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 1.18
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 2.8466666
 	},
 	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 0.78
-	},
-	{
-		"type": "left_spikes",
-		"x": 5.4466667,
-		"y": 0.38
-	},
-	{
-		"type": "left_spikes",
-		"x": 5.3133335,
-		"y": 0.11333334
+		"type": "plains_pf",
+		"x": 7.0933332,
+		"y": 3.2466667
 	},
 	{
 		"type": "left_spikes",
@@ -851,51 +847,6 @@
 	{
 		"type": "left_spikes",
 		"x": 15.713333,
-		"y": 0.24666667
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 3.18
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 2.78
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 2.38
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 2.1133332
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 1.7133334
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 1.3133334
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 0.91333336
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
-		"y": 0.5133333
-	},
-	{
-		"type": "right_spikes",
-		"x": 7.0466666,
 		"y": 0.24666667
 	},
 	{
