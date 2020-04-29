@@ -745,13 +745,11 @@ public class GameCanvas {
    * @param effect the particle effect to draw
    */
   public void drawParticleEffect(ParticleEffect effect) {
-    System.out.println("drawing effect");
     effect.draw(spriteBatch);
   }
 
   /**
    * Sets the shader for the sprite batch for the current draw cycle.
-   * @param shader
    */
   public void setShader(ShaderProgram shader) {
     spriteBatch.setShader(shader);
@@ -761,7 +759,7 @@ public class GameCanvas {
    * Removes the shader for the sprite batch for the current draw cycle.
    */
   public void removeShader() {
-      spriteBatch.setShader(null);
+    spriteBatch.setShader(null);
   }
 
   /**

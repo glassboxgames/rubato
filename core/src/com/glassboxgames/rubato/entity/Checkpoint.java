@@ -1,7 +1,8 @@
 package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.*;
@@ -68,9 +69,12 @@ public class Checkpoint extends Entity {
   public void update(float delta) {
     super.update(delta);
     if (activated) {
+      Vector2 pos = getPosition().sub(0.25f, 0.65f).scl(Shared.PPM);
+      for (ParticleEmitter emitter : activeEffect.getEmitters()) {
+        emitter.setPosition(pos.x, pos.y);
+      }
       activeEffect.update(delta);
       if (activeEffect.isComplete()) {
-        activeEffect.scaleEffect(0.01f);
         activeEffect.reset();
       }
     }

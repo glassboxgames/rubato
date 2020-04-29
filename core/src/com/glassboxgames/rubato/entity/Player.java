@@ -1,7 +1,7 @@
 package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.*;
@@ -110,7 +110,6 @@ public class Player extends Entity {
   protected Shard shard;
 
   /** Particle effects */
-  public ParticleEffect deathEffect;
   public ParticleEffect dashEffect;
 
   /**
@@ -137,11 +136,9 @@ public class Player extends Entity {
     hasDash = false;
     shard = new Shard(x, y);
 
-    deathEffect = new ParticleEffect();
-    deathEffect.load(Gdx.files.internal("Particles/fire.pe"), Gdx.files.internal("Particles"));
     dashEffect = new ParticleEffect();
     dashEffect.load(Gdx.files.internal("Particles/dash.pe"), Gdx.files.internal("Particles"));
-    dashEffect.scaleEffect(0.01f);
+    dashEffect.scaleEffect(0.7f);
   }
 
   /**
@@ -382,6 +379,7 @@ public class Player extends Entity {
         }
         dashDir.set(input);
       }
+      dashEffect.start();
       break;
     case STATE_CLING:
       body.setGravityScale(0f);
@@ -454,8 +452,9 @@ public class Player extends Entity {
 
   @Override
   public void update(float delta) {
+    Vector2 pos = getPosition().scl(Shared.PPM);
+    dashEffect.setPosition(pos.x, pos.y);
     dashEffect.update(delta);
-    dashEffect.getEmitters().first().setPosition(getPosition().x, getPosition().y);
 
     if (!isAlive()) {
       return;
@@ -554,11 +553,9 @@ public class Player extends Entity {
   public void draw(GameCanvas canvas) {
     if (isAlive()) {
       super.draw(canvas);
+      canvas.drawParticleEffect(dashEffect);
       if (isAttacking()) {
         shard.draw(canvas);
-      }
-      if (isDashing()) {
-        canvas.drawParticleEffect(dashEffect);
       }
     } else {
       canvas.setShader(Shared.DESAT_SHADER);

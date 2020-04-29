@@ -128,7 +128,7 @@ public class CollisionController implements ContactListener {
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
         player.setAlive(false);
-        soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.03f);
+        // soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.03f);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       if (enemy.isSuspended()) {

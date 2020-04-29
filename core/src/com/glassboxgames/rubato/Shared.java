@@ -49,6 +49,7 @@ public final class Shared {
   /** The desaturation shader */
   public static final ShaderProgram DESAT_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/desat.vsr"), Gdx.files.internal("Shaders/desat.fsr"));
 
+  /** Sound files */
   public static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
   public static final String DASH_SOUND = "Sounds/Dash/Dash.mp3";
   public static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
