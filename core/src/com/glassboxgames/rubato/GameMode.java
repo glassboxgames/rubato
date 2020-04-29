@@ -2,6 +2,7 @@ package com.glassboxgames.rubato;
 
 import java.text.DecimalFormat;
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -28,6 +29,8 @@ public class GameMode implements Screen {
     INTRO,
     /** While we are playing the game */
     PLAY,
+    /** When Adagio has died and in the process of respawning */
+    DEAD,
   }
 
   /** Exit code for returning to the menu */
@@ -77,6 +80,14 @@ public class GameMode implements Screen {
   private static final String LEVELS_HIGHLIGHT_FILE = "User Interface/Buttons/levels_button_highlighted.png";
   private static final String MENU_DEFAULT_FILE = "User Interface/Buttons/menu_button.png";
   private static final String MENU_HIGHLIGHT_FILE = "User Interface/Buttons/menu_button_highlighted.png";
+
+  /** Sound effects */
+  private static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
+  private static final String DASH_SOUND = "Sounds/Dash/Dash.mp3";
+  private static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
+  private static final String CHECKPOINT_SOUND = "Sounds/Environment/Checkpoint.mp3";
+  private static final String ATTACK_HIT_SOUND = "Sounds/Attacking/AttackHit.mp3";
+  private static final String DEATH_SOUND = "Sounds/Death/Death.mp3";
 
   /** Gravity **/
   private static final float GRAVITY = -50f;
@@ -211,6 +222,20 @@ public class GameMode implements Screen {
     manager.load(MENU_HIGHLIGHT_FILE, Texture.class);
     assets.add(MENU_HIGHLIGHT_FILE);
 
+    // Sound Assets
+    manager.load(GRASS_RUN_SOUND, Sound.class);
+    assets.add(GRASS_RUN_SOUND);
+    manager.load(DASH_SOUND, Sound.class);
+    assets.add(DASH_SOUND);
+    manager.load(ATTACK_SWING_SOUND, Sound.class);
+    assets.add(ATTACK_SWING_SOUND);
+    manager.load(ATTACK_HIT_SOUND, Sound.class);
+    assets.add(ATTACK_HIT_SOUND);
+    manager.load(CHECKPOINT_SOUND, Sound.class);
+    assets.add(CHECKPOINT_SOUND);
+    manager.load(DEATH_SOUND, Sound.class);
+    assets.add(DEATH_SOUND);
+
     for (State state : states) {
       state.preloadContent(manager);
     }
@@ -234,6 +259,15 @@ public class GameMode implements Screen {
     levelsHighlight = manager.get(LEVELS_HIGHLIGHT_FILE, Texture.class);
     menuDefault = manager.get(MENU_DEFAULT_FILE, Texture.class);
     menuHighlight = manager.get(MENU_HIGHLIGHT_FILE, Texture.class);
+
+    // Allocate sounds
+    SoundController sounds = SoundController.getInstance();
+    sounds.allocate(manager, GRASS_RUN_SOUND);
+    sounds.allocate(manager, DASH_SOUND);
+    sounds.allocate(manager, ATTACK_SWING_SOUND);
+    sounds.allocate(manager, ATTACK_HIT_SOUND);
+    sounds.allocate(manager, CHECKPOINT_SOUND);
+    sounds.allocate(manager, DEATH_SOUND);
 
     // Initialize pause menu
     pauseStage = new Stage();
@@ -309,7 +343,32 @@ public class GameMode implements Screen {
   public boolean isEditable() {
     return editable;
   }
-  
+
+  /**
+   * Checks if any sound effects need to be played
+   *
+   */
+  protected void updateSound() {
+    SoundController soundController = SoundController.getInstance();
+    Player player = level.getPlayer();
+    if (player.isRunning()) {
+      if (!soundController.isActive(GRASS_RUN_SOUND)) {
+        soundController.play(GRASS_RUN_SOUND, GRASS_RUN_SOUND, true, 0.35f);
+      }
+    } else {
+      if (soundController.isActive(GRASS_RUN_SOUND)) {
+        soundController.stop(GRASS_RUN_SOUND);
+      }
+    }
+    if (player.isDashing()) {
+      soundController.play(DASH_SOUND, DASH_SOUND, false, 0.1f);
+    }
+    if (player.isAttacking()) {
+      soundController.play(ATTACK_SWING_SOUND, ATTACK_SWING_SOUND, false, 0.1f);
+    }
+    soundController.update();
+  }
+
   /**
    * Updates the state of the game.
    * @param delta time in seconds since last frame
@@ -442,7 +501,7 @@ public class GameMode implements Screen {
           listener.exitScreen(this, EXIT_RESET);
           return;
         }
-        
+
         Array<Enemy> enemies = level.getEnemies();
         Array<Enemy> removedEnemies = new Array<Enemy>();
         Array<Enemy> addedEnemies = new Array<Enemy>();
@@ -477,6 +536,7 @@ public class GameMode implements Screen {
         }
         platforms.removeAll(removedPlatforms, true);
         level.getCheckpoint().update(delta);
+        updateSound();
 
         if (player.isAlive()) {
           player.sync();

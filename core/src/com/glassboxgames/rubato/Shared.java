@@ -49,6 +49,13 @@ public final class Shared {
   /** The desaturation shader */
   public static final ShaderProgram DESAT_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/desat.vsr"), Gdx.files.internal("Shaders/desat.fsr"));
 
+  public static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
+  public static final String DASH_SOUND = "Sounds/Dash/Dash.mp3";
+  public static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
+  public static final String CHECKPOINT_SOUND = "Sounds/Environment/Checkpoint.mp3";
+  public static final String ATTACK_HIT_SOUND = "Sounds/Attacking/AttackHit.mp3";
+  public static final String DEATH_SOUND = "Sounds/Death/Death.mp3";
+
   static {
     JSON.setOutputType(JsonWriter.OutputType.json);
     Array<ChapterData> chapters = JSON.fromJson(Array.class, ChapterData.class,

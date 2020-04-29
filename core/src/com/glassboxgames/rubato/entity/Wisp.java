@@ -22,9 +22,9 @@ public class Wisp extends Enemy {
   /** Projectile offset */
   private static final Vector2 PROJECTILE_OFFSET = new Vector2(0.2f, 0.2f);
   /** Projectile velocity */
-  private static final Vector2 PROJECTILE_VELOCITY = new Vector2(3f, 0f);
+  private static final Vector2 PROJECTILE_VELOCITY = new Vector2(4f, 0f);
   /** Projectile life */
-  private static final int PROJECTILE_LIFE = 60;
+  private static final int PROJECTILE_LIFE = 90;
 
   /** Array of spawned projectiles */
   private Array<Enemy> spawned;
@@ -71,7 +71,8 @@ public class Wisp extends Enemy {
     case STATE_ATTACK:
       Vector2 pos = getPosition().add(temp.set(PROJECTILE_OFFSET).scl(getDirection(), 1));
       Vector2 vel = temp.set(PROJECTILE_VELOCITY).scl(getDirection(), 1);
-      spawned.add(new Projectile(pos.x, pos.y, vel, PROJECTILE_LIFE));
+      Projectile proj = new Projectile(pos.x, pos.y, vel, PROJECTILE_LIFE);
+      spawned.add(proj);
       break;
     }
   }
