@@ -117,7 +117,7 @@ public class EditorMode implements Screen {
     String[] keys = new String[] {
       "player", "checkpoint", "simple", "crumbling",
       "bottom_spikes", "left_spikes", "top_spikes", "right_spikes",
-      "spider", "wisp", "wyrm",
+      "spider", "wisp", "wyrm", "blob",
     };
     int buttonSize = 50;
     int buttonSpacing = 20;
@@ -329,6 +329,7 @@ public class EditorMode implements Screen {
       case "spider":
       case "wisp":
       case "wyrm":
+      case "blob":
         {
           for (ImageButton button : levelMap.get(key)) {
             EnemyData enemy = new EnemyData();

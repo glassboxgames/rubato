@@ -172,6 +172,7 @@ public class GameMode implements Screen {
     states.addAll(Spider.initStates());
     states.addAll(Wisp.initStates());
     states.addAll(Wyrm.initStates());
+    states.addAll(Blob.initStates());
   }
 
   /**

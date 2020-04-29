@@ -6,7 +6,13 @@
 	"x": 1.62,
 	"y": 1.345
 },
-"enemies": [],
+"enemies": [
+	{
+		"type": "blob",
+		"x": 5,
+		"y": 4
+	}
+],
 "platforms": [
 	{
 		"type": "simple",

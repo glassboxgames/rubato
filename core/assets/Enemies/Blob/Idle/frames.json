@@ -1,0 +1,12 @@
+[
+  {
+    "file": "blob_enemy50x50.png",
+    "sensors": {},
+    "hitboxes": [
+      [0, 0, 0.35, 0.35, 0]
+    ],
+    "hurtboxes": [
+      [0, 0, 0.35, 0.35, 0]
+    ]
+  }
+]

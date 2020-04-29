@@ -77,6 +77,9 @@ public class LevelContainer {
       case "wyrm":
         enemy = new Wyrm(x, y);
         break;
+      case "blob":
+        enemy = new Blob(x, y);
+        break;
       }
       if (enemy != null) {
         enemies.add(enemy);
