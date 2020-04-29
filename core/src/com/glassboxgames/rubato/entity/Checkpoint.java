@@ -34,7 +34,7 @@ public class Checkpoint extends Entity {
     bodyDef.type = BodyDef.BodyType.StaticBody;
     activeEffect = new ParticleEffect();
     activeEffect.load(Gdx.files.internal("Particles/checkpoint.pe"), Gdx.files.internal("Particles"));
-    activeEffect.scaleEffect(0.01f);
+    activeEffect.scaleEffect(1f);
     // these values are the height and width of the pillar / 2
     activeEffect.getEmitters().first().setPosition(x-0.24f, y-0.64f);
     activeEffect.getEmitters().get(1).setPosition(x-0.24f, y-0.64f);
