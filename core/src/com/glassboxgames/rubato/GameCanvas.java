@@ -54,6 +54,8 @@ public class GameCanvas {
 
   /** Camera for the underlying SpriteBatch */
   private OrthographicCamera camera;
+  /** Vector cache for camera position */
+  private Vector2 cameraPos = new Vector2();
 
   // CACHE OBJECTS
   /** Value to cache window width (if we are currently full screen) */
@@ -339,7 +341,15 @@ public class GameCanvas {
                                         getWidth() / 2, levelWidth - getWidth() / 2);
     camera.position.y = MathUtils.clamp(camera.position.y,
                                         getHeight() / 2, levelHeight - getHeight() / 2);
+    cameraPos.set(camera.position.x, camera.position.y);
     camera.update();
+  }
+
+  /**
+   * Gets the camera position.
+   */
+  public Vector2 getCameraPos() {
+    return cameraPos;
   }
 
   /**

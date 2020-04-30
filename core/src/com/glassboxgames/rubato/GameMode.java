@@ -140,8 +140,6 @@ public class GameMode implements Screen {
   private Array<State> states;
   /** Current level */
   private LevelContainer level;
-  /** Position of the camera */
-  private Vector2 cameraPos;
 
   /** Upper left corner of the visible canvas **/
   private Vector2 uiPos;
@@ -165,7 +163,6 @@ public class GameMode implements Screen {
 
     assets = new Array();
     gameState = GameState.INTRO;
-    cameraPos = new Vector2();
     uiPos = new Vector2();
     devSelect = -1;
 
@@ -566,11 +563,11 @@ public class GameMode implements Screen {
 
     Player player = level.getPlayer();
     if (player.isAlive()) {
-      Vector2 pos = player.getPosition().scl(Shared.PPM);
+      Vector2 delta = player.getPosition().scl(Shared.PPM).sub(canvas.getCameraPos()).scl(0.25f);
       float width = level.getWidth() * Shared.PPM;
       float height = level.getHeight() * Shared.PPM;
-      cameraPos.set(pos);
-      canvas.moveCamera(cameraPos, width, height);
+      canvas.moveCamera(canvas.getCameraPos().add(delta), width, height);
+      Vector2 pos = canvas.getCameraPos();
       uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2, 0, width - canvas.getWidth()) + DEV_DRAW_OFFSET,
                 MathUtils.clamp(pos.y + canvas.getHeight() / 2, canvas.getHeight(), height) - DEV_DRAW_OFFSET);
     }
