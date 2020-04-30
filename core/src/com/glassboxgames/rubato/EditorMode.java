@@ -27,7 +27,7 @@ public class EditorMode implements Screen {
   /** Default level width */
   private static final float DEFAULT_WIDTH = 30f;
   /** Default level height */
-  private static final float DEFAULT_HEIGHT = 10f;
+  private static final float DEFAULT_HEIGHT = 18f;
   /** Ghost grid size */
   private static final int GRID_SIZE = 10;
 
