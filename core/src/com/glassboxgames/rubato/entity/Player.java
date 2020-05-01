@@ -465,6 +465,10 @@ public class Player extends Entity {
       vel.set(dashDir).setLength(dashSpeed);
       dashTime++;
     } else {
+      if (isGrounded()) {
+        hasDash = true;
+      }
+
       if (dashCooldown >= 0) {
         dashCooldown--;
       }
@@ -533,10 +537,6 @@ public class Player extends Entity {
     body.setLinearVelocity(vel);
 
     /* ------- all physics manipulations should be applied before this line! ------- */
-
-    if (isGrounded()) {
-      hasDash = true;
-    }
 
     shard.update(delta, getPosition(), getDirection());
   }
