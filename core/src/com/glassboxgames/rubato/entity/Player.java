@@ -22,7 +22,7 @@ public class Player extends Entity {
   /** Horizontal move damping */
   public static final float MOVE_DAMPING = 10f;
   /** Max horizontal speed */
-  public static final float MAX_X_SPEED = 3.3f;
+  public static final float MAX_X_SPEED = 4f;
   public static float maxXSpeed = MAX_X_SPEED;
   /** Max vertical speed */
   public static final float MAX_Y_SPEED = 8f;
