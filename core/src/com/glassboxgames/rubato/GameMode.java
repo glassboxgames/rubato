@@ -381,7 +381,8 @@ public class GameMode implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
           paused = false;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
+            || Gdx.input.isKeyJustPressed(Input.Keys.J)) {
           switch (pauseIndex) {
           case PAUSE_RESUME:
             paused = false;
@@ -398,9 +399,11 @@ public class GameMode implements Screen {
           }
         }
         int n = pauseButtons.size;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)
+            || Gdx.input.isKeyJustPressed(Input.Keys.A)) {
           pauseIndex = (pauseIndex + n - 1) % n;
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)
+                   || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
           pauseIndex = (pauseIndex + 1) % n;
         }
         for (Button button : pauseButtons) {
@@ -469,7 +472,7 @@ public class GameMode implements Screen {
         Player player = level.getPlayer();
         if (player.isAlive()) {
           Vector2 pos = player.getPosition();
-          if (pos.x >= level.getWidth() + X_BOUND) {
+          if (pos.x >= level.getWidth()) {
             listener.exitScreen(this, EXIT_COMPLETE);
             return;
           }

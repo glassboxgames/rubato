@@ -288,7 +288,9 @@ public class SelectMode implements Screen {
     if (active) {
       int totalChapters = Shared.CHAPTER_LEVELS.size;
       int unlocked = getNumUnlockedLevels(chapter);
-      if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && chapter < chaptersUnlocked && level < unlocked) {
+      if ((Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
+           || Gdx.input.isKeyJustPressed(Input.Keys.J))
+          && chapter < chaptersUnlocked && level < unlocked) {
         listener.exitScreen(this, EXIT_PLAY);
         return;
       }
@@ -299,13 +301,15 @@ public class SelectMode implements Screen {
       }
 
       int oldChapter = chapter;
-      if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.UP)
+          || Gdx.input.isKeyJustPressed(Input.Keys.W)) {
         chapter = (chapter + totalChapters - 1) % totalChapters;
         unlocked = getNumUnlockedLevels(chapter);
         level = 0;
         page = -1;
       }
-      if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)
+          || Gdx.input.isKeyJustPressed(Input.Keys.S)) {
         chapter = (chapter + 1) % totalChapters;
         unlocked = getNumUnlockedLevels(chapter);
         level = 0;
@@ -316,10 +320,12 @@ public class SelectMode implements Screen {
       int totalLevels = levelButtons.size;
 
       if (unlocked > 0) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)
+            || Gdx.input.isKeyJustPressed(Input.Keys.A)) {
           level = (level + unlocked - 1) % unlocked;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)
+            || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
           level = (level + 1) % unlocked;
         }
       } 

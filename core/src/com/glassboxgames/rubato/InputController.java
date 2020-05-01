@@ -191,24 +191,26 @@ public class InputController {
     exitPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
     resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
     editPressed = Gdx.input.isKeyJustPressed(Input.Keys.E);
-    attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.F);
-    dashPressed = Gdx.input.isKeyJustPressed(Input.Keys.D);
-    jumpPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
-    jumpHeld = Gdx.input.isKeyPressed(Input.Keys.SPACE);
+    attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.J);
+    dashPressed = Gdx.input.isKeyJustPressed(Input.Keys.K);
+    jumpPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE)
+      || Gdx.input.isKeyJustPressed(Input.Keys.W);
+    jumpHeld = Gdx.input.isKeyPressed(Input.Keys.SPACE)
+      || Gdx.input.isKeyPressed(Input.Keys.W);
 
     horizontal = 0;
-    if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
       horizontal += 1;
     }
-    if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+    if (Gdx.input.isKeyPressed(Input.Keys.A)) {
       horizontal -= 1;
     }
 
     vertical = 0;
-    if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+    if (Gdx.input.isKeyPressed(Input.Keys.W)) {
       vertical += 1;
     }
-    if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+    if (Gdx.input.isKeyPressed(Input.Keys.S)) {
       vertical -= 1;
     }
   }

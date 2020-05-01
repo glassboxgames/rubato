@@ -181,15 +181,18 @@ public class MainMenu implements Screen {
         listener.exitScreen(this, EXIT_QUIT);
         return;
       }
-      if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
+          || Gdx.input.isKeyJustPressed(Input.Keys.J)) {
         listener.exitScreen(this, index);
         return;
       }
 
       int last = index;
-      if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.UP)
+          || Gdx.input.isKeyJustPressed(Input.Keys.W)) {
         index = (index - 1 + buttons.size) % buttons.size;
-      } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+      } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)
+                 || Gdx.input.isKeyJustPressed(Input.Keys.S)) {
         index = (index + 1) % buttons.size;
       }
       buttons.get(last).setStyle(optionStyle);

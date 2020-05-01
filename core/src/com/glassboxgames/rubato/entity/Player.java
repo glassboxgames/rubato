@@ -348,7 +348,7 @@ public class Player extends Entity {
    * Faces the player based on their input.
    */
   public void tryFace() {
-    if (!isClinging() && !isAttacking() && !isDashing() && !isWallJumping()) {
+    if (!isClinging() && !isAttacking() && !isDashing()) {
       if (input.x > 0) {
         faceRight();
       } else if (input.x < 0) {
