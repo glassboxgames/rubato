@@ -348,7 +348,7 @@ public class Player extends Entity {
    * Faces the player based on their input.
    */
   public void tryFace() {
-    if (!isClinging() && !isAttacking() && !isDashing()) {
+    if (!isClinging() && !isDashing()) {
       if (input.x > 0) {
         faceRight();
       } else if (input.x < 0) {
@@ -527,7 +527,6 @@ public class Player extends Entity {
           attackTime = -1;
           forwardAttack = upAttack = downAttack = false;
           enemiesHit.clear();
-          shard.stopAttack();
         }
       } else if (attackCooldown >= 0) {
         attackCooldown--;
@@ -538,28 +537,20 @@ public class Player extends Entity {
 
     /* ------- all physics manipulations should be applied before this line! ------- */
 
-    shard.update(delta, getPosition(), getDirection());
+    shard.update(delta, getPosition(), getDirection(), isAttacking());
   }
 
   @Override
   public boolean activatePhysics(World world) {
-    if (super.activatePhysics(world)) {
-      return shard.activatePhysics(world);
-    }
-    return false;
+    return super.activatePhysics(world) && shard.activatePhysics(world);
   }
 
   @Override
   public void draw(GameCanvas canvas) {
     if (isAlive()) {
-      super.draw(canvas);
       canvas.drawParticleEffect(dashEffect);
-      if (isAttacking()) {
-        shard.draw(canvas);
-      }
-    } else {
-      canvas.setShader(Shared.DESAT_SHADER);
+      super.draw(canvas);
+      shard.draw(canvas, isAttacking());
     }
-
   }
 }

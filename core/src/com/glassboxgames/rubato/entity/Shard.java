@@ -19,6 +19,8 @@ public class Shard extends Entity {
   private static final float SHARD_SPEED = 10f;
   /** Shard distance from center */
   private static final float SHARD_DIST = 0.7f;
+  /** Idle angle */
+  private static final float IDLE_ANGLE = MathUtils.PI * 3 / 2;
 
   /** Temp vector for calculations */
   private Vector2 temp;
@@ -33,6 +35,7 @@ public class Shard extends Entity {
     bodyDef.gravityScale = 0;
     bodyDef.fixedRotation = false;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
+    bodyDef.angle = IDLE_ANGLE;
     temp = new Vector2();
   }
 
@@ -80,31 +83,34 @@ public class Shard extends Entity {
   }
 
   /**
-   * Stops the shard swing.
+   * Updates this shard with the given parameters.
    */
-  public void stopAttack() {
-    body.setAngularVelocity(0);
+  public void update(float delta, Vector2 center, int direction, boolean isAttacking) {
+    super.update(delta);
+    setPosition(center);
+    if (!isAttacking) {
+      setDirection(direction);
+      body.setTransform(getPosition(), IDLE_ANGLE);
+      body.setAngularVelocity(0);
+    }
   }
 
   /**
-   * Updates this shard with the given parameters.
+   * Draws this shard with the given parameters.
    */
-  public void update(float delta, Vector2 center, int direction) {
-    super.update(delta);
-    setPosition(center);
-    setDirection(direction);
-  }
-
-  @Override
-  public void draw(GameCanvas canvas) {
+  public void draw(GameCanvas canvas, boolean isAttacking) {
     Texture texture = getState().getTexture(getCount());
     float w = texture.getWidth();
     float h = texture.getHeight();
-    temp.set(1, 1).setLength(SHARD_DIST * Shared.PPM).setAngleRad(getAngle());
-    Vector2 pos = getPosition().scl(Shared.PPM);
+    if (isAttacking) {
+      temp.set(1, 1).setLength(SHARD_DIST).setAngleRad(getAngle());
+    } else {
+      temp.set(-0.5f * getDirection(), 0.7f);
+    }
+    Vector2 pos = getPosition().add(temp).scl(Shared.PPM);
     canvas.draw(texture, Color.WHITE,
                 0, h / 2,
-                temp.x + pos.x, temp.y + pos.y,
+                pos.x, pos.y,
                 w, h, getAngle() * 180f / MathUtils.PI);
   }
 }
