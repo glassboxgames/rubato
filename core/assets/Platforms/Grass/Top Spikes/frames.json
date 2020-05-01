@@ -3,7 +3,7 @@
     "file": "top.png",
     "sensors": {},
     "hitboxes": [
-      [0, 0.15, 0.35, 0.25, 0],
+      [0, 0, 0.6, 0.6, 0],
     ],
     "hurtboxes": [],
   },
