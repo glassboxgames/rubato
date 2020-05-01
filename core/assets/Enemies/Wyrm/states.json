@@ -5,14 +5,14 @@
   },
   {
     "path": "Windup/",
-    "loop": false,
+    "loop": true,
   },
   {
     "path": "Attack/",
     "loop": false,
   },
   {
-    "path": "Return/",
-    "loop": false,
+    "path": "Idle/",
+    "loop": true,
   }
 ]

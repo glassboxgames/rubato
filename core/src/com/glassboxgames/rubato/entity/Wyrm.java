@@ -103,6 +103,8 @@ public class Wyrm extends Enemy {
       body.setLinearVelocity(temp.set(divePos).sub(initPos).setLength(DIVE_SPEED));
       break;
     case STATE_RETURN:
+      if (getDirection() == 1) faceLeft();
+      else faceRight();
       body.setLinearVelocity(temp.set(initPos).sub(getPosition()).setLength(RETURN_SPEED));
       break;
     }
