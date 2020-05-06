@@ -13,23 +13,25 @@ public class Wyrm extends Enemy {
   private static final int STATE_IDLE = 0;
   private static final int STATE_WINDUP = 1;
   private static final int STATE_ATTACK = 2;
-  private static final int STATE_RETURN = 3;
 
   /** Wyrm states */
   public static Array<State> states = null;
 
+  /** Drift speed */
+  private static final float DRIFT_SPEED = 1f;
+  /** Attack cooldown */
+  private static final int ATTACK_COOLDOWN = 60;
   /** Dive speed */
-  private static final float DIVE_SPEED = 6f;
-  /** Return speed */
-  private static final float RETURN_SPEED = 4.5f;
-  /** Return threshold */
-  private static final float THRESHOLD = 0.1f;
+  private static final float DIVE_SPEED = 7f;
+  /** Dive duration */
+  private static final int DIVE_DURATION = 60;
   /** Max health */
   private static final float MAX_HEALTH = 1f;
-  /** Initial coordinates */
-  private Vector2 initPos;
-  /** Dive target position */
-  private Vector2 divePos;
+
+  /** Dive direction */
+  private Vector2 diveDir;
+  /** Current attack cooldown */
+  private int attackCooldown;
   /** Temp calculation vector */
   private Vector2 temp;
 
@@ -38,9 +40,9 @@ public class Wyrm extends Enemy {
    */
   public Wyrm(float x, float y) {
     super(x, y, STATE_IDLE);
-    bodyDef.type = BodyDef.BodyType.KinematicBody;
-    initPos = new Vector2();
-    divePos = new Vector2();
+    bodyDef.type = BodyDef.BodyType.DynamicBody;
+    bodyDef.gravityScale = 0f;
+    diveDir = new Vector2();
     temp = new Vector2();
   }
 
@@ -48,8 +50,7 @@ public class Wyrm extends Enemy {
    * Initializes wyrm states.
    */
   public static Array<State> initStates() {
-    states = State.readStates("Enemies/Wyrm/");
-    return states;
+    return states = State.readStates("Enemies/Wyrm/");
   }
 
   @Override
@@ -57,11 +58,18 @@ public class Wyrm extends Enemy {
     return states;
   }
 
+  /**
+   * Stops this wyrm's attack.
+   */
+  public void cancelAttack() {
+    setState(STATE_IDLE);
+  }
+
   @Override
   public void advanceState() {
     switch (stateIndex) {
     case STATE_IDLE:
-      if (getTarget() != null) {
+      if (getTarget() != null && attackCooldown <= 0) {
         setState(STATE_WINDUP);
       }
       break;
@@ -71,12 +79,7 @@ public class Wyrm extends Enemy {
       }
       break;
     case STATE_ATTACK:
-      if (getPosition().dst(divePos) < THRESHOLD) {
-        setState(STATE_RETURN);
-      }
-      break;
-    case STATE_RETURN:
-      if (getPosition().dst(initPos) < THRESHOLD) {
+      if (getCount() > DIVE_DURATION) {
         setState(STATE_IDLE);
       }
       break;
@@ -87,26 +90,42 @@ public class Wyrm extends Enemy {
   public void enterState() {
     super.enterState();
     switch (stateIndex) {
-    case STATE_IDLE:
+    case STATE_ATTACK:
+      body.setLinearVelocity(temp.set(diveDir).setLength(DIVE_SPEED));
+      break;
+    }
+  }
+
+  @Override
+  public void leaveState() {
+    switch (stateIndex) {
+    case STATE_ATTACK:
+      attackCooldown = ATTACK_COOLDOWN;
       body.setLinearVelocity(0, 0);
       break;
-    case STATE_WINDUP:
-      divePos.set(getTarget());
-      initPos.set(getPosition());
-      if (divePos.x > initPos.x) {
+    }
+  }
+
+  @Override
+  public void update(float delta) {
+    super.update(delta);
+    if (!isSuspended()) {
+      if (attackCooldown > 0) {
+        attackCooldown--;
+      }
+
+      if (getVelocity().x > 0) {
         faceRight();
-      } else {
+      } else if (getVelocity().x < 0) {
         faceLeft();
       }
-      break;
-    case STATE_ATTACK:
-      body.setLinearVelocity(temp.set(divePos).sub(initPos).setLength(DIVE_SPEED));
-      break;
-    case STATE_RETURN:
-      if (getDirection() == 1) faceLeft();
-      else faceRight();
-      body.setLinearVelocity(temp.set(initPos).sub(getPosition()).setLength(RETURN_SPEED));
-      break;
+
+      if (getTarget() != null) {
+        diveDir.set(getTarget()).sub(getPosition()).nor();
+        if (stateIndex != STATE_ATTACK) {
+          body.setLinearVelocity(temp.set(diveDir).setLength(DRIFT_SPEED));
+        }
+      }
     }
   }
 

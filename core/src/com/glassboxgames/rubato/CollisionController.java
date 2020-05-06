@@ -32,7 +32,27 @@ public class CollisionController implements ContactListener {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    startCollision((Entity.Collider)d1, (Entity.Collider)d2);
+    if (d1 != null && d2 != null) {
+      Entity.Collider o1 = (Entity.Collider)d1;
+      Entity.Collider o2 = (Entity.Collider)d2;
+      if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
+        startCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
+        startCollision((Player)o2.entity, o2, (Enemy)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Platform) {
+        startCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
+        startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
+      } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
+        startCollision((Enemy)o1.entity, o1, (Platform)o2.entity, o2);
+      } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
+        startCollision((Enemy)o2.entity, o2, (Platform)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Checkpoint) {
+        startCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
+        startCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      }
+    }
   }
   
   @Override
@@ -41,60 +61,46 @@ public class CollisionController implements ContactListener {
     Fixture f2 = contact.getFixtureB();
     Object d1 = f1.getUserData();
     Object d2 = f2.getUserData();
-    endCollision((Entity.Collider)d1, (Entity.Collider)d2);
+    if (d1 != null && d2 != null) {
+      Entity.Collider o1 = (Entity.Collider)d1;
+      Entity.Collider o2 = (Entity.Collider)d2;
+      if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
+        endCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
+        endCollision((Player)o2.entity, o2, (Enemy)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Platform) {
+        endCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
+        endCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
+      } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
+        endCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
+      } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
+        endCollision((Enemy)o2.entity, o2, (Platform) o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Checkpoint) {
+        endCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
+        endCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      }
+    }
   }
 
   @Override
-  public void preSolve(Contact contact, Manifold manifold) {}
+  public void preSolve(Contact contact, Manifold manifold) {
+    Fixture f1 = contact.getFixtureA();
+    Fixture f2 = contact.getFixtureB();
+    Object d1 = f1.getUserData();
+    Object d2 = f2.getUserData();
+    if (d1 != null && d2 != null) {
+      Entity.Collider o1 = (Entity.Collider)d1;
+      Entity.Collider o2 = (Entity.Collider)d2;
+      if (o1.entity instanceof Enemy && o2.entity instanceof Enemy) {
+        contact.setEnabled(false);
+      }
+    }
+  }
 
   @Override
   public void postSolve(Contact contact, ContactImpulse impulse) {}
-
-  /**
-   * Process the start of a collision between the two given entities (with metadata).
-   */
-  private void startCollision(Entity.Collider o1, Entity.Collider o2) {
-    if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
-      startCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
-    } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
-      startCollision((Player)o2.entity, o2, (Enemy)o1.entity, o1);
-    } else if (o1.entity instanceof Player && o2.entity instanceof Platform) {
-      startCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
-    } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
-      startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
-    } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
-      startCollision((Enemy)o1.entity, o1, (Platform)o2.entity, o2);
-    } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
-      startCollision((Enemy)o2.entity, o2, (Platform)o1.entity, o1);
-    } else if (o1.entity instanceof Player && o2.entity instanceof Checkpoint) {
-      startCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
-    } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
-      startCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
-    }
-  }
-
-  /**
-   * Process the end of a collision between the two given entities (with metadata).
-   */
-  private void endCollision(Entity.Collider o1, Entity.Collider o2) {
-    if (o1.entity instanceof Player && o2.entity instanceof Enemy) {
-      endCollision((Player)o1.entity, o1, (Enemy)o2.entity, o2);
-    } else if (o2.entity instanceof Player && o1.entity instanceof Enemy) {
-      endCollision((Player)o2.entity, o2, (Enemy)o1.entity, o1);
-    } else if (o1.entity instanceof Player && o2.entity instanceof Platform) {
-      endCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
-    } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
-      endCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
-    } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
-      endCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
-    } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
-      endCollision((Enemy)o2.entity, o2, (Platform) o1.entity, o1);
-    } else if (o1.entity instanceof Player && o2.entity instanceof Checkpoint) {
-      endCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
-    } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
-      endCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
-    }
-  }
 
   /**
    * Attacks the given enemy with the given player.
@@ -196,6 +202,10 @@ public class CollisionController implements ContactListener {
     } else if (enemyCollider.isEdgeSensor() && platformCollider.isHurtbox()) {
       if (enemy instanceof Spider) {
         ((Spider)enemy).setEdge(false);
+      }
+    } else if (enemyCollider.isHurtbox() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Wyrm) {
+        ((Wyrm)enemy).cancelAttack();
       }
     }
   }

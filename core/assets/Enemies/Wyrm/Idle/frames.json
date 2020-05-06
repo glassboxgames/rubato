@@ -2,7 +2,7 @@
   {
     "file": "Armature_swim_00.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -14,7 +14,7 @@
   {
     "file": "Armature_swim_01.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -26,7 +26,7 @@
   {
     "file": "Armature_swim_02.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -38,7 +38,7 @@
   {
     "file": "Armature_swim_03.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -50,7 +50,7 @@
   {
     "file": "Armature_swim_04.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -62,7 +62,7 @@
   {
     "file": "Armature_swim_05.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -74,7 +74,7 @@
   {
     "file": "Armature_swim_06.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -86,7 +86,7 @@
   {
     "file": "Armature_swim_07.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -98,7 +98,7 @@
   {
     "file": "Armature_swim_08.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -110,7 +110,7 @@
   {
     "file": "Armature_swim_09.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -122,7 +122,7 @@
   {
     "file": "Armature_swim_10.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -134,7 +134,7 @@
   {
     "file": "Armature_swim_11.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -146,7 +146,7 @@
   {
     "file": "Armature_swim_12.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -158,7 +158,7 @@
   {
     "file": "Armature_swim_13.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -170,7 +170,7 @@
   {
     "file": "Armature_swim_14.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -182,7 +182,7 @@
   {
     "file": "Armature_swim_15.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -194,7 +194,7 @@
   {
     "file": "Armature_swim_16.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -206,7 +206,7 @@
   {
     "file": "Armature_swim_17.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -218,7 +218,7 @@
   {
     "file": "Armature_swim_18.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -230,7 +230,7 @@
   {
     "file": "Armature_swim_19.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -242,7 +242,7 @@
   {
     "file": "Armature_swim_20.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -254,7 +254,7 @@
   {
     "file": "Armature_swim_21.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -266,7 +266,7 @@
   {
     "file": "Armature_swim_22.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -278,7 +278,7 @@
   {
     "file": "Armature_swim_23.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -290,7 +290,7 @@
   {
     "file": "Armature_swim_24.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -302,7 +302,7 @@
   {
     "file": "Armature_swim_25.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -314,7 +314,7 @@
   {
     "file": "Armature_swim_26.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -326,7 +326,7 @@
   {
     "file": "Armature_swim_27.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -338,7 +338,7 @@
   {
     "file": "Armature_swim_28.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -350,7 +350,7 @@
   {
     "file": "Armature_swim_29.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -362,7 +362,7 @@
   {
     "file": "Armature_swim_30.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -374,7 +374,7 @@
   {
     "file": "Armature_swim_31.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -386,7 +386,7 @@
   {
     "file": "Armature_swim_32.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -398,7 +398,7 @@
   {
     "file": "Armature_swim_33.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -410,7 +410,7 @@
   {
     "file": "Armature_swim_34.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -422,7 +422,7 @@
   {
     "file": "Armature_swim_35.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],
@@ -434,7 +434,7 @@
   {
     "file": "Armature_swim_36.png",
     "sensors": {
-      "vision": [0, 0, 7, 7, 0]
+      "vision": [0, 0, 10, 10, 0]
     },
     "hitboxes": [
       [0.2, 0, 1.25, 0.13, 0],

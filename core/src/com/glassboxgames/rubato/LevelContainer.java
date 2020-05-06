@@ -18,6 +18,9 @@ import com.glassboxgames.util.*;
  * This class represents everything inside a single level.
  */
 public class LevelContainer {
+  /** Width of the left wall fixture */
+  private static final float LEFT_WALL_WIDTH = 0.5f;
+
   /** The dimensions of the level */
   private float width, height;
   /** The level background texture */
@@ -30,29 +33,10 @@ public class LevelContainer {
   private Array<Platform> platforms;
   /** The checkpoint in this level (optional) */
   private Checkpoint checkpoint;
-
-
-  /**
-   * Instantiates a level container with the given parameters.
-   * @param width the level width
-   * @param height the level height
-   * @param background the level background texture
-   * @param player the main player
-   * @param enemies array of enemies
-   * @param platforms array of platforms
-   * @param checkpoint the checkpoint, if it exists
-   */
-  public LevelContainer(float width, float height, Texture background,
-                        Player player, Array<Enemy> enemies,
-                        Array<Platform> platforms, Checkpoint checkpoint) {
-    this.width = width;
-    this.height = height;
-    this.background = background;
-    this.player = player;
-    this.enemies = enemies;
-    this.platforms = platforms;
-    this.checkpoint = checkpoint;
-  }
+  /** The left wall definition */
+  private BodyDef leftWallDef;
+  /** The left wall in this level */
+  private Body leftWall;
 
   /**
    * Instantiates a LevelContainer from a LevelData object.
@@ -128,6 +112,9 @@ public class LevelContainer {
       }
     }
     checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
+    leftWallDef = new BodyDef();
+    leftWallDef.type = BodyDef.BodyType.StaticBody;
+    leftWallDef.position.set(-LEFT_WALL_WIDTH / 2, height / 2);
   }
 
   /**
@@ -142,6 +129,13 @@ public class LevelContainer {
       platform.activatePhysics(world);
     }
     checkpoint.activatePhysics(world);
+    leftWall = world.createBody(leftWallDef);
+    FixtureDef def = new FixtureDef();
+    def.friction = 0;
+    PolygonShape shape = new PolygonShape();
+    shape.setAsBox(LEFT_WALL_WIDTH / 2, height);
+    def.shape = shape;
+    leftWall.createFixture(def);
   }
 
   /**
@@ -156,6 +150,11 @@ public class LevelContainer {
       platform.deactivatePhysics(world);
     }
     checkpoint.deactivatePhysics(world);
+    if (leftWall != null) {
+      world.destroyBody(leftWall);
+      leftWall = null;
+      leftWallDef.active = false;
+    }
   }
 
   /**

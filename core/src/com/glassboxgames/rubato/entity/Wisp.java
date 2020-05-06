@@ -21,11 +21,13 @@ public class Wisp extends Enemy {
   private static final int ATTACK_COOLDOWN = 30;
   /** Projectile offset */
   private static final Vector2 PROJECTILE_OFFSET = new Vector2(0.2f, 0.2f);
-  /** Projectile velocity */
-  private static final Vector2 PROJECTILE_VELOCITY = new Vector2(4f, 0f);
+  /** Projectile speed */
+  private static final float PROJECTILE_SPEED = 4f;
   /** Projectile life */
   private static final int PROJECTILE_LIFE = 90;
 
+  /** Direction to shoot projectile */
+  private Vector2 shootDir;
   /** Array of spawned projectiles */
   private Array<Enemy> spawned;
   /** Temp vector for calculations */
@@ -38,6 +40,7 @@ public class Wisp extends Enemy {
    */
   public Wisp(float x, float y) {
     super(x, y, STATE_IDLE);
+    shootDir = new Vector2();
     spawned = new Array<Enemy>();
     temp = new Vector2();
     bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -60,17 +63,9 @@ public class Wisp extends Enemy {
   public void enterState() {
     super.enterState();
     switch (stateIndex) {
-    case STATE_WINDUP:
-      float delta = getTarget().x - getPosition().x;
-      if (delta > 0) {
-        faceRight();
-      } else if (delta < 0) {
-        faceLeft();
-      }
-      break;
     case STATE_ATTACK:
-      Vector2 pos = getPosition().add(temp.set(PROJECTILE_OFFSET).scl(getDirection(), 1));
-      Vector2 vel = temp.set(PROJECTILE_VELOCITY).scl(getDirection(), 1);
+      Vector2 pos = temp.set(PROJECTILE_OFFSET).scl(getDirection(), 1).add(getPosition());
+      Vector2 vel = shootDir.setLength(PROJECTILE_SPEED);
       Projectile proj = new Projectile(pos.x, pos.y, vel, PROJECTILE_LIFE);
       spawned.add(proj);
       break;
@@ -99,6 +94,22 @@ public class Wisp extends Enemy {
     }
   }
 
+  @Override
+  public void update(float delta) {
+    super.update(delta);
+    if (!isSuspended()) {
+      if (getTarget() != null) {
+        shootDir.set(getTarget()).sub(getPosition()).setLength(1f);
+        float diff = getTarget().x - getPosition().x;
+        if (diff > 0) {
+          faceRight();
+        } else if (diff < 0) {
+          faceLeft();
+        }
+      }
+    }
+  }
+  
   /**
    * Returns the array of spawned projectiles.
    */

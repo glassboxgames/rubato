@@ -11,6 +11,10 @@ public class Blob extends Enemy {
   public static Array<State> states = null;
   /** Health */
   private static final float MAX_HEALTH = 1f;
+  /** Bobbing velocity */
+  private static final float BOB_SPEED = 1f;
+  /** Number of frames per bob segment */
+  private static final int BOB_FRAMES = 60;
 
   /**
    * Initializes a blob enemy with the specified parameters.
@@ -39,12 +43,12 @@ public class Blob extends Enemy {
   public void advanceState(){
     switch (stateIndex) {
     case STATE_IDLE_UP:
-      if (getCount() == 20) {
+      if (getCount() >= BOB_FRAMES) {
         setState(STATE_IDLE_DOWN);
       }
       break;
     case STATE_IDLE_DOWN:
-      if (getCount() == 20) {
+      if (getCount() >= BOB_FRAMES) {
         setState(STATE_IDLE_UP);
       }
     }
@@ -55,10 +59,10 @@ public class Blob extends Enemy {
     super.enterState();
     switch (stateIndex) {
     case (STATE_IDLE_UP):
-      body.setLinearVelocity(0, 0.25f);
+      body.setLinearVelocity(0, BOB_SPEED);
       break;
     case (STATE_IDLE_DOWN):
-      body.setLinearVelocity(0, -0.25f);
+      body.setLinearVelocity(0, -BOB_SPEED);
       break;
     }
   }

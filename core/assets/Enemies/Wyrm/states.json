@@ -11,8 +11,4 @@
     "path": "Attack/",
     "loop": false,
   },
-  {
-    "path": "Idle/",
-    "loop": true,
-  }
 ]

@@ -120,7 +120,7 @@ public abstract class Enemy extends Entity {
    * Draws the enemy to the canvas
    */
   public void draw(GameCanvas canvas) {
-    if(isSuspended()) {
+    if (isSuspended()) {
       ShaderProgram temp = canvas.getShader();
       canvas.setShader(Shared.DESAT_SHADER);
       super.draw(canvas);

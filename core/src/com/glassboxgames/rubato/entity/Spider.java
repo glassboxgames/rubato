@@ -15,11 +15,11 @@ public class Spider extends Enemy {
   public static Array<State> states = null;
 
   /** Max horizontal speed */
-  private static final float MAX_SPEED = 1.5f;
+  private static final float MAX_SPEED = 1.2f;
   /** Max health */
   private static final float MAX_HEALTH = 1f;
   /** Attack launch force */
-  private static final Vector2 ATTACK_FORCE = new Vector2(400, 300);
+  private static final Vector2 ATTACK_FORCE = new Vector2(500, 700);
 
   /** Temporary vector */
   private Vector2 temp = new Vector2();
@@ -76,9 +76,6 @@ public class Spider extends Enemy {
   public void enterState() {
     super.enterState();
     switch (stateIndex) {
-    case STATE_WANDER:
-      body.setGravityScale(1f);
-      break;
     case STATE_WINDUP:
       body.setLinearVelocity(0, 0);
       float delta = getTarget().x - getPosition().x;
@@ -90,16 +87,6 @@ public class Spider extends Enemy {
       break;
     case STATE_ATTACK:
       body.applyForce(temp.set(ATTACK_FORCE).scl(getDirection(), 1), getPosition(), true);
-      break;
-    }
-  }
-
-  @Override
-  public void leaveState() {
-    super.leaveState();
-    switch (stateIndex) {
-    case STATE_ATTACK:
-      body.setGravityScale(1.0f);
       break;
     }
   }

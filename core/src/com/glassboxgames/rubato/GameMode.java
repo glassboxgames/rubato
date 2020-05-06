@@ -476,7 +476,7 @@ public class GameMode implements Screen {
             listener.exitScreen(this, editable ? EXIT_EDIT : EXIT_COMPLETE);
             return;
           }
-          if (pos.x < 0 || pos.y < 0) {
+          if (pos.y < 0) {
             listener.exitScreen(this, EXIT_RESET);
             return;
           }
