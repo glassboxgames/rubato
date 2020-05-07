@@ -35,97 +35,97 @@
 ],
 "platforms": [
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 19.626667,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 18.96,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 18.293333,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 17.76,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 12.16,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 11.36,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 10.826667,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 10.16,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 6.4266667,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 5.76,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 5.0933332,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 4.4266667,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 3.76,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 3.0933332,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 2.4266667,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 1.76,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 1.0933334,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 0.42666668,
 		"y": 0.44666666
 	},
 	{
-		"type": "plains_pf",
+		"type": "tb_plains",
 		"x": 9.493333,
 		"y": 0.44666666
 	}

@@ -49,72 +49,110 @@ public class LevelContainer {
     player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
     for (EnemyData enemyData : data.enemies) {
-      float x = enemyData.x;
-      float y = enemyData.y;
-      Enemy enemy = null;
-      switch (enemyData.type) {
-      case "spider":
-        enemy = new Spider(x, y);
-        break;
-      case "wisp":
-        enemy = new Wisp(x, y);
-        break;
-      case "wyrm":
-        enemy = new Wyrm(x, y);
-        break;
-      case "blob":
-        enemy = new Blob(x, y);
-        break;
-      }
+      Enemy enemy = createEnemy(enemyData);
       if (enemy != null) {
         enemies.add(enemy);
       }
     }
     platforms = new Array<Platform>();
     for (PlatformData platformData : data.platforms) {
-      int type = -1;
-      switch (platformData.type) {
-      case "simple":
-        type = Platform.TYPE_SIMPLE;
-        break;
-      case "crumbling":
-        type = Platform.TYPE_CRUMBLING;
-        break;
-      case "bottom_spikes":
-        type = Platform.TYPE_BOTTOM_SPIKES;
-        break;
-      case "left_spikes":
-        type = Platform.TYPE_LEFT_SPIKES;
-        break;
-      case "top_spikes":
-        type = Platform.TYPE_TOP_SPIKES;
-        break;
-      case "right_spikes":
-        type = Platform.TYPE_RIGHT_SPIKES;
-        break;
-      case "plains_pf":
-        type = Platform.TYPE_PLAINS;
-        break;
-      case "forest_pf":
-        type = Platform.TYPE_FOREST;
-        break;
-      case "mountain_pf":
-        type = Platform.TYPE_MOUNTAIN;
-        break;
-      case "desert_pf":
-        type = Platform.TYPE_DESERT;
-        break;
-      default:
-        Gdx.app.error("LevelContainer", "Found unregistered platform type: " + platformData.type, new RuntimeException());
-      }
-      if (type != -1) {
-        platforms.add(new Platform(platformData.x, platformData.y, type));
+      Platform platform = createPlatform(platformData);
+      if (platform != null) {
+        platforms.add(platform);
       }
     }
     checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
     leftWallDef = new BodyDef();
     leftWallDef.type = BodyDef.BodyType.StaticBody;
     leftWallDef.position.set(-LEFT_WALL_WIDTH / 2, height / 2);
+  }
+
+  /**
+   * Creates and returns an enemy from an enemy data object.
+   */
+  private static Enemy createEnemy(EnemyData data) {
+    float x = data.x;
+    float y = data.y;
+    switch (data.type) {
+    case "blob":
+      return new Blob(x, y);
+    case "spider":
+      return new Spider(x, y);
+    case "wisp":
+      return new Wisp(x, y);
+    case "wyrm":
+      return new Wyrm(x, y);
+    default:
+      return null;
+    }
+  }
+
+  /**
+   * Returns the type index associated with the given type string.
+   */
+  private static int typeStringToIndex(String type) {
+    switch (type) {
+    case "tb_forest":
+      return Platform.TYPE_TB_FOREST;
+    case "t_forest":
+      return Platform.TYPE_T_FOREST;
+    case "m_forest":
+      return Platform.TYPE_M_FOREST;
+    case "b_forest":
+      return Platform.TYPE_B_FOREST;
+    case "tb_plains":
+      return Platform.TYPE_TB_PLAINS;
+    case "t_plains":
+      return Platform.TYPE_T_PLAINS;
+    case "m_plains":
+      return Platform.TYPE_M_PLAINS;
+    case "b_plains":
+      return Platform.TYPE_B_PLAINS;
+    case "tb_desert":
+      return Platform.TYPE_TB_DESERT;
+    case "t_desert":
+      return Platform.TYPE_T_DESERT;
+    case "m_desert":
+      return Platform.TYPE_M_DESERT;
+    case "b_desert":
+      return Platform.TYPE_B_DESERT;
+    case "tb_mountains":
+      return Platform.TYPE_TB_MOUNTAINS;
+    case "t_mountains":
+      return Platform.TYPE_T_MOUNTAINS;
+    case "m_mountains":
+      return Platform.TYPE_M_MOUNTAINS;
+    case "b_mountains":
+      return Platform.TYPE_B_MOUNTAINS;
+    case "b_wood_spikes":
+      return Platform.TYPE_B_WOOD_SPIKES;
+    case "l_wood_spikes":
+      return Platform.TYPE_L_WOOD_SPIKES;
+    case "t_wood_spikes":
+      return Platform.TYPE_T_WOOD_SPIKES;
+    case "r_wood_spikes":
+      return Platform.TYPE_R_WOOD_SPIKES;
+    case "b_stone_spikes":
+      return Platform.TYPE_B_STONE_SPIKES;
+    case "l_stone_spikes":
+      return Platform.TYPE_L_STONE_SPIKES;
+    case "t_stone_spikes":
+      return Platform.TYPE_T_STONE_SPIKES;
+    case "r_stone_spikes":
+      return Platform.TYPE_R_STONE_SPIKES;
+    case "crumbling":
+      return Platform.TYPE_CRUMBLING;
+    default:
+      return -1;
+    }
+  }
+
+  /**
+   * Creates and returns a platform from a data object.
+   */
+  private static Platform createPlatform(PlatformData data) {
+    int type = typeStringToIndex(data.type);
+    return type == -1 ? null : new Platform(data.x, data.y, type);
   }
 
   /**

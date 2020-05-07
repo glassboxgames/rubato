@@ -1,0 +1,21 @@
+{
+  "Start": ["player"],
+  "End": ["checkpoint"],
+  "Enemies": [
+    "spider",
+    "wisp",
+    "wyrm",
+    "blob",
+  ],
+  "Platforms": [
+    "crumbling",
+    "tb_forest",
+    "t_forest",
+    "m_forest",
+    "b_forest",
+    "b_wood_spikes",
+    "l_wood_spikes",
+    "t_wood_spikes",
+    "r_wood_spikes",
+  ],
+}

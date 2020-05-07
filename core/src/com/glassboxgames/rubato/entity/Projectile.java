@@ -29,7 +29,7 @@ public class Projectile extends Enemy {
     super(x, y, STATE_IDLE);
     this.velocity = new Vector2(velocity);
     this.life = life;
-    bodyDef.type = BodyDef.BodyType.KinematicBody;
+    bodyDef.gravityScale = 0f;
   }
 
   /**

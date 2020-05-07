@@ -10,17 +10,32 @@ import com.glassboxgames.rubato.*;
  */
 public class Platform extends Entity {
   /** Type indices */
-  public static final int TYPE_SIMPLE = 0;
-  public static final int TYPE_BOTTOM_SPIKES = 1;
-  public static final int TYPE_LEFT_SPIKES = 2;
-  public static final int TYPE_TOP_SPIKES = 3;
-  public static final int TYPE_RIGHT_SPIKES = 4;
-  public static final int TYPE_CRUMBLING = 5;
-  public static final int TYPE_PLAINS = 6;
-  public static final int TYPE_FOREST = 7;
-  public static final int TYPE_MOUNTAIN = 8;
-  public static final int TYPE_DESERT = 9;
-
+  public static final int TYPE_TB_FOREST = 0;
+  public static final int TYPE_T_FOREST = 1;
+  public static final int TYPE_M_FOREST = 2;
+  public static final int TYPE_B_FOREST = 3;
+  public static final int TYPE_TB_PLAINS = 4;
+  public static final int TYPE_T_PLAINS = 5;
+  public static final int TYPE_M_PLAINS = 6;
+  public static final int TYPE_B_PLAINS = 7;
+  public static final int TYPE_TB_DESERT = 8;
+  public static final int TYPE_T_DESERT = 9;
+  public static final int TYPE_M_DESERT = 10;
+  public static final int TYPE_B_DESERT = 11;
+  public static final int TYPE_TB_MOUNTAINS = 12;
+  public static final int TYPE_T_MOUNTAINS = 13;
+  public static final int TYPE_M_MOUNTAINS = 14;
+  public static final int TYPE_B_MOUNTAINS = 15;
+  
+  public static final int TYPE_B_WOOD_SPIKES = 16;
+  public static final int TYPE_L_WOOD_SPIKES = 17;
+  public static final int TYPE_T_WOOD_SPIKES = 18;
+  public static final int TYPE_R_WOOD_SPIKES = 19;
+  public static final int TYPE_B_STONE_SPIKES = 20;
+  public static final int TYPE_L_STONE_SPIKES = 21;
+  public static final int TYPE_T_STONE_SPIKES = 22;
+  public static final int TYPE_R_STONE_SPIKES = 23;
+  public static final int TYPE_CRUMBLING = 24;
   
   /** Number of frames for a crumbling block to crumble */
   public static final int CRUMBLING_TIME = 60;
@@ -48,7 +63,7 @@ public class Platform extends Entity {
    * Initializes platform states.
    */
   public static Array<State> initStates() {
-    return states = State.readStates("Platforms/Grass/");
+    return states = State.readStates("Platforms/");
   }
 
   @Override

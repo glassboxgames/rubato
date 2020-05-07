@@ -43,6 +43,8 @@ public class CollisionController implements ContactListener {
         startCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
         startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
+      } else if (o1.entity instanceof Enemy && o2.entity instanceof Enemy) {
+        startCollision((Enemy)o1.entity, o1, (Enemy) o2.entity, o2);
       } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
         startCollision((Enemy)o1.entity, o1, (Platform)o2.entity, o2);
       } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
@@ -72,6 +74,8 @@ public class CollisionController implements ContactListener {
         endCollision((Player)o1.entity, o1, (Platform)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Platform) {
         endCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
+      } else if (o1.entity instanceof Enemy && o2.entity instanceof Enemy) {
+        endCollision((Enemy)o1.entity, o1, (Enemy) o2.entity, o2);
       } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
         endCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
       } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
@@ -85,19 +89,7 @@ public class CollisionController implements ContactListener {
   }
 
   @Override
-  public void preSolve(Contact contact, Manifold manifold) {
-    Fixture f1 = contact.getFixtureA();
-    Fixture f2 = contact.getFixtureB();
-    Object d1 = f1.getUserData();
-    Object d2 = f2.getUserData();
-    if (d1 != null && d2 != null) {
-      Entity.Collider o1 = (Entity.Collider)d1;
-      Entity.Collider o2 = (Entity.Collider)d2;
-      if (o1.entity instanceof Enemy && o2.entity instanceof Enemy) {
-        contact.setEnabled(false);
-      }
-    }
-  }
+  public void preSolve(Contact contact, Manifold manifold) {}
 
   @Override
   public void postSolve(Contact contact, ContactImpulse impulse) {}
@@ -189,6 +181,26 @@ public class CollisionController implements ContactListener {
       player.removeAdjacent(platform);
     }
   }
+  
+  /**
+   * Handles a collision starting between two enemies.
+   */
+  private void startCollision(Enemy e1, Entity.Collider collider1,
+                              Enemy e2, Entity.Collider collider2) {
+    if (collider1.isHurtbox() && collider2.isHurtbox()) {
+      if (e1 instanceof Projectile && e2.isSuspended()) {
+        e1.setRemove(true);
+      } else if (e2 instanceof Projectile && e1.isSuspended()) {
+        e2.setRemove(true);
+      }
+    }
+  }
+
+  /**
+   * Handles a collision ending between two enemies.
+   */
+  private void endCollision(Enemy e1, Entity.Collider collider1,
+                            Enemy e2, Entity.Collider collider2) {}
 
   /**
    * Handles a collision starting between an enemy and a platform.
@@ -206,6 +218,8 @@ public class CollisionController implements ContactListener {
     } else if (enemyCollider.isHurtbox() && platformCollider.isHurtbox()) {
       if (enemy instanceof Wyrm) {
         ((Wyrm)enemy).cancelAttack();
+      } else if (enemy instanceof Projectile) {
+        enemy.setRemove(true);
       }
     }
   }

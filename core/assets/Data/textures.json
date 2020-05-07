@@ -1,25 +1,50 @@
 {
-  "plains": "Backgrounds/Plains/plains.png",
   "forest": "Backgrounds/Forest/forest.png",
-  "mountain": "Backgrounds/Mountains/mountains.png",
+  "plains": "Backgrounds/Plains/plains.png",
   "desert": "Backgrounds/Desert/desert.png",
-  "plains_pf": "Platforms/Grass/Plains/tb_plains.png",
-  "forest_pf": "Platforms/Grass/Forest/tb_forest.png",
-  "mountain_pf": "Platforms/Grass/Mountain/tb_mountain.png",
-  "desert_pf": "Platforms/Grass/Desert/tb_desert.png",
+  "mountains": "Backgrounds/Mountains/mountains.png",
+
   "player": "Adagio/Idle/0.png",
   "checkpoint": "Checkpoints/Inactive/pillar_off.png",
-  "simple": "Platforms/Grass/Simple/tb_grass.png",
-  "crumbling": "Platforms/Grass/Crumbling/0.png",
-  "bottom_spikes": "Platforms/Grass/Bottom Spikes/bottom.png",
-  "left_spikes": "Platforms/Grass/Left Spikes/left.png",
-  "top_spikes": "Platforms/Grass/Top Spikes/top.png",
-  "right_spikes": "Platforms/Grass/Right Spikes/right.png",
+
+  "crumbling": "Platforms/Crumbling/0.png",
+
+  "tb_forest": "Platforms/Forest/tb/0.png",
+  "t_forest": "Platforms/Forest/t/0.png",
+  "m_forest": "Platforms/Forest/m/0.png",
+  "b_forest": "Platforms/Forest/b/0.png",
+
+  "tb_plains": "Platforms/Plains/tb/0.png",
+  "t_plains": "Platforms/Plains/t/0.png",
+  "m_plains": "Platforms/Plains/m/0.png",
+  "b_plains": "Platforms/Plains/b/0.png",
+
+  "tb_desert": "Platforms/Desert/tb/0.png",
+  "t_desert": "Platforms/Desert/t/0.png",
+  "m_desert": "Platforms/Desert/m/0.png",
+  "b_desert": "Platforms/Desert/b/0.png",
+
+  "tb_mountains": "Platforms/Mountains/tb/0.png",
+  "t_mountains": "Platforms/Mountains/t/0.png",
+  "m_mountains": "Platforms/Mountains/m/0.png",
+  "b_mountains": "Platforms/Mountains/b/0.png",
+
+  "b_wood_spikes": "Platforms/Wood Spikes/Bottom/0.png",
+  "l_wood_spikes": "Platforms/Wood Spikes/Left/0.png",
+  "t_wood_spikes": "Platforms/Wood Spikes/Top/0.png",
+  "r_wood_spikes": "Platforms/Wood Spikes/Right/0.png",
+
+  "b_stone_spikes": "Platforms/Stone Spikes/Bottom/0.png",
+  "l_stone_spikes": "Platforms/Stone Spikes/Left/0.png",
+  "t_stone_spikes": "Platforms/Stone Spikes/Top/0.png",
+  "r_stone_spikes": "Platforms/Stone Spikes/Right/0.png",
+
   "spider": "Enemies/Spider/Wander/Armature_walk_00.png",
   "projectile": "Enemies/Projectile/Idle/0.png",
   "wisp": "Enemies/Wisp/Idle/Armature_idle_00.png",
   "wyrm": "Enemies/Wyrm/Idle/Armature_swim_00.png",
   "blob": "Enemies/Blob/Idle/blob_enemy50x50.png",
+
   "pillar_selected": "User Interface/Level Selector/pillar_ui_selected.png",
   "pillar_on": "User Interface/Level Selector/pillar_ui_on.png",
   "pillar_off": "User Interface/Level Selector/pillar_ui_off.png",

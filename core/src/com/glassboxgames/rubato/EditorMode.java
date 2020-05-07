@@ -24,10 +24,12 @@ public class EditorMode implements Screen {
   /** Exit code for playtesting */
   public static final int EXIT_TEST = 1;
 
+  /** Editor metadata file */
+  private static final String EDITOR_FILE = "Data/editor.json";
   /** Default level width */
-  private static final float DEFAULT_WIDTH = 30f;
+  private static final float DEFAULT_WIDTH = 17f;
   /** Default level height */
-  private static final float DEFAULT_HEIGHT = 18f;
+  private static final float DEFAULT_HEIGHT = 10f;
   /** Ghost grid size */
   private static final int GRID_SIZE = 10;
 
@@ -51,12 +53,14 @@ public class EditorMode implements Screen {
   /** Input processor for the editor */
   private InputProcessor inputProcessor;
 
+  /** Map of editor groups */
+  private OrderedMap<String, Array<String>> editorGroups;
   /** Button map for the UI */
   private ObjectMap<String, ImageButton> uiMap;
   /** Current ghost button */
   private ImageButton ghost;
   /** Button map for the level */
-  private ObjectMap<String, Array<ImageButton>> levelMap;
+  private OrderedMap<String, Array<ImageButton>> levelMap;
   /** Array tracking loaded assets */
   private Array<String> assets = new Array<String>();
   /** Current chapter name */
@@ -74,8 +78,9 @@ public class EditorMode implements Screen {
     uiStage = new Stage();
     levelStage = new Stage();
     inputProcessor = new InputMultiplexer(uiStage, levelStage);
+    editorGroups = Shared.JSON.fromJson(OrderedMap.class, Gdx.files.local(EDITOR_FILE));
     uiMap = new ObjectMap<String, ImageButton>();
-    levelMap = new ObjectMap<String, Array<ImageButton>>();
+    levelMap = new OrderedMap<String, Array<ImageButton>>();
     chapterName = Shared.CHAPTER_NAMES.get(Shared.CHAPTER_FOREST);
     width = DEFAULT_WIDTH;
     height = DEFAULT_HEIGHT;
@@ -95,23 +100,29 @@ public class EditorMode implements Screen {
   public void loadContent(AssetManager manager) {
     font = manager.get(FONT, BitmapFont.class);
 
-    String[] keys = new String[] {
-      "player", "checkpoint", "simple", "crumbling",
-      "bottom_spikes", "left_spikes", "top_spikes", "right_spikes",
-      "plains_pf", "forest_pf", "mountain_pf", "desert_pf",
-      "spider", "wisp", "wyrm", "blob",
-    };
-    int buttonSize = 50;
-    int buttonSpacing = 20;
-    for (int i = 0; i < keys.length; i++) {
-      createUIButton(keys[i],
-                     buttonSpacing + i * (buttonSize + buttonSpacing),
-                     Gdx.graphics.getHeight() - buttonSize - buttonSpacing,
-                     buttonSize, buttonSize);
+    int buttonSize = 35;
+
+    Table table = new Table();
+    table.setFillParent(true);
+    table.left();
+    uiStage.addActor(table);
+
+    for (String key : editorGroups.keys()) {
+      Array<String> textures = editorGroups.get(key);
+      Table group = new Table();
+      for (String name : textures) {
+        group.add(createUIButton(name)).width(buttonSize).height(buttonSize).row();
+      }
+      table.add(group).row();
     }
+
     Image img = new Image(Shared.TEXTURE_MAP.get(chapterName));
-    img.setWidth(width * Shared.PPM);
-    img.setHeight(height * Shared.PPM);
+    img.setX(width / 2);
+    img.setY(height / 2);
+    img.setWidth(width);
+    img.setHeight(height);
+    img.setScale(Shared.PPM);
+    img.setScaling(Scaling.stretch);
     levelStage.addActor(img);
   }
 
@@ -155,18 +166,11 @@ public class EditorMode implements Screen {
   }
   
   /**
-   * Creates a UI button with the given key.
+   * Creates a UI button.
    * @param key the key for the button
-   * @param x the x coordinate
-   * @param y the y coordinate
-   * @param w the button width
-   * @param h the button height
    */
-  private void createUIButton(final String key, float x, float y, float w, float h) {
+  private Button createUIButton(final String key) {
     final ImageButton button = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key)));
-    button.setPosition(x, y);
-    button.setWidth(w);
-    button.setHeight(h);
     button.getImage().setScaling(Scaling.fit);
     button.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
@@ -174,7 +178,7 @@ public class EditorMode implements Screen {
       }
     });
     uiMap.put(key, button);
-    uiStage.addActor(button);
+    return button;
   }
 
   /**
@@ -294,56 +298,31 @@ public class EditorMode implements Screen {
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
     for (String key : levelMap.keys()) {
-      switch (key) {
-      case "player":
-        {
-          ImageButton button = levelMap.get(key).get(0);
-          data.player = new PlayerData();
-          data.player.x = getCenterX(button) / Shared.PPM;
-          data.player.y = getCenterY(button) / Shared.PPM;
-          break;
+      if (key.equals("player")) {
+        ImageButton button = levelMap.get(key).get(0);
+        data.player = new PlayerData();
+        data.player.x = getCenterX(button) / Shared.PPM;
+        data.player.y = getCenterY(button) / Shared.PPM;
+      } else if (key.equals("checkpoint")) {
+        ImageButton button = levelMap.get(key).get(0);
+        data.checkpoint = new CheckpointData();
+        data.checkpoint.x = getCenterX(button) / Shared.PPM;
+        data.checkpoint.y = getCenterY(button) / Shared.PPM;
+      } else if (editorGroups.get("Enemies").contains(key, false)) {
+        for (ImageButton button : levelMap.get(key)) {
+          EnemyData enemy = new EnemyData();
+          enemy.type = key;
+          enemy.x = getCenterX(button) / Shared.PPM;
+          enemy.y = getCenterY(button) / Shared.PPM;
+          data.enemies.add(enemy);
         }
-      case "spider":
-      case "wisp":
-      case "wyrm":
-      case "blob":
-        {
-          for (ImageButton button : levelMap.get(key)) {
-            EnemyData enemy = new EnemyData();
-            enemy.type = key;
-            enemy.x = getCenterX(button) / Shared.PPM;
-            enemy.y = getCenterY(button) / Shared.PPM;
-            data.enemies.add(enemy);
-          }
-          break;
-        }
-      case "simple":
-      case "crumbling":
-      case "bottom_spikes":
-      case "left_spikes":
-      case "top_spikes":
-      case "right_spikes":
-      case "plains_pf":
-      case "forest_pf":
-      case "mountain_pf":
-      case "desert_pf":
-        {
-          for (ImageButton button : levelMap.get(key)) {
-            PlatformData platform = new PlatformData();
-            platform.type = key;
-            platform.x = getCenterX(button) / Shared.PPM;
-            platform.y = getCenterY(button) / Shared.PPM;
-            data.platforms.add(platform);
-          }
-          break;
-        }
-      case "checkpoint":
-        {
-          ImageButton button = levelMap.get(key).get(0);
-          data.checkpoint = new CheckpointData();
-          data.checkpoint.x = getCenterX(button) / Shared.PPM;
-          data.checkpoint.y = getCenterY(button) / Shared.PPM;
-          break;
+      } else if (editorGroups.get("Platforms").contains(key, false)) {
+        for (ImageButton button : levelMap.get(key)) {
+          PlatformData platform = new PlatformData();
+          platform.type = key;
+          platform.x = getCenterX(button) / Shared.PPM;
+          platform.y = getCenterY(button) / Shared.PPM;
+          data.platforms.add(platform);
         }
       }
     }

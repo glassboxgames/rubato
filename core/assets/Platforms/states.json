@@ -1,0 +1,102 @@
+[
+  {
+    "path": "Forest/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Forest/t/",
+    "loop": true,
+  },
+  {
+    "path": "Forest/m/",
+    "loop": true,
+  },
+  {
+    "path": "Forest/b/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/t/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/m/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/b/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/t/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/m/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/b/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/t/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/m/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/b/",
+    "loop": true,
+  },
+  {
+    "path": "Wood Spikes/Bottom/",
+    "loop": true,
+  },
+  {
+    "path": "Wood Spikes/Left/",
+    "loop": true,
+  },
+  {
+    "path": "Wood Spikes/Top/",
+    "loop": true,
+  },
+  {
+    "path": "Wood Spikes/Right/",
+    "loop": true,
+  },  
+  {
+    "path": "Stone Spikes/Bottom/",
+    "loop": true,
+  },
+  {
+    "path": "Stone Spikes/Left/",
+    "loop": true,
+  },
+  {
+    "path": "Stone Spikes/Top/",
+    "loop": true,
+  },
+  {
+    "path": "Stone Spikes/Right/",
+    "loop": true,
+  },
+  {
+    "path": "Crumbling/",
+    "loop": false,
+  },
+]
