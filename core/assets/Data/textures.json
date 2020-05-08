@@ -1,8 +1,8 @@
 {
-  "forest": "Backgrounds/Forest/forest.png",
-  "plains": "Backgrounds/Plains/plains.png",
-  "desert": "Backgrounds/Desert/desert.png",
-  "mountains": "Backgrounds/Mountains/mountains.png",
+  "forest": "Backgrounds/forest.png",
+  "plains": "Backgrounds/plains.png",
+  "desert": "Backgrounds/desert.png",
+  "mountains": "Backgrounds/mountains.png",
 
   "player": "Adagio/Idle/0.png",
   "checkpoint": "Checkpoints/Inactive/pillar_off.png",
