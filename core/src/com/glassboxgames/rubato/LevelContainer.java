@@ -244,8 +244,10 @@ public class LevelContainer {
    */
   public void draw(GameCanvas canvas, boolean debug) {
     canvas.removeShader();
+    canvas.begin(Shared.BACKGROUND_SCALE, Shared.BACKGROUND_SCALE);
+    canvas.drawBackground(background);
+    canvas.end();
     canvas.begin();
-    canvas.drawBackground(background, width * Shared.PPM, height * Shared.PPM);
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
