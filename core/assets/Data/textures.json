@@ -68,6 +68,9 @@
   "save_icon": "User Interface/Icons/save_icon.png",
   "play_icon": "User Interface/Icons/play_icon.png",
 
+  "choice_selected": "User Interface/Level Editor/multiple choice/choice_selected.png",
+  "choice_deselected": "User Interface/Level Editor/multiple choice/choice_deselected.png",
+
   "adagio_icon": "User Interface/Icons/adagio_icon.png",
   "checkpoint_icon": "User Interface/Icons/checkpoint_icon.png",
   "spider_icon": "User Interface/Icons/spider_icon.png",

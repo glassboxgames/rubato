@@ -33,17 +33,21 @@ public class EditorMode implements Screen {
   /** Ghost grid size */
   private static final int GRID_SIZE = 10;
 
-  /** UI font key */
-  private static final String FONT = "level_editor_font.ttf";
-  /** UI font size */
-  private static final int FONT_SIZE = 18;
+  /** Group name font key */
+  private static final String GROUP_FONT = "level_editor_group_font.ttf";
+  /** Group name font size */
+  private static final int GROUP_FONT_SIZE = 14;
+  /** Chapter name font key */
+  private static final String CHAPTER_FONT = "level_editor_chapter_font.ttf";
+  /** Chapter name font size */
+  private static final int CHAPTER_FONT_SIZE = 18;
   /** Map movement speed */
   private static final int MAP_MOVE_SPEED = 15;
 
   /** Listener for exit events */
   private ScreenListener listener;
-  /** Font for the UI */
-  private BitmapFont font;
+  /** Fonts */
+  private BitmapFont groupFont, chapterFont;
   /** Whether this mode is active */
   private boolean active;
   /** Stage for the level */
@@ -53,10 +57,12 @@ public class EditorMode implements Screen {
   /** Input processor for the editor */
   private InputProcessor inputProcessor;
 
+  /** Map of background drawables */
+  private ObjectMap<String, Drawable> backgroundMap;
+  /** Current background image */
+  private Image background;
   /** Map of editor groups */
   private OrderedMap<String, OrderedMap<String, Array<String>>> editorGroups;
-  /** Button map for the UI */
-  private ObjectMap<String, ImageButton> uiMap;
   /** Current ghost */
   private Ghost ghost;
   /** Button map for the level */
@@ -65,6 +71,9 @@ public class EditorMode implements Screen {
   private Array<String> assets = new Array<String>();
   /** Current chapter name */
   private String chapterName;
+  /** Chapter button map */
+  private ObjectMap<String, Button> chapterButtonMap;
+
   /** Dimensions of the current level */
   private float width, height;
   
@@ -87,9 +96,10 @@ public class EditorMode implements Screen {
         editorGroups.get(groupName).put(value.name(), new Array<String>(value.asStringArray()));
       }
     }
-    uiMap = new ObjectMap<String, ImageButton>();
+    backgroundMap = new ObjectMap<String, Drawable>();
     levelMap = new OrderedMap<String, Array<ImageButton>>();
     chapterName = Shared.CHAPTER_NAMES.get(Shared.CHAPTER_FOREST);
+    chapterButtonMap = new ObjectMap<String, Button>();
     width = DEFAULT_WIDTH;
     height = DEFAULT_HEIGHT;
   }
@@ -98,16 +108,20 @@ public class EditorMode implements Screen {
    * Preloads the assets for the level editor with the given manager.
    */
   public void preloadContent(AssetManager manager) {
-    manager.load(FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE, FONT_SIZE, 0));
-    assets.add(FONT);
+    manager.load(GROUP_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.BOLD_FONT_FILE, GROUP_FONT_SIZE, 6));
+    assets.add(GROUP_FONT);
+    manager.load(CHAPTER_FONT, BitmapFont.class,
+                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE, CHAPTER_FONT_SIZE, 0));
+    assets.add(CHAPTER_FONT);
   }
 
   /**
    * Loads the assets for the level editor with the given manager.
    */
   public void loadContent(AssetManager manager) {
-    font = manager.get(FONT, BitmapFont.class);
+    groupFont = manager.get(GROUP_FONT, BitmapFont.class);
+    chapterFont = manager.get(CHAPTER_FONT, BitmapFont.class);
 
     Table table = new Table();
     table.setFillParent(true);
@@ -144,26 +158,52 @@ public class EditorMode implements Screen {
         playtest();
       }
     });
-    table.add(toolbar).left().row();
+    table.add(toolbar).padBottom(10).left().row();
+
+    Table biomes = new Table();
+    biomes.add(new Label("BIOME", new Label.LabelStyle(groupFont, Color.WHITE)))
+      .padBottom(10).left().row();
+    for (String name : Shared.CHAPTER_NAMES) {
+      Drawable deselected = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("choice_deselected"));
+      Drawable selected = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("choice_selected"));
+      ImageTextButton.ImageTextButtonStyle style =
+        new ImageTextButton.ImageTextButtonStyle();
+      style.font = chapterFont;
+      style.imageUp = deselected;
+      style.imageChecked = selected;
+      final ImageTextButton button = new ImageTextButton(name.substring(0, 1).toUpperCase() + name.substring(1),
+                                                         style);
+      button.getImageCell().padRight(10);
+      final String newChapterName = name;
+      button.addListener(new ClickListener(Input.Buttons.LEFT) {
+        public void clicked(InputEvent e, float x, float y) {
+          chapterName = newChapterName;
+        }
+      });
+      backgroundMap.put(name, new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name)));
+      chapterButtonMap.put(name, button);
+      biomes.add(button).padBottom(10).left().row();
+    }
+    table.add(biomes).padLeft(10).padBottom(20).left().row();
     
     for (String groupName : editorGroups.keys()) {
       Table group = new Table();
-      group.padBottom(20);
-      Label label = new Label(groupName, new Label.LabelStyle(font, Color.WHITE));
-      group.add(label).padLeft(10).padBottom(10).left().row();
+      group.padLeft(10).padBottom(20);
+      group.add(new Label(groupName.toUpperCase(), new Label.LabelStyle(groupFont, Color.WHITE)))
+        .padBottom(10).left().row();
       Table icons = new Table();
       group.add(icons).left().row();
       for (String icon : editorGroups.get(groupName).keys()) {
         icons.add(createUIButton(icon, editorGroups.get(groupName).get(icon)))
-          .width(35).height(35).padLeft(10).left();
+          .width(35).height(35).padRight(10).left();
       }
-      table.add(group).left().row();
+      table.add(group).padBottom(20).left().row();
     }
 
-    Image img = new Image(Shared.TEXTURE_MAP.get(chapterName));
-    img.setAlign(Align.bottomLeft);
-    img.setScale(Shared.BACKGROUND_SCALE);
-    levelStage.addActor(img);
+    background = new Image(backgroundMap.get(chapterName));
+    background.setAlign(Align.bottomLeft);
+    background.setScale(Shared.BACKGROUND_SCALE);
+    levelStage.addActor(background);
   }
 
   /**
@@ -224,7 +264,6 @@ public class EditorMode implements Screen {
         ghost = new Ghost(options, 0);
       }
     });
-    uiMap.put(key, button);
     return button;
   }
 
@@ -337,54 +376,47 @@ public class EditorMode implements Screen {
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
     for (String key : levelMap.keys()) {
-      switch (key) {
-      case "player":
-        {
-          ImageButton button = levelMap.get(key).get(0);
-          data.player = new PlayerData();
-          data.player.x = getCenterX(button) / Shared.PPM;
-          data.player.y = getCenterY(button) / Shared.PPM;
+      boolean isEnemy = false;
+      for (Array<String> textures : editorGroups.get("Enemies").values()) {
+        if (textures.contains(key, false)) {
+          isEnemy = true;
           break;
         }
-      case "checkpoint": 
-        {
-          ImageButton button = levelMap.get(key).get(0);
-          data.checkpoint = new CheckpointData();
-          data.checkpoint.x = getCenterX(button) / Shared.PPM;
-          data.checkpoint.y = getCenterY(button) / Shared.PPM;
+      }
+
+      boolean isPlatform = false;
+      for (Array<String> textures : editorGroups.get("Platforms").values()) {
+        if (textures.contains(key, false)) {
+          isPlatform = true;
           break;
         }
-      case "spider": 
-      case "wisp": 
-      case "wyrm": 
-      case "blob":
-        {
-          for (ImageButton button : levelMap.get(key)) {
-            EnemyData enemy = new EnemyData();
-            enemy.type = key;
-            enemy.x = getCenterX(button) / Shared.PPM;
-            enemy.y = getCenterY(button) / Shared.PPM;
-            data.enemies.add(enemy);
-          }
-          break;
+      }
+
+      if (key.equals("player")) {
+        ImageButton button = levelMap.get(key).get(0);
+        data.player = new PlayerData();
+        data.player.x = getCenterX(button) / Shared.PPM;
+        data.player.y = getCenterY(button) / Shared.PPM;
+      } else if (key.equals("checkpoint")) {
+        ImageButton button = levelMap.get(key).get(0);
+        data.checkpoint = new CheckpointData();
+        data.checkpoint.x = getCenterX(button) / Shared.PPM;
+        data.checkpoint.y = getCenterY(button) / Shared.PPM;
+      } else if (isEnemy) {
+        for (ImageButton button : levelMap.get(key)) {
+          EnemyData enemy = new EnemyData();
+          enemy.type = key;
+          enemy.x = getCenterX(button) / Shared.PPM;
+          enemy.y = getCenterY(button) / Shared.PPM;
+          data.enemies.add(enemy);
         }
-      case "tb_forest":
-      case "t_forest":
-      case "m_forest":
-      case "b_forest":
-      case "b_wood_spikes":
-      case "l_wood_spikes":
-      case "t_wood_spikes":
-      case "r_wood_spikes":
-        {
-          for (ImageButton button : levelMap.get(key)) {
-            PlatformData platform = new PlatformData();
-            platform.type = key;
-            platform.x = getCenterX(button) / Shared.PPM;
-            platform.y = getCenterY(button) / Shared.PPM;
-            data.platforms.add(platform);
-          }
-          break;
+      } else if (isPlatform) {
+        for (ImageButton button : levelMap.get(key)) {
+          PlatformData platform = new PlatformData();
+          platform.type = key;
+          platform.x = getCenterX(button) / Shared.PPM;
+          platform.y = getCenterY(button) / Shared.PPM;
+          data.platforms.add(platform);
         }
       }
     }
@@ -478,6 +510,11 @@ public class EditorMode implements Screen {
           ghost.changeTexture(1);
         }
       }
+
+      for (String name : chapterButtonMap.keys()) {
+        chapterButtonMap.get(name).setChecked(name == chapterName);
+      }
+      background.setDrawable(backgroundMap.get(chapterName));
 
       // Camera movement
       Camera camera = levelStage.getCamera();
