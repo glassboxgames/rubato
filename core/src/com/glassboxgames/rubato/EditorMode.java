@@ -26,12 +26,10 @@ public class EditorMode implements Screen {
 
   /** Editor metadata file */
   private static final String EDITOR_FILE = "Data/editor.json";
-  /** Default level width */
-  private static final float DEFAULT_WIDTH = 30f;
-  /** Default level height */
-  private static final float DEFAULT_HEIGHT = 18f;
   /** Ghost grid size */
   private static final int GRID_SIZE = 10;
+  /** Amount to add to furthest platform for level width bound */
+  private static final float WIDTH_OFFSET = 0.4f;
 
   /** Group name font key */
   private static final String GROUP_FONT = "level_editor_group_font.ttf";
@@ -74,9 +72,6 @@ public class EditorMode implements Screen {
   /** Chapter button map */
   private ObjectMap<String, Button> chapterButtonMap;
 
-  /** Dimensions of the current level */
-  private float width, height;
-  
   /**
    * Instantiates the editor mode controller.
    * @param listener the screen exit listener
@@ -100,8 +95,6 @@ public class EditorMode implements Screen {
     levelMap = new OrderedMap<String, Array<ImageButton>>();
     chapterName = Shared.CHAPTER_NAMES.get(Shared.CHAPTER_FOREST);
     chapterButtonMap = new ObjectMap<String, Button>();
-    width = DEFAULT_WIDTH;
-    height = DEFAULT_HEIGHT;
   }
 
   /**
@@ -319,13 +312,7 @@ public class EditorMode implements Screen {
   public void loadLevel(LevelData data) {
     clear();
     
-    width = data.width;
-    height = data.height;
     chapterName = data.chapter;
-    Image img = new Image(Shared.TEXTURE_MAP.get(chapterName));
-    img.setWidth(width * Shared.PPM);
-    img.setHeight(height * Shared.PPM);
-    levelStage.addActor(img);
     if (data.player != null) {
       createLevelButton("player",
                         data.player.x * Shared.PPM,
@@ -371,8 +358,6 @@ public class EditorMode implements Screen {
   public LevelData exportLevel() {
     LevelData data = new LevelData();
     data.chapter = chapterName;
-    data.width = width;
-    data.height = height;
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
     for (String key : levelMap.keys()) {
@@ -420,6 +405,16 @@ public class EditorMode implements Screen {
         }
       }
     }
+
+    float furthestX = data.checkpoint.x;
+    for (PlatformData platform : data.platforms) {
+      furthestX = Math.max(furthestX, platform.x);
+    }
+    data.width = MathUtils.clamp(furthestX + WIDTH_OFFSET,
+                                 Gdx.graphics.getWidth() / Shared.PPM,
+                                 background.getHeight() / Shared.PPM);
+    data.height = background.getHeight() / Shared.PPM;
+
     return data;
   }
 
@@ -518,8 +513,6 @@ public class EditorMode implements Screen {
 
       // Camera movement
       Camera camera = levelStage.getCamera();
-      int screenWidth = Gdx.graphics.getWidth();
-      int screenHeight = Gdx.graphics.getHeight();
       if (Gdx.input.isKeyPressed(Input.Keys.A)) {
         camera.position.x -= MAP_MOVE_SPEED;
       }
@@ -532,12 +525,6 @@ public class EditorMode implements Screen {
       if (Gdx.input.isKeyPressed(Input.Keys.W)) {
         camera.position.y += MAP_MOVE_SPEED;
       }
-      camera.position.x = MathUtils.clamp(camera.position.x,
-                                          screenWidth / 2,
-                                          width * Shared.PPM - screenWidth / 2);
-      camera.position.y = MathUtils.clamp(camera.position.y,
-                                          screenHeight / 2,
-                                          height * Shared.PPM - screenHeight / 2);
       camera.update();
 
       Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
