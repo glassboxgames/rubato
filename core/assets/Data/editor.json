@@ -36,6 +36,10 @@
       "l_wood_spikes",
       "t_wood_spikes",
       "r_wood_spikes",
+      "b_stone_spikes",
+      "l_stone_spikes",
+      "t_stone_spikes",
+      "r_stone_spikes",
     ],
   },
 }
