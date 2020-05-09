@@ -13,6 +13,8 @@ import com.glassboxgames.rubato.serialize.*;
 public final class Shared {
   /** Screen pixels per Box2D meter */
   public static final float PPM = 75f;
+  /** Background image scaling */
+  public static final float BACKGROUND_SCALE = 0.4f;
 
   /** Bold font file path */
   public static final String BOLD_FONT_FILE = "Fonts/Rajdhani-Bold.ttf";

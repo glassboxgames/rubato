@@ -473,7 +473,7 @@ public class GameMode implements Screen {
         if (player.isAlive()) {
           Vector2 pos = player.getPosition();
           if (pos.x >= level.getWidth()) {
-            listener.exitScreen(this, editable ? EXIT_EDIT : EXIT_COMPLETE);
+            listener.exitScreen(this, editable ? EXIT_RESET : EXIT_COMPLETE);
             return;
           }
           if (pos.y < 0) {

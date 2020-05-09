@@ -356,6 +356,20 @@ public class GameCanvas {
    * Draw the background image.
    *
    * @param image Texture to draw as an overlay
+   */
+  public void drawBackground(Texture image) {
+    if (active != DrawPass.STANDARD) {
+      Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+      return;
+    }
+    spriteBatch.setColor(Color.WHITE);
+    spriteBatch.draw(image, 0, 0);
+  }
+
+  /**
+   * Draw the background image.
+   *
+   * @param image Texture to draw as an overlay
    * @param w Level width
    * @param h Level height
    */

@@ -1,8 +1,8 @@
 {
-  "forest": "Backgrounds/Forest/forest.png",
-  "plains": "Backgrounds/Plains/plains.png",
-  "desert": "Backgrounds/Desert/desert.png",
-  "mountains": "Backgrounds/Mountains/mountains.png",
+  "forest": "Backgrounds/forest.png",
+  "plains": "Backgrounds/plains.png",
+  "desert": "Backgrounds/desert.png",
+  "mountains": "Backgrounds/mountains.png",
 
   "player": "Adagio/Idle/0.png",
   "checkpoint": "Checkpoints/Inactive/pillar_off.png",
@@ -48,6 +48,7 @@
   "pillar_selected": "User Interface/Level Selector/pillar_ui_selected.png",
   "pillar_on": "User Interface/Level Selector/pillar_ui_on.png",
   "pillar_off": "User Interface/Level Selector/pillar_ui_off.png",
+
   "forest_light": "User Interface/Buttons/forest_light_button.png",
   "forest_dark": "User Interface/Buttons/forest_dark_button.png",
   "plains_light": "User Interface/Buttons/plains_light_button.png",
@@ -56,8 +57,27 @@
   "desert_dark": "User Interface/Buttons/desert_dark_button.png",
   "mountains_light": "User Interface/Buttons/mountains_light_button.png",
   "mountains_dark": "User Interface/Buttons/mountains_dark_button.png",
+
   "play_highlight": "User Interface/Buttons/resume_button_highlighted.png",
   "play_default": "User Interface/Buttons/resume_button.png",
   "arrow_left": "User Interface/Level Selector/arrow_left.png",
   "arrow_right": "User Interface/Level Selector/arrow_right.png",
+
+  "home_icon": "User Interface/Icons/home_icon.png",
+  "load_icon": "User Interface/Icons/load_icon.png",
+  "save_icon": "User Interface/Icons/save_icon.png",
+  "play_icon": "User Interface/Icons/play_icon.png",
+
+  "choice_selected": "User Interface/Level Editor/multiple choice/choice_selected.png",
+  "choice_deselected": "User Interface/Level Editor/multiple choice/choice_deselected.png",
+
+  "adagio_icon": "User Interface/Icons/adagio_icon.png",
+  "checkpoint_icon": "User Interface/Icons/checkpoint_icon.png",
+  "spider_icon": "User Interface/Icons/spider_icon.png",
+  "wisp_icon": "User Interface/Icons/wisp_icon.png",
+  "wyrm_icon": "User Interface/Icons/wyrm_icon.png",
+  "blob_icon": "User Interface/Icons/blob_icon.png",
+  "platform_icon": "User Interface/Icons/platform_icon.png",
+  "crumbling_icon": "User Interface/Icons/crumbling_icon.png",
+  "spikes_icon": "User Interface/Icons/spikes_icon.png",
 }
