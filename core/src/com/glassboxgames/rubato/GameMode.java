@@ -83,7 +83,6 @@ public class GameMode implements Screen {
 
   /** Sound effects */
   private static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
-  private static final String DASH_SOUND = "Sounds/Dash/Dash.mp3";
   private static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
   private static final String CHECKPOINT_SOUND = "Sounds/Environment/Checkpoint.mp3";
   private static final String ATTACK_HIT_SOUND = "Sounds/Attacking/AttackHit.mp3";
@@ -172,7 +171,6 @@ public class GameMode implements Screen {
     // Initialize entity state machines
     states = new Array<State>();
     states.addAll(Player.initStates());
-    states.addAll(Shard.initStates());
     states.addAll(Platform.initStates());
     states.addAll(Checkpoint.initStates());
     states.addAll(Projectile.initStates());
@@ -222,8 +220,6 @@ public class GameMode implements Screen {
     // Sound Assets
     manager.load(GRASS_RUN_SOUND, Sound.class);
     assets.add(GRASS_RUN_SOUND);
-    manager.load(DASH_SOUND, Sound.class);
-    assets.add(DASH_SOUND);
     manager.load(ATTACK_SWING_SOUND, Sound.class);
     assets.add(ATTACK_SWING_SOUND);
     manager.load(ATTACK_HIT_SOUND, Sound.class);
@@ -260,7 +256,6 @@ public class GameMode implements Screen {
     // Allocate sounds
     SoundController sounds = SoundController.getInstance();
     sounds.allocate(manager, GRASS_RUN_SOUND);
-    sounds.allocate(manager, DASH_SOUND);
     sounds.allocate(manager, ATTACK_SWING_SOUND);
     sounds.allocate(manager, ATTACK_HIT_SOUND);
     sounds.allocate(manager, CHECKPOINT_SOUND);
@@ -357,9 +352,6 @@ public class GameMode implements Screen {
         soundController.stop(GRASS_RUN_SOUND);
       }
     }
-    if (player.isDashing()) {
-      soundController.play(DASH_SOUND, DASH_SOUND, false, 0.1f);
-    }
     if (player.isAttacking()) {
       soundController.play(ATTACK_SWING_SOUND, ATTACK_SWING_SOUND, false, 0.1f);
     }
@@ -453,10 +445,8 @@ public class GameMode implements Screen {
               Player.maxJumpDuration += devChange * 1;
               break;
             case 6:
-              Player.dashDuration += devChange * 1;
               break;
             case 7:
-              Player.dashSpeed += devChange * 0.5;
               break;
             case 8:
               break;
@@ -483,14 +473,10 @@ public class GameMode implements Screen {
 
           player.setInputVector(input.getHorizontal(), input.getVertical());
           player.tryFace();
-          player.tryCling();
           if (input.didJump()) {
             player.tryJump();
           } else if (input.didHoldJump()) {
             player.tryExtendJump();
-          }
-          if (input.didDash()) {
-            player.tryDash();
           }
           if (input.didAttack()) {
             player.tryAttack();
@@ -600,10 +586,10 @@ public class GameMode implements Screen {
                xOffset, yOffset - 3 * deltaOffset);
       drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION,
                xOffset, yOffset - 4 * deltaOffset);
-      drawText(6, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
-               xOffset, yOffset - 5 * deltaOffset);
-      drawText(7, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
-               xOffset, yOffset - 6 * deltaOffset);
+      // drawText(6, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
+      //          xOffset, yOffset - 5 * deltaOffset);
+      // drawText(7, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
+      //          xOffset, yOffset - 6 * deltaOffset);
       drawText(0, "Enemy Damage", Enemy.damage, Enemy.DAMAGE,
         xOffset, yOffset - 9 * deltaOffset);
       canvas.end();

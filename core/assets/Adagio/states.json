@@ -16,15 +16,7 @@
     "loop": false,
   },
   {
-    "path": "Dash/",
-    "loop": true,
-  },
-  {
-    "path": "Cling/",
-    "loop": true,
-  },
-  {
-    "path": "WallJump/",
+    "path": "Attack/",
     "loop": false,
   }
 ]

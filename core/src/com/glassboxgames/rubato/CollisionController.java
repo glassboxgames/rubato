@@ -111,16 +111,8 @@ public class CollisionController implements ContactListener {
   private void startCollision(Player player, Entity.Collider playerCollider,
                               Enemy enemy, Entity.Collider enemyCollider) {
 
-    if (playerCollider.isForwardSensor() && enemyCollider.isHurtbox()) {
-      if (player.isAttackingForward()) {
-        attack(player, enemy);
-      }
-    } else if (playerCollider.isUpSensor() && enemyCollider.isHurtbox()) {
-      if (player.isAttackingUp()) {
-        attack(player, enemy);
-      }
-    } else if (playerCollider.isDownSensor() && enemyCollider.isHurtbox()) {
-      if (player.isAttackingDown()) {
+    if (playerCollider.isHitbox() && enemyCollider.isHurtbox()) {
+      if (player.isAttacking()) {
         attack(player, enemy);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {

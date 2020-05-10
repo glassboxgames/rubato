@@ -362,8 +362,6 @@ public abstract class Entity {
       EDGE,
       VISION,
       FORWARD,
-      UP,
-      DOWN,
       CENTER,
     }
 
@@ -426,27 +424,6 @@ public abstract class Entity {
      */
     public boolean isWallSensor() {
       return type == Type.WALL;
-    }
-
-    /**
-     * Returns whether this collider is a forward sensor.
-     */
-    public boolean isForwardSensor() {
-      return type == Type.FORWARD;
-    }
-
-    /**
-     * Returns whether this collider is an up sensor.
-     */
-    public boolean isUpSensor() {
-      return type == Type.UP;
-    }
-
-    /**
-     * Returns whether this collider is a down sensor.
-     */
-    public boolean isDownSensor() {
-      return type == Type.DOWN;
     }
 
     /**
