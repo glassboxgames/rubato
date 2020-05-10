@@ -311,7 +311,7 @@ public class EditorMode implements Screen {
    */
   public void loadLevel(LevelData data) {
     clear();
-    
+    levelStage.addActor(background);
     chapterName = data.chapter;
     if (data.player != null) {
       createLevelButton("player",
@@ -412,7 +412,7 @@ public class EditorMode implements Screen {
     }
     data.width = MathUtils.clamp(furthestX + WIDTH_OFFSET,
                                  Gdx.graphics.getWidth() / Shared.PPM,
-                                 background.getHeight() / Shared.PPM);
+                                 background.getWidth() / Shared.PPM);
     data.height = background.getHeight() / Shared.PPM;
 
     return data;
