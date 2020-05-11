@@ -1,66 +1,194 @@
 [
   {
-    "path": "Forest/tb/",
+    "path": "Forest/c/t/",
     "loop": true,
   },
   {
-    "path": "Forest/t/",
+    "path": "Forest/c/m/",
     "loop": true,
   },
   {
-    "path": "Forest/m/",
+    "path": "Forest/c/b/",
     "loop": true,
   },
   {
-    "path": "Forest/b/",
+    "path": "Forest/c/tb/",
     "loop": true,
   },
   {
-    "path": "Plains/tb/",
+    "path": "Forest/l/t/",
     "loop": true,
   },
   {
-    "path": "Plains/t/",
+    "path": "Forest/l/m/",
     "loop": true,
   },
   {
-    "path": "Plains/m/",
+    "path": "Forest/l/b/",
     "loop": true,
   },
   {
-    "path": "Plains/b/",
+    "path": "Forest/l/tb/",
     "loop": true,
   },
   {
-    "path": "Desert/tb/",
+    "path": "Forest/r/t/",
     "loop": true,
   },
   {
-    "path": "Desert/t/",
+    "path": "Forest/r/m/",
     "loop": true,
   },
   {
-    "path": "Desert/m/",
+    "path": "Forest/r/b/",
     "loop": true,
   },
   {
-    "path": "Desert/b/",
+    "path": "Forest/r/tb/",
     "loop": true,
   },
   {
-    "path": "Mountains/tb/",
+    "path": "Plains/c/t/",
     "loop": true,
   },
   {
-    "path": "Mountains/t/",
+    "path": "Plains/c/m/",
     "loop": true,
   },
   {
-    "path": "Mountains/m/",
+    "path": "Plains/c/b/",
     "loop": true,
   },
   {
-    "path": "Mountains/b/",
+    "path": "Plains/c/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/l/t/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/l/m/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/l/b/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/l/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/r/t/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/r/m/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/r/b/",
+    "loop": true,
+  },
+  {
+    "path": "Plains/r/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/c/t/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/c/m/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/c/b/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/c/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/l/t/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/l/m/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/l/b/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/l/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/r/t/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/r/m/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/r/b/",
+    "loop": true,
+  },
+  {
+    "path": "Desert/r/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/c/t/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/c/m/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/c/b/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/c/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/l/t/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/l/m/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/l/b/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/l/tb/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/r/t/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/r/m/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/r/b/",
+    "loop": true,
+  },
+  {
+    "path": "Mountains/r/tb/",
     "loop": true,
   },
   {

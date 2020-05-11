@@ -1,166 +1,81 @@
 {
-"width": 39.4,
-"height": 341.49335,
+"width": 16,
+"height": 9.726666,
 "chapter": "forest",
 "player": {
-	"x": 6.22,
-	"y": 11.773334
+	"x": 6.7533336,
+	"y": 3.24
 },
 "enemies": [],
 "platforms": [
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 0.84
+		"type": "forest_c_t",
+		"x": 10.733334,
+		"y": 5.233333
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 1.64
+		"type": "forest_c_t",
+		"x": 6.866667,
+		"y": 2.3
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 2.44
+		"type": "forest_c_m",
+		"x": 10.733334,
+		"y": 4.5666666
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 3.24
+		"type": "forest_c_b",
+		"x": 10.733334,
+		"y": 3.9
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 3.9066668
+		"type": "forest_c_tb",
+		"x": 12.866667,
+		"y": 2.3
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 4.7066665
+		"type": "forest_l_t",
+		"x": 10.3,
+		"y": 5.233333
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 5.5066667
+		"type": "forest_l_m",
+		"x": 10.3,
+		"y": 4.5666666
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 6.306667
+		"type": "forest_l_b",
+		"x": 10.3,
+		"y": 3.9
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 7.1066666
+		"type": "forest_l_tb",
+		"x": 12.466666,
+		"y": 2.3
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 7.9066668
+		"type": "forest_r_t",
+		"x": 11.166667,
+		"y": 5.233333
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 8.706667
+		"type": "forest_r_m",
+		"x": 11.166667,
+		"y": 4.5666666
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 9.506667
+		"type": "forest_r_b",
+		"x": 11.166667,
+		"y": 3.9
 	},
 	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 10.306666
-	},
-	{
-		"type": "tb_forest",
-		"x": 6.1666665,
-		"y": 10.973333
-	},
-	{
-		"type": "crumbling",
-		"x": 39,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 37.4,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 34.866665,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 34,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 30.8,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 29.066668,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 27.066668,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 25.066668,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 23.066668,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 21.066668,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 19.2,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 17.066668,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 13.866667,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 10.4,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 8.4,
-		"y": 9
-	},
-	{
-		"type": "crumbling",
-		"x": 7.8,
-		"y": 9
+		"type": "forest_r_tb",
+		"x": 13.266666,
+		"y": 2.3
 	}
 ],
 "checkpoint": {
-	"x": 38.853333,
-	"y": 10.166667
+	"x": 4.72,
+	"y": 4.4333334
 }
 }

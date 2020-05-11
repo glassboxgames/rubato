@@ -54,17 +54,11 @@ public class LevelContainer {
     player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
     for (EnemyData enemyData : data.enemies) {
-      Enemy enemy = createEnemy(enemyData);
-      if (enemy != null) {
-        enemies.add(enemy);
-      }
+      enemies.add(createEnemy(enemyData));
     }
     platforms = new Array<Platform>();
     for (PlatformData platformData : data.platforms) {
-      Platform platform = createPlatform(platformData);
-      if (platform != null) {
-        platforms.add(platform);
-      }
+      platforms.add(createPlatform(platformData));
     }
     checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
     leftWallDef = new BodyDef();
@@ -88,67 +82,9 @@ public class LevelContainer {
     case "wyrm":
       return new Wyrm(x, y);
     default:
+      Gdx.app.error("LevelContainer", "Found unknown enemy type " + data.type, new RuntimeException());
+      Gdx.app.exit();
       return null;
-    }
-  }
-
-  /**
-   * Returns the type index associated with the given type string.
-   */
-  private static int typeStringToIndex(String type) {
-    switch (type) {
-    case "tb_forest":
-      return Platform.TYPE_TB_FOREST;
-    case "t_forest":
-      return Platform.TYPE_T_FOREST;
-    case "m_forest":
-      return Platform.TYPE_M_FOREST;
-    case "b_forest":
-      return Platform.TYPE_B_FOREST;
-    case "tb_plains":
-      return Platform.TYPE_TB_PLAINS;
-    case "t_plains":
-      return Platform.TYPE_T_PLAINS;
-    case "m_plains":
-      return Platform.TYPE_M_PLAINS;
-    case "b_plains":
-      return Platform.TYPE_B_PLAINS;
-    case "tb_desert":
-      return Platform.TYPE_TB_DESERT;
-    case "t_desert":
-      return Platform.TYPE_T_DESERT;
-    case "m_desert":
-      return Platform.TYPE_M_DESERT;
-    case "b_desert":
-      return Platform.TYPE_B_DESERT;
-    case "tb_mountains":
-      return Platform.TYPE_TB_MOUNTAINS;
-    case "t_mountains":
-      return Platform.TYPE_T_MOUNTAINS;
-    case "m_mountains":
-      return Platform.TYPE_M_MOUNTAINS;
-    case "b_mountains":
-      return Platform.TYPE_B_MOUNTAINS;
-    case "b_wood_spikes":
-      return Platform.TYPE_B_WOOD_SPIKES;
-    case "l_wood_spikes":
-      return Platform.TYPE_L_WOOD_SPIKES;
-    case "t_wood_spikes":
-      return Platform.TYPE_T_WOOD_SPIKES;
-    case "r_wood_spikes":
-      return Platform.TYPE_R_WOOD_SPIKES;
-    case "b_stone_spikes":
-      return Platform.TYPE_B_STONE_SPIKES;
-    case "l_stone_spikes":
-      return Platform.TYPE_L_STONE_SPIKES;
-    case "t_stone_spikes":
-      return Platform.TYPE_T_STONE_SPIKES;
-    case "r_stone_spikes":
-      return Platform.TYPE_R_STONE_SPIKES;
-    case "crumbling":
-      return Platform.TYPE_CRUMBLING;
-    default:
-      return -1;
     }
   }
 
@@ -156,8 +92,14 @@ public class LevelContainer {
    * Creates and returns a platform from a data object.
    */
   private static Platform createPlatform(PlatformData data) {
-    int type = typeStringToIndex(data.type);
-    return type == -1 ? null : new Platform(data.x, data.y, type);
+    try {
+      int type = Platform.Type.valueOf(data.type.toUpperCase()).ordinal();
+      return new Platform(data.x, data.y, type);
+    } catch (Exception e) {
+      Gdx.app.error("LevelContainer", "Found unknown platform type " + data.type, new RuntimeException());
+      Gdx.app.exit();
+      return null;
+    }
   }
 
   /**

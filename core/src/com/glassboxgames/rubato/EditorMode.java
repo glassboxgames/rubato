@@ -27,7 +27,7 @@ public class EditorMode implements Screen {
   /** Editor metadata file */
   private static final String EDITOR_FILE = "Data/editor.json";
   /** Ghost grid size */
-  private static final int GRID_SIZE = 10;
+  private static final int GRID_SIZE = 5;
   /** Amount to add to furthest platform for level width bound */
   private static final float WIDTH_OFFSET = 0.4f;
   /** Map movement speed */
@@ -553,7 +553,7 @@ public class EditorMode implements Screen {
         styles.add(style);
       }
       button = new ImageButton(styles.get(index));
-      button.getColor().a = 0.5f;
+      button.getColor().a = 0.7f;
       button.addListener(new ClickListener(Input.Buttons.LEFT) {
         public void clicked(InputEvent event, float x, float y) {
           createLevelButton(textures.get(index),
