@@ -74,6 +74,13 @@ public abstract class Entity {
   }
 
   /**
+   * Returns the texture.
+   */
+  public Texture getTexture() {
+    return getState().getTexture(getCount());
+  }
+
+  /**
    * Returns the position vector. Always returns a copy in the same vector.
    */
   public Vector2 getPosition() {
@@ -309,7 +316,7 @@ public abstract class Entity {
    * Draws this entity to the given canvas.
    */
   public void draw(GameCanvas canvas) {
-    Texture texture = getState().getTexture(getCount());
+    Texture texture = getTexture();
     float w = texture.getWidth();
     float h = texture.getHeight();
     Vector2 pos = getPosition().scl(Shared.PPM);

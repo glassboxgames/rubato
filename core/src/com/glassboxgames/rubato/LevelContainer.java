@@ -258,9 +258,7 @@ public class LevelContainer {
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
-    if (player.isAlive()) {
-      player.draw(canvas);
-    }
+    player.draw(canvas);
     canvas.end();
 
     if (debug) {
@@ -272,7 +270,7 @@ public class LevelContainer {
       for (Enemy enemy : enemies) {
         enemy.drawPhysics(canvas);
       }
-      if (player.isAlive()) {
+      if (player.isActive()) {
         player.drawPhysics(canvas);
       }
       canvas.endDebug();

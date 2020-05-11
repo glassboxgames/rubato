@@ -18,5 +18,9 @@
   {
     "path": "Attack/",
     "loop": false,
+  },
+  {
+    "path": "Dead/",
+    "loop": false,
   }
 ]

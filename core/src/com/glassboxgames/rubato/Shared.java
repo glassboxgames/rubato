@@ -53,7 +53,6 @@ public final class Shared {
 
   /** Sound files */
   public static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
-  public static final String DASH_SOUND = "Sounds/Dash/Dash.mp3";
   public static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
   public static final String CHECKPOINT_SOUND = "Sounds/Environment/Checkpoint.mp3";
   public static final String ATTACK_HIT_SOUND = "Sounds/Attacking/AttackHit.mp3";

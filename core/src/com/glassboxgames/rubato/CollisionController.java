@@ -9,6 +9,7 @@ public class CollisionController implements ContactListener {
   /** The singleton instance of the collision controller */
   private static CollisionController controller = null;
 
+  /** The singleton instance of the sound controller */
   SoundController soundController = SoundController.getInstance();
 
   /**
@@ -118,7 +119,6 @@ public class CollisionController implements ContactListener {
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
         player.setAlive(false);
-        // soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.03f);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       if (enemy.isSuspended()) {

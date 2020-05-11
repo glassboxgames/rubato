@@ -44,6 +44,7 @@ public class Player extends Entity {
   public static final int STATE_FALL = 2;
   public static final int STATE_JUMP = 3;
   public static final int STATE_ATTACK = 4;
+  public static final int STATE_DEAD = 5;
 
   /** Player states */
   public static Array<State> states = null;
@@ -61,14 +62,17 @@ public class Player extends Entity {
   /** Remaining attack cooldown */
   private int attackCooldown;
 
-  /** Whether the player is currently alive */
-  private boolean alive;
+  /** Whether the player is currently active */
+  protected boolean active;
   /** Enemies that have been hit by the current active attack */
   private ObjectSet<Enemy> enemiesHit;
   /** Entities that the player is currently using as ground */
   private ObjectSet<Entity> entitiesUnderfoot;
   /** Entities that the player is adjacent to */
   private ObjectSet<Entity> entitiesAdjacent;
+
+  /** The singleton instance of the sound controller */
+  SoundController soundController = SoundController.getInstance();
 
   /**
    * Instantiates a player with the given parameters.
@@ -85,7 +89,7 @@ public class Player extends Entity {
     enemiesHit = new ObjectSet<Enemy>();
     entitiesUnderfoot = new ObjectSet<Entity>();
     entitiesAdjacent = new ObjectSet<Entity>();
-    alive = true;
+    active = true;
   }
 
   /**
@@ -104,7 +108,7 @@ public class Player extends Entity {
    * Tries to start a jump.
    */
   public void tryJump() {
-    if (!isJumping() && isGrounded()) {
+    if ((stateIndex != STATE_DEAD) && !isJumping() && isGrounded()) {
       setState(STATE_JUMP);
     } 
   }
@@ -113,7 +117,7 @@ public class Player extends Entity {
    * Tries to extend an existing jump.
    */
   public void tryExtendJump() {
-    if (isJumping()) {
+    if ((stateIndex != STATE_DEAD) && isJumping()) {
       if (jumpDuration < maxJumpDuration) {
         jumpDuration++;
       }
@@ -124,23 +128,31 @@ public class Player extends Entity {
    * Tries to start a player attack.
    */
   public void tryAttack() {
-    if (!isAttacking() && attackCooldown < 0) {
+    if ((stateIndex != STATE_DEAD) && !isAttacking() && attackCooldown < 0) {
+      soundController.play(Shared.ATTACK_SWING_SOUND, Shared.ATTACK_SWING_SOUND, false, 0.1f);
       setState(STATE_ATTACK);
     }
   }
 
   /**
-   * Returns whether the player is alive.
+   * Returns whether the player is active (alive or dying).
    */
-  public boolean isAlive() {
-    return alive;
+  public boolean isActive() {
+    return active;
   }
 
   /**
    * Sets whether the player is alive.
    */
   public void setAlive(boolean value) {
-    alive = value;
+    if (value) {
+      if (stateIndex == STATE_DEAD) {
+        setState(STATE_IDLE);
+      }
+    } else if (stateIndex != STATE_DEAD) {
+      soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.25f);
+      setState(STATE_DEAD);
+    }
   }
 
   /**
@@ -210,17 +222,21 @@ public class Player extends Entity {
    * Sets the player's input vector.
    */
   public void setInputVector(float x, float y) {
-    input.set(x, y);
+    if (stateIndex != STATE_DEAD) {
+      input.set(x, y);
+    }
   }
 
   /**
    * Faces the player based on their input.
    */
   public void tryFace() {
-    if (input.x > 0) {
-      faceRight();
-    } else if (input.x < 0) {
-      faceLeft();
+    if (stateIndex != STATE_DEAD) {
+      if (input.x > 0) {
+        faceRight();
+      } else if (input.x < 0) {
+        faceLeft();
+      }
     }
   }
 
@@ -234,6 +250,9 @@ public class Player extends Entity {
     case STATE_JUMP:
       jumpTime = 0;
       jumpDuration = minJumpDuration;
+      break;
+    case STATE_DEAD:
+      body.setGravityScale(0f);
       break;
     }
   }
@@ -287,10 +306,15 @@ public class Player extends Entity {
 
   @Override
   public void update(float delta) {
-    if (!isAlive()) {
+    super.update(delta);
+
+    if (stateIndex == STATE_DEAD) {
+      body.setLinearVelocity(new Vector2());
+      if (getCount() >= getState().getLength()) {
+        active = false;
+      }
       return;
     }
-    super.update(delta);
 
     if (input.x != 0) {
       temp.set(MOVE_IMPULSE * Math.signum(input.x), 0);
@@ -332,7 +356,7 @@ public class Player extends Entity {
 
   @Override
   public void draw(GameCanvas canvas) {
-    if (isAlive()) {
+    if (active) {
       super.draw(canvas);
     }
   }
