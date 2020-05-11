@@ -81,19 +81,21 @@ public class SettingsMode implements Screen {
     deselectedStyle.fontColor = Color.WHITE;
     labelStyle = new Label.LabelStyle(Shared.FONT_MAP.get("settings.deselected.ttf"), Color.WHITE);
 
+    ImageButton home = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("home_icon")));
+    home.addListener(new ClickListener(Input.Buttons.LEFT) {
+      public void clicked(InputEvent e, float x, float y) {
+        exitToMenu();
+      }
+    });
+    home.setX(20);
+    home.setY(Gdx.graphics.getHeight() - home.getHeight() - 20);
+    stage.addActor(home);
+
     final Table table = new Table();
     stage.addActor(table);
     table.setFillParent(true);
     table.pad(150, 90, 150, 90);
       
-    TextButton back = new TextButton("back", deselectedStyle);
-    back.addListener(new ClickListener(Input.Buttons.LEFT) {
-      public void clicked(InputEvent e, float x, float y) {
-        exitToMenu();
-      }
-    });
-    table.add(back).padBottom(50).left().row();
-
     table.add(new Label("CONTROLS",
                         new Label.LabelStyle(Shared.FONT_MAP.get("settings.header.ttf"), Color.WHITE)))
       .left().row();

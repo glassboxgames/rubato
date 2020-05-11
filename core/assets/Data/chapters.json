@@ -1,7 +1,14 @@
 [
   {
     "key": "forest",
-    "maps": ["Levels/test.json", "Levels/test.json"],
+    "maps": [
+      "Levels/test.json",
+      "Levels/test.json",
+      "Levels/test.json",
+      "Levels/test.json",
+      "Levels/test.json",
+      "Levels/test.json",
+    ],
   },
   {
     "key": "plains",

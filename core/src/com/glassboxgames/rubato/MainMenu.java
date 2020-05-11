@@ -159,6 +159,7 @@ public class MainMenu implements Screen {
   public void hide() {
     active = false;
     Gdx.input.setInputProcessor(null);
+    index = -1;
   }
 
   @Override

@@ -91,6 +91,8 @@ public class GameMode implements Screen {
 
   /** Whether this game mode is paused */
   private boolean paused;
+  /** Game stage */
+  private Stage gameStage;
   /** Pause menu stage */
   private Stage pauseStage;
   /** Pause menu table */
@@ -99,8 +101,6 @@ public class GameMode implements Screen {
   private Array<Button> pauseButtons;
   /** Pause menu button group */
   private HorizontalGroup pauseButtonGroup;
-  /** Pause menu button index */
-  private int pauseIndex;
 
   /** Overlay fade (between 0 and 1) */
   private float overlayFade;
@@ -193,6 +193,18 @@ public class GameMode implements Screen {
    * Initializes the game mode UI.
    */
   public void initUI() {
+    gameStage = new Stage();
+    ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pause_icon")));
+    pauseButton.addListener(new ClickListener(Input.Buttons.LEFT) {
+      public void clicked(InputEvent e, float x, float y) {
+        System.out.println("clicked");
+        pauseGame();
+      }
+    });
+    pauseButton.setX(20);
+    pauseButton.setY(Gdx.graphics.getHeight() - pauseButton.getHeight() - 20);
+    gameStage.addActor(pauseButton);
+    
     pauseStage = new Stage();
     pauseTable = new Table();
     pauseTable.setFillParent(true);
@@ -226,7 +238,7 @@ public class GameMode implements Screen {
     button.setWidth(100);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        paused = false;
+        resumeGame();
         switch (index) {
         case PAUSE_RESET:
           startExit(EXIT_RESET);
@@ -280,9 +292,9 @@ public class GameMode implements Screen {
     level = new LevelContainer(data, manager);
     gameState = GameState.INTRO;
     this.editable = editable;
-    paused = false;
     exiting = false;
     overlayFade = 1;
+    resumeGame();
   }
 
   /**
@@ -348,7 +360,7 @@ public class GameMode implements Screen {
 
       if (paused) {
         if (input.pressedExit()) {
-          paused = false;
+          resumeGame();
         }
 
         pauseStage.act(delta);
@@ -486,6 +498,8 @@ public class GameMode implements Screen {
         checkpoint.sync();
 
         world.step(1 / 60f, 8, 3);
+
+        gameStage.act(delta);
       }
     }
 
@@ -544,6 +558,8 @@ public class GameMode implements Screen {
                               new Color(0, 0, 0, 0.4f), level.getWidth(), level.getHeight());
         canvas.end();
         pauseStage.draw();
+      } else {
+        gameStage.draw();
       }
 
       if (overlayFade > 0) {
@@ -599,14 +615,13 @@ public class GameMode implements Screen {
   private void pauseGame() {
     Gdx.input.setInputProcessor(pauseStage);
     paused = true;
-    pauseIndex = 0;
   }
 
   /**
    * Resumes the game.
    */
   private void resumeGame() {
-    Gdx.input.setInputProcessor(null);
+    Gdx.input.setInputProcessor(gameStage);
     paused = false;
   }
 
@@ -621,11 +636,13 @@ public class GameMode implements Screen {
 
   @Override
   public void show() {
+    Gdx.input.setInputProcessor(gameStage);
     active = true;
   }
 
   @Override
   public void hide() {
+    Gdx.input.setInputProcessor(null);
     active = false;
   }
 

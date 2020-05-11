@@ -36,7 +36,9 @@ public class SelectMode implements Screen {
   /** Group for level chooser */
   private HorizontalGroup levelChooser;
   /** Button styles for level chooser */
-  private ImageTextButton.ImageTextButtonStyle lockedStyle, unlockedStyle;
+  private ImageTextButton.ImageTextButtonStyle lockedLevelStyle, unlockedLevelStyle;
+  /** Button style maps for chapter chooser */
+  private ObjectMap<String, ImageButton.ImageButtonStyle> lockedChapterStyles, unlockedChapterStyles;
 
   /** Current chapter */
   private int chapter;
@@ -54,6 +56,8 @@ public class SelectMode implements Screen {
   private Array<ImageTextButton> levelButtons;
   /** Current level label */
   private Label currLevelLabel;
+  /** Arrow buttons */
+  private ImageButton leftArrow, rightArrow;
 
   /**
    * Instantiates the level selector mode controller.
@@ -66,21 +70,41 @@ public class SelectMode implements Screen {
     levelButtonsByChapter = new Array<Array<ImageTextButton>>();
     levelButtons = new Array<ImageTextButton>();
     backgrounds = new Array<Image>();
+    lockedChapterStyles = new ObjectMap<String, ImageButton.ImageButtonStyle>();
+    unlockedChapterStyles = new ObjectMap<String, ImageButton.ImageButtonStyle>();
   }
 
   /**
    * Initializes the UI.
    */
   public void initUI() {
+    final SaveController save = SaveController.getInstance();
+
+    ImageButton home = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("home_icon")));
+    home.addListener(new ClickListener(Input.Buttons.LEFT) {
+      public void clicked(InputEvent e, float x, float y) {
+        exitToMenu();
+      }
+    });
+    home.setX(20);
+    home.setY(Gdx.graphics.getHeight() - home.getHeight() - 20);
+    stage.addActor(home);
+    
     for (int i = 0; i < Shared.CHAPTER_NAMES.size; i++) {
       String name = Shared.CHAPTER_NAMES.get(i);
+      ImageButton.ImageButtonStyle unlockedStyle = new ImageButton.ImageButtonStyle();
+      unlockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_unlocked"));
+      unlockedStyle.imageOver = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_hovered"));
+      unlockedStyle.imageChecked = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_selected"));
+      ImageButton.ImageButtonStyle lockedStyle = new ImageButton.ImageButtonStyle();
+      lockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_locked"));
+      
       final ImageButton button =
-        new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_dark")), null,
-                        new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_light")));
+        new ImageButton(save.getLevelsUnlocked(name) > 0 ? unlockedStyle : lockedStyle);
       // hex magic
       int buttonSize = 60;
       button.setX(40 + (i % 2) * buttonSize * (float)Math.sqrt(3) / 4);
-      button.setY(Gdx.graphics.getHeight() - (40 + buttonSize + i * buttonSize * 3 / 4));
+      button.setY(Gdx.graphics.getHeight() - (70 + buttonSize + i * buttonSize * 3 / 4));
       button.setWidth(buttonSize);
       button.setHeight(buttonSize);
       final int newChapter = i;
@@ -94,48 +118,39 @@ public class SelectMode implements Screen {
     }
 
     Table table = new Table();
-    ImageButton left = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("arrow_left")));
-    left.addListener(new ClickListener(Input.Buttons.LEFT) {
+    leftArrow = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("arrow_left")));
+    leftArrow.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        int n = getNumPages();
-        page = (page + n - 1) % n;
+        page--;
         updateChooser();
       }
     });
-    table.add(left).left().expandX();
+    table.add(leftArrow).left().expandX();
     
     levelChooser = new HorizontalGroup();
-    lockedStyle = new ImageTextButton.ImageTextButtonStyle();
-    lockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_off"));
-    lockedStyle.font = Shared.FONT_MAP.get("select.level_number.ttf");
-    lockedStyle.fontColor = Color.WHITE;
-    unlockedStyle = new ImageTextButton.ImageTextButtonStyle();
-    unlockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_on"));
-    unlockedStyle.imageChecked = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_selected"));
-    unlockedStyle.font = Shared.FONT_MAP.get("select.level_number.ttf");
-    unlockedStyle.fontColor = Color.WHITE;
+    lockedLevelStyle = new ImageTextButton.ImageTextButtonStyle();
+    lockedLevelStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_off"));
+    lockedLevelStyle.font = Shared.FONT_MAP.get("select.level_number.ttf");
+    lockedLevelStyle.fontColor = Color.WHITE;
+    unlockedLevelStyle = new ImageTextButton.ImageTextButtonStyle();
+    unlockedLevelStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_on"));
+    unlockedLevelStyle.imageOver = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_selected"));
+    unlockedLevelStyle.font = Shared.FONT_MAP.get("select.level_number.ttf");
+    unlockedLevelStyle.fontColor = Color.WHITE;
     for (int c = 0; c < Shared.CHAPTER_LEVELS.size; c++) {
       Array<ImageTextButton> buttons = new Array<ImageTextButton>();
       for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size; l++) {
-        final ImageTextButton button = new ImageTextButton(Integer.toString(l + 1), lockedStyle);
+        final ImageTextButton button = new ImageTextButton(Integer.toString(l + 1), lockedLevelStyle);
         button.clearChildren();
         button.add(button.getLabel()).padBottom(40).row();
         button.add(button.getImage());
         final int newLevel = l;
         button.addListener(new ClickListener(Input.Buttons.LEFT) {
           public void clicked(InputEvent e, float x, float y) {
-            if (newLevel < SaveController.getInstance().getLevelsUnlocked(chapter)) {
+            if (newLevel < save.getLevelsUnlocked(chapter)) {
               level = newLevel;
               play();
             }
-          }
-
-          public void enter(InputEvent e, float x, float y, int pointer, Actor from) {
-            button.setChecked(true);
-          }
-
-          public void exit(InputEvent e, float x, float y, int pointer, Actor to) {
-            button.setChecked(false);
           }
         });
         buttons.add(button);
@@ -146,14 +161,14 @@ public class SelectMode implements Screen {
     levelChooser.space(60);
     table.add(levelChooser).center();
 
-    ImageButton right = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("arrow_right")));
-    right.addListener(new ClickListener(Input.Buttons.LEFT) {
+    rightArrow = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("arrow_right")));
+    rightArrow.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        page = (page + 1) % getNumPages();
+        page++;
         updateChooser();
       }
     });
-    table.add(right).right().expandX();
+    table.add(rightArrow).right().expandX();
     
     table.setFillParent(true);
     table.center().bottom().pad(0, 40, 100, 40);
@@ -172,6 +187,8 @@ public class SelectMode implements Screen {
    */
   private void updateChooser() {
     levelChooser.clear();
+    leftArrow.setVisible(page > 0);
+    rightArrow.setVisible(page < getNumPages() - 1);
     for (int i = 0; i < LEVELS_SHOWN; i++) {
       int l = page * LEVELS_SHOWN + i;
       if (l < levelButtons.size) {
@@ -209,6 +226,13 @@ public class SelectMode implements Screen {
   }
 
   /**
+   * Exits to the main menu.
+   */
+  private void exitToMenu() {
+    listener.exitScreen(this, EXIT_MENU);
+  }
+  
+  /**
    * Starts playing the selected level.
    */
   private void play() {
@@ -223,7 +247,8 @@ public class SelectMode implements Screen {
       input.readInput();
 
       if (input.pressedExit()) {
-        listener.exitScreen(this, EXIT_MENU);
+        exitToMenu();
+        return;
       }
 
       for (int i = 0; i < chapterButtons.size; i++) {
@@ -235,7 +260,7 @@ public class SelectMode implements Screen {
       int unlocked = save.getLevelsUnlocked(chapter);
 
       for (int i = 0; i < levelButtons.size; i++) {
-        levelButtons.get(i).setStyle(i < unlocked ? unlockedStyle : lockedStyle);
+        levelButtons.get(i).setStyle(i < unlocked ? unlockedLevelStyle : lockedLevelStyle);
       }
 
       Gdx.gl.glClearColor(0f, 0f, 0f, 1f);

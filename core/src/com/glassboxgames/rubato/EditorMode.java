@@ -90,7 +90,7 @@ public class EditorMode implements Screen {
   public void initUI() {
     Table table = new Table();
     table.setFillParent(true);
-    table.top().left().pad(10);
+    table.top().left().pad(20);
     uiStage.addActor(table);
 
     Table toolbar = new Table();
