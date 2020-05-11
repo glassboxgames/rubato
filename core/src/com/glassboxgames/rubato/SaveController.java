@@ -64,6 +64,7 @@ public class SaveController {
    */
   public void setLevelsUnlocked(String chapter, int levels) {
     data.unlocked.put(chapter, levels);
+    writeSave();
   }
 
   /**

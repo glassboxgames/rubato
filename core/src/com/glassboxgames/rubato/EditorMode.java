@@ -473,7 +473,6 @@ public class EditorMode implements Screen {
       }
 
       for (String name : chapterButtonMap.keys()) {
-        System.out.println(name + " " + chapterName);
         chapterButtonMap.get(name).setChecked(name == chapterName);
       }
       background.setDrawable(backgroundMap.get(chapterName));

@@ -159,7 +159,7 @@ public class GDXRoot extends Game implements ScreenListener {
         if (levelIndex >= levels.size) {
           levelIndex = 0;
           level = levels.get(levelIndex);
-          setScreen(mainMenu);
+          setScreen(selectMode);
         } else {
           level = levels.get(levelIndex);
           gameMode.initLevel(level, manager, false);
@@ -168,6 +168,18 @@ public class GDXRoot extends Game implements ScreenListener {
         gameMode.initLevel(level, manager, gameMode.isEditable());
       } else if (exitCode == GameMode.EXIT_EDIT) {
         setScreen(editorMode);
+      } else if (exitCode == GameMode.EXIT_CHECKPOINT) {
+        SaveController save = SaveController.getInstance();
+        int unlocked = save.getLevelsUnlocked(chapterIndex);
+        if (levelIndex == unlocked - 1) {
+          if (unlocked < levels.size) {
+            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
+          } else if (chapterIndex < Shared.CHAPTER_NAMES.size) {
+            save.setLevelsUnlocked(chapterIndex + 1, 1);
+          } else {
+            // game end logic 
+          }
+        }
       } else {
         Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode,
                       new RuntimeException());

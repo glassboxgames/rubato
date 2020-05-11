@@ -48,6 +48,13 @@ public class Checkpoint extends Entity {
     return states;
   }
 
+  /**
+   * Returns whether this checkpoint was just activated.
+   */
+  public boolean wasJustActivated() {
+    return isActivated() && getInternalCount() == 0;
+  }
+
   @Override
   public Array<State> getStates() {
     return states;

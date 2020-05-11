@@ -1,18 +1,18 @@
 [
   {
     "key": "forest",
-    "maps": [],
+    "maps": ["Levels/test.json", "Levels/test.json"],
   },
   {
     "key": "plains",
-    "maps": [],
+    "maps": ["Levels/test.json", "Levels/test.json"],
   },
   {
     "key": "desert",
-    "maps": [],
+    "maps": ["Levels/test.json", "Levels/test.json"],
   },
   {
     "key": "mountains",
-    "maps": [],
+    "maps": ["Levels/test.json", "Levels/test.json"],
   },
 ]

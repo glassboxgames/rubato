@@ -266,6 +266,13 @@ public abstract class Entity {
   }
 
   /**
+   * Returns the internal animation count (float).
+   */
+  public float getInternalCount() {
+    return count;
+  }
+  
+  /**
    * Returns the current count of the animation as an int.
    */
   public int getCount() {

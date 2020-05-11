@@ -41,6 +41,8 @@ public class GameMode implements Screen {
   public static final int EXIT_RESET = 3;
   /** Exit code for editing the level */
   public static final int EXIT_EDIT = 4;
+  /** Exit code for reaching the checkpoint */
+  public static final int EXIT_CHECKPOINT = 5;
 
   /** Pause code for resuming */
   public static final int PAUSE_RESUME = 0;
@@ -467,8 +469,9 @@ public class GameMode implements Screen {
         
         Checkpoint checkpoint = level.getCheckpoint();
         checkpoint.update(delta);
-        if (checkpoint.isActivated()) {
+        if (checkpoint.wasJustActivated()) {
           level.removeRightWall();
+          listener.exitScreen(this, EXIT_CHECKPOINT);
         }
 
         if (player.isActive()) {
