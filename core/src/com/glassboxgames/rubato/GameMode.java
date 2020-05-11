@@ -464,7 +464,12 @@ public class GameMode implements Screen {
           }
         }
         platforms.removeAll(removedPlatforms, true);
-        level.getCheckpoint().update(delta);
+        
+        Checkpoint checkpoint = level.getCheckpoint();
+        checkpoint.update(delta);
+        if (checkpoint.isActivated()) {
+          level.removeRightWall();
+        }
 
         if (player.isActive()) {
           player.sync();
@@ -475,7 +480,7 @@ public class GameMode implements Screen {
         for (Platform platform : level.getPlatforms()) {
           platform.sync();
         }
-        level.getCheckpoint().sync();
+        checkpoint.sync();
 
         world.step(1 / 60f, 8, 3);
       }

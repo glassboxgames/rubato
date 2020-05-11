@@ -18,8 +18,8 @@ import com.glassboxgames.util.*;
  * This class represents everything inside a single level.
  */
 public class LevelContainer {
-  /** Width of the left wall fixture */
-  private static final float LEFT_WALL_WIDTH = 0.5f;
+  /** Width of the wall fixture */
+  private static final float WALL_WIDTH = 0.5f;
 
   /** The dimensions of the level */
   private float width, height;
@@ -33,10 +33,10 @@ public class LevelContainer {
   private Array<Platform> platforms;
   /** The checkpoint in this level (optional) */
   private Checkpoint checkpoint;
-  /** The left wall definition */
-  private BodyDef leftWallDef;
-  /** The left wall in this level */
-  private Body leftWall;
+  /** The wall definition */
+  private BodyDef wallDef;
+  /** The walls in this level */
+  private Body leftWall, rightWall;
 
   /**
    * Instantiates a LevelContainer from a LevelData object.
@@ -61,9 +61,8 @@ public class LevelContainer {
       platforms.add(createPlatform(platformData));
     }
     checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
-    leftWallDef = new BodyDef();
-    leftWallDef.type = BodyDef.BodyType.StaticBody;
-    leftWallDef.position.set(-LEFT_WALL_WIDTH / 2, height / 2);
+    wallDef = new BodyDef();
+    wallDef.type = BodyDef.BodyType.StaticBody;
   }
 
   /**
@@ -114,13 +113,17 @@ public class LevelContainer {
       platform.activatePhysics(world);
     }
     checkpoint.activatePhysics(world);
-    leftWall = world.createBody(leftWallDef);
     FixtureDef def = new FixtureDef();
     def.friction = 0;
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(LEFT_WALL_WIDTH / 2, height);
+    shape.setAsBox(WALL_WIDTH / 2, height);
     def.shape = shape;
+    leftWall = world.createBody(wallDef);
+    leftWall.setTransform(-WALL_WIDTH / 2, height / 2, 0);
     leftWall.createFixture(def);
+    rightWall = world.createBody(wallDef);
+    rightWall.setTransform(width + WALL_WIDTH / 2, height / 2, 0);
+    rightWall.createFixture(def);
   }
 
   /**
@@ -138,7 +141,10 @@ public class LevelContainer {
     if (leftWall != null) {
       world.destroyBody(leftWall);
       leftWall = null;
-      leftWallDef.active = false;
+    }
+    if (rightWall != null) {
+      world.destroyBody(rightWall);
+      rightWall = null;
     }
   }
 
@@ -182,6 +188,13 @@ public class LevelContainer {
    */
   public Checkpoint getCheckpoint() {
     return checkpoint;
+  }
+
+  /**
+   * Removes the right wall in this level.
+   */
+  public void removeRightWall() {
+    rightWall.setActive(false);
   }
 
   /**
