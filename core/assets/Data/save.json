@@ -1,4 +1,16 @@
 {
-  "chaptersUnlocked": 3,
-  "levelsUnlocked": 1,
+"unlocked": {
+	"mountains": 0,
+	"desert": 0,
+	"forest": 10,
+	"plains": 0
+},
+"bindings": {
+	"left": "Left",
+	"attack": "F",
+	"up": "Up",
+	"right": "Right",
+	"down": "Down",
+	"jump": "Space"
+}
 }

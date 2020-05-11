@@ -1,4 +1,6 @@
 {
+  "blank": "User Interface/blank.png",
+  
   "forest": "Backgrounds/forest.png",
   "plains": "Backgrounds/plains.png",
   "desert": "Backgrounds/desert.png",
@@ -74,6 +76,20 @@
   "wyrm": "Enemies/Wyrm/Idle/Armature_swim_00.png",
   "blob": "Enemies/Blob/Idle/blob_enemy50x50.png",
 
+  "pause_overlay": "User Interface/Play Screen/pause_overlay.png",
+  "resume_deselected": "User Interface/Buttons/resume_button.png",
+  "resume_selected": "User Interface/Buttons/resume_button_highlighted.png",
+  "reset_deselected": "User Interface/Buttons/reset_button.png",
+  "reset_selected": "User Interface/Buttons/reset_button_highlighted.png",
+  "levels_deselected": "User Interface/Buttons/levels_button.png",
+  "levels_selected": "User Interface/Buttons/levels_button_highlighted.png",
+  "menu_deselected": "User Interface/Buttons/menu_button.png",
+  "menu_selected": "User Interface/Buttons/menu_button_highlighted.png",
+
+  "highlight": "User Interface/Highlight/highlight.png",
+  "no_highlight": "User Interface/Highlight/no_highlight.png",
+  "adagio_head_icon": "User Interface/Main Menu/adagio_head_51x61.png",
+
   "pillar_selected": "User Interface/Level Selector/pillar_ui_selected.png",
   "pillar_on": "User Interface/Level Selector/pillar_ui_on.png",
   "pillar_off": "User Interface/Level Selector/pillar_ui_off.png",
@@ -109,4 +125,7 @@
   "platform_icon": "User Interface/Icons/platform_icon.png",
   "crumbling_icon": "User Interface/Icons/crumbling_icon.png",
   "spikes_icon": "User Interface/Icons/spikes_icon.png",
+
+  "slider_track": "User Interface/Buttons/slider_track.png",
+  "slider_knob": "User Interface/Buttons/slider_knob.png",
 }

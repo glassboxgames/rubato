@@ -26,41 +26,12 @@ public class MainMenu implements Screen {
   /** Exit code to quit */
   public static final int EXIT_QUIT = 3;
 
-  /** Asset paths */
-  protected static final String HIGHLIGHT_FILE =
-    "User Interface/Highlight/highlight.png";
-  protected static final String DEFAULT_FILE =
-    "User Interface/Highlight/no_highlight.png";
-  protected static final String ADAGIO_ICON_FILE =
-    "User Interface/Main Menu/adagio_head_51x61.png";
-
-  /** Font files */
-  protected static final String TITLE_FONT = "main_menu_title_font.ttf";
-  protected static final String HIGHLIGHT_FONT = "main_menu_highlight_font.ttf";
-  protected static final String OPTION_FONT = "main_menu_option_font.ttf";
-
-  /** UI element sizes */
-  protected static final int TITLE_FONT_SIZE = 96;
-  protected static final int HIGHLIGHT_FONT_SIZE = 48;
-  protected static final int OPTION_FONT_SIZE = 48;
-  protected static final int BUTTON_HEIGHT = 72;
-  protected static final int PADDING = 90;
-
-  /** Loaded assets */
-  protected Texture highlightBackground, optionBackground, adagioIcon;
-  protected BitmapFont titleFont, highlightFont, optionFont;
-
-
-  /** Array of loaded assets */
-  protected Array<String> assets;
   /** Button styles */
-  TextButton.TextButtonStyle highlightStyle, optionStyle;
+  TextButton.TextButtonStyle selectedStyle, deselectedStyle;
   /** Whether this mode is active */
   protected boolean active;
   /** Stage for the menu */
   protected Stage stage;
-  /** Table for the menu */
-  protected Table table;
   /** Listener to call when exiting */
   protected ScreenListener listener;
   /** Array of menu buttons */
@@ -74,77 +45,54 @@ public class MainMenu implements Screen {
    */
   public MainMenu(ScreenListener listener) {
     this.listener = listener;
-    assets = new Array<String>();
     stage = new Stage();
-    table = new Table();
-    stage.addActor(table);
     buttons = new Array<TextButton>();
-  }
-
-  /**
-   * Preloads the assets for the main menu with the given manager.
-   */
-  public void preloadContent(AssetManager manager) {
-    manager.load(TITLE_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE,
-                                               TITLE_FONT_SIZE));
-    assets.add(TITLE_FONT);
-
-    manager.load(HIGHLIGHT_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE,
-                                               HIGHLIGHT_FONT_SIZE));
-    assets.add(HIGHLIGHT_FONT);
-
-    manager.load(OPTION_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE,
-                                               OPTION_FONT_SIZE));
-    assets.add(OPTION_FONT);
-
-    manager.load(HIGHLIGHT_FILE, Texture.class);
-    assets.add(HIGHLIGHT_FILE);
-    manager.load(DEFAULT_FILE, Texture.class);
-    assets.add(DEFAULT_FILE);
-    manager.load(ADAGIO_ICON_FILE, Texture.class);
-    assets.add(ADAGIO_ICON_FILE);
+    index = -1;
   }
 
   /**
    * Adds a menu option at the given index.
    */
-  private void addMenuOption(int index, String text) {
-    TextButton button = new TextButton(text, optionStyle);
-    button.padRight(PADDING);
+  private void addMenuOption(final int i, String text) {
+    final TextButton button = new TextButton(text, deselectedStyle);
+    button.padRight(90);
     button.getLabel().setAlignment(Align.right);
-    button.setHeight(BUTTON_HEIGHT);
-    if (index >= buttons.size) {
-      buttons.setSize(index + 1);
+    button.addListener(new ClickListener(Input.Buttons.LEFT) {
+      public void clicked(InputEvent e, float x, float y) {
+        chooseOption();
+      }
+
+      public void enter(InputEvent e, float x, float y, int pointer, Actor from) {
+        index = i;
+      }
+
+      public void exit(InputEvent e, float x, float y, int pointer, Actor from) {
+        index = -1;
+      }
+    });
+    if (i >= buttons.size) {
+      buttons.setSize(i + 1);
     }
-    buttons.set(index, button);
+    buttons.set(i, button);
   }
   
   /**
-   * Loads the assets for the main menu with the given manager.
+   * Initializes the UI for the main menu.
    */
-  public void loadContent(AssetManager manager) {
-    titleFont = manager.get(TITLE_FONT, BitmapFont.class);
-    highlightFont = manager.get(HIGHLIGHT_FONT, BitmapFont.class);
-    optionFont = manager.get(OPTION_FONT, BitmapFont.class);
-
-    highlightBackground = manager.get(HIGHLIGHT_FILE, Texture.class);
-    optionBackground = manager.get(DEFAULT_FILE, Texture.class);
-    adagioIcon = manager.get(ADAGIO_ICON_FILE, Texture.class);
-
+  public void initUI() {
+    Table table = new Table();
+    stage.addActor(table);
     table.setFillParent(true);
-    table.right().bottom().padBottom(PADDING);
+    table.right().bottom().padBottom(90);
 
-    highlightStyle = new TextButton.TextButtonStyle();
-    highlightStyle.up = new TextureRegionDrawable(highlightBackground);
-    highlightStyle.font = highlightFont;
-    highlightStyle.fontColor = Color.WHITE;
-    optionStyle = new TextButton.TextButtonStyle();
-    optionStyle.up = new TextureRegionDrawable(optionBackground);
-    optionStyle.font = optionFont;
-    optionStyle.fontColor = Color.WHITE;
+    selectedStyle = new TextButton.TextButtonStyle();
+    selectedStyle.up = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("highlight"));
+    selectedStyle.font = Shared.FONT_MAP.get("main_menu.selected.ttf");
+    selectedStyle.fontColor = Color.WHITE;
+    deselectedStyle = new TextButton.TextButtonStyle();
+    deselectedStyle.up = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("no_highlight"));
+    deselectedStyle.font = Shared.FONT_MAP.get("main_menu.deselected.ttf");
+    deselectedStyle.fontColor = Color.WHITE;
 
     addMenuOption(EXIT_PLAY, "play");
     addMenuOption(EXIT_EDITOR, "editor");
@@ -152,9 +100,10 @@ public class MainMenu implements Screen {
     addMenuOption(EXIT_QUIT, "quit");
 
     HorizontalGroup title = new HorizontalGroup();
-    title.addActor(new Label("rubat", new Label.LabelStyle(titleFont, Color.WHITE)));
-    title.addActor(new Image(adagioIcon));
-    title.space(Shared.DEFAULT_FONT_SPACING).padRight(PADDING).right();
+    title.addActor(new Label("rubat", new Label.LabelStyle(Shared.FONT_MAP.get("main_menu.title.ttf"),
+                                                           Color.WHITE)));
+    title.addActor(new Image(Shared.TEXTURE_MAP.get("adagio_head_icon")));
+    title.space(8).padRight(90).right();
     table.add(title).right();
 
     for (TextButton button : buttons) {
@@ -164,39 +113,25 @@ public class MainMenu implements Screen {
   }
 
   /**
-   * Unloads the assets for the main menu with the given manager.
+   * Chooses the current menu option.
    */
-  public void unloadContent(AssetManager manager) {
-    for (String s : assets) {
-      if (manager.isLoaded(s)) {
-        manager.unload(s);
-      }
-    }
+  private void chooseOption() {
+    listener.exitScreen(this, index);
   }
 
   @Override
   public void render(float delta) {
     if (active) {
-      if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+      InputController input = InputController.getInstance();
+      input.readInput();
+      
+      if (input.pressedExit()) {
         listener.exitScreen(this, EXIT_QUIT);
-        return;
-      }
-      if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
-          || Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-        listener.exitScreen(this, index);
-        return;
       }
 
-      int last = index;
-      if (Gdx.input.isKeyJustPressed(Input.Keys.UP)
-          || Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-        index = (index - 1 + buttons.size) % buttons.size;
-      } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)
-                 || Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-        index = (index + 1) % buttons.size;
-      }
-      buttons.get(last).setStyle(optionStyle);
-      buttons.get(index).setStyle(highlightStyle);
+      for (int i = 0; i < buttons.size; i++) {
+        buttons.get(i).setStyle(index == i ? selectedStyle : deselectedStyle);
+      }          
 
       Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

@@ -49,8 +49,8 @@ public class Player extends Entity {
   /** Player states */
   public static Array<State> states = null;
   
-  /** Normalized vector indicating the directions the player is pressing */
-  private Vector2 input;
+  /** Horizontal input (1 for right, -1 for left, 0 for none) */
+  private int input;
 
   /** Current jump length so far */
   private int jumpTime;
@@ -81,8 +81,6 @@ public class Player extends Entity {
    */
   public Player(float x, float y) {
     super(x, y, STATE_IDLE);
-    input = new Vector2();
-    // TODO fix hardcoded dims
     attackTime = -1;
     jumpTime = -1;
     jumpDuration = -1;
@@ -219,24 +217,20 @@ public class Player extends Entity {
   }
 
   /**
-   * Sets the player's input vector.
+   * Sets the player input.
    */
-  public void setInputVector(float x, float y) {
-    if (stateIndex != STATE_DEAD) {
-      input.set(x, y);
-    }
+  public void setInput(int input) {
+    this.input = input;
   }
 
   /**
    * Faces the player based on their input.
    */
   public void tryFace() {
-    if (stateIndex != STATE_DEAD) {
-      if (input.x > 0) {
-        faceRight();
-      } else if (input.x < 0) {
-        faceLeft();
-      }
+    if (input > 0) {
+      faceRight();
+    } else if (input < 0) {
+      faceLeft();
     }
   }
 
@@ -284,20 +278,20 @@ public class Player extends Entity {
       break;
     case STATE_FALL:
       if (isGrounded()) {
-        setState(input.x != 0 ? STATE_RUN : STATE_IDLE);
+        setState(input != 0 ? STATE_RUN : STATE_IDLE);
       }
       break;
     case STATE_RUN:
       if (!isGrounded()) {
         setState(STATE_FALL);
-      } else if (input.x == 0) {
+      } else if (input == 0) {
         setState(STATE_IDLE);
       }
       break;
     case STATE_IDLE:
       if (!isGrounded()) {
         setState(STATE_FALL);
-      } else if (input.x != 0) {
+      } else if (input != 0) {
         setState(STATE_RUN);
       }
       break;
@@ -309,15 +303,15 @@ public class Player extends Entity {
     super.update(delta);
 
     if (stateIndex == STATE_DEAD) {
-      body.setLinearVelocity(new Vector2());
+      body.setLinearVelocity(0, 0);
       if (getCount() >= getState().getLength()) {
         active = false;
       }
       return;
     }
 
-    if (input.x != 0) {
-      temp.set(MOVE_IMPULSE * Math.signum(input.x), 0);
+    if (input != 0) {
+      temp.set(MOVE_IMPULSE * input, 0);
       body.applyLinearImpulse(temp, getPosition(), true);
     } else {
       // damping

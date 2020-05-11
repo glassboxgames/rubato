@@ -51,6 +51,12 @@ public class GDXRoot extends Game implements ScreenListener {
     for (String path : Shared.TEXTURE_PATHS.values()) {
       manager.load(path, Texture.class);
     }
+    for (String key : Shared.FONT_METADATA.keys()) {
+      Array<Float> metadata = Shared.FONT_METADATA.get(key);
+      manager.load(key, BitmapFont.class, Shared.createFontLoaderParams(metadata.get(0).intValue(),
+                                                                        metadata.get(1).intValue(),
+                                                                        metadata.get(2).intValue()));
+    }
     canvas = new GameCanvas();
     loadingMode = new LoadingMode(canvas, manager, this);
     mainMenu = new MainMenu(this);
@@ -58,11 +64,7 @@ public class GDXRoot extends Game implements ScreenListener {
     editorMode = new EditorMode(this);
     selectMode = new SelectMode(this);
     settingsMode = new SettingsMode(this);
-    mainMenu.preloadContent(manager);
     gameMode.preloadContent(manager);
-    editorMode.preloadContent(manager);
-    selectMode.preloadContent(manager);
-    settingsMode.preloadContent(manager);
     setScreen(loadingMode);
   }
 
@@ -82,11 +84,12 @@ public class GDXRoot extends Game implements ScreenListener {
         manager.unload(path);
       }
     }
-    mainMenu.unloadContent(manager);
-    editorMode.unloadContent(manager);
+    for (String key : Shared.FONT_METADATA.keys()) {
+      if (manager.isLoaded(key)) {
+        manager.unload(key);
+      }
+    }
     gameMode.unloadContent(manager);
-    selectMode.unloadContent(manager);
-    settingsMode.unloadContent(manager);
     mainMenu.dispose();
     editorMode.dispose();
     gameMode.dispose();
@@ -108,11 +111,17 @@ public class GDXRoot extends Game implements ScreenListener {
         for (String key : Shared.TEXTURE_PATHS.keys()) {
           Shared.TEXTURE_MAP.put(key, manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class));
         }
-        mainMenu.loadContent(manager);
+        for (String key : Shared.FONT_METADATA.keys()) {
+          Shared.FONT_MAP.put(key, manager.get(key, BitmapFont.class));
+        }
         gameMode.loadContent(manager);
-        editorMode.loadContent(manager);
-        selectMode.loadContent(manager);
-        settingsMode.loadContent(manager);
+
+        mainMenu.initUI();
+        selectMode.initUI();
+        gameMode.initUI();
+        editorMode.initUI();
+        settingsMode.initUI();
+
         setScreen(mainMenu);
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,

@@ -30,22 +30,11 @@ public class EditorMode implements Screen {
   private static final int GRID_SIZE = 10;
   /** Amount to add to furthest platform for level width bound */
   private static final float WIDTH_OFFSET = 0.4f;
-
-  /** Group name font key */
-  private static final String GROUP_FONT = "level_editor_group_font.ttf";
-  /** Group name font size */
-  private static final int GROUP_FONT_SIZE = 14;
-  /** Chapter name font key */
-  private static final String CHAPTER_FONT = "level_editor_chapter_font.ttf";
-  /** Chapter name font size */
-  private static final int CHAPTER_FONT_SIZE = 18;
   /** Map movement speed */
   private static final int MAP_MOVE_SPEED = 15;
 
   /** Listener for exit events */
   private ScreenListener listener;
-  /** Fonts */
-  private BitmapFont groupFont, chapterFont;
   /** Whether this mode is active */
   private boolean active;
   /** Stage for the level */
@@ -65,8 +54,6 @@ public class EditorMode implements Screen {
   private Ghost ghost;
   /** Button map for the level */
   private OrderedMap<String, Array<ImageButton>> levelMap;
-  /** Array tracking loaded assets */
-  private Array<String> assets = new Array<String>();
   /** Current chapter name */
   private String chapterName;
   /** Chapter button map */
@@ -98,24 +85,9 @@ public class EditorMode implements Screen {
   }
 
   /**
-   * Preloads the assets for the level editor with the given manager.
+   * Initializes the level editor UI.
    */
-  public void preloadContent(AssetManager manager) {
-    manager.load(GROUP_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.BOLD_FONT_FILE, GROUP_FONT_SIZE, 6));
-    assets.add(GROUP_FONT);
-    manager.load(CHAPTER_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE, CHAPTER_FONT_SIZE, 0));
-    assets.add(CHAPTER_FONT);
-  }
-
-  /**
-   * Loads the assets for the level editor with the given manager.
-   */
-  public void loadContent(AssetManager manager) {
-    groupFont = manager.get(GROUP_FONT, BitmapFont.class);
-    chapterFont = manager.get(CHAPTER_FONT, BitmapFont.class);
-
+  public void initUI() {
     Table table = new Table();
     table.setFillParent(true);
     table.top().left().pad(10);
@@ -154,18 +126,19 @@ public class EditorMode implements Screen {
     table.add(toolbar).padBottom(10).left().row();
 
     Table biomes = new Table();
-    biomes.add(new Label("BIOME", new Label.LabelStyle(groupFont, Color.WHITE)))
+    biomes
+      .add(new Label("BIOME", new Label.LabelStyle(Shared.FONT_MAP.get("editor.header.ttf"), Color.WHITE)))
       .padBottom(10).left().row();
     for (String name : Shared.CHAPTER_NAMES) {
       Drawable deselected = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("choice_deselected"));
       Drawable selected = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("choice_selected"));
       ImageTextButton.ImageTextButtonStyle style =
         new ImageTextButton.ImageTextButtonStyle();
-      style.font = chapterFont;
+      style.font = Shared.FONT_MAP.get("editor.item.ttf");
       style.imageUp = deselected;
       style.imageChecked = selected;
-      final ImageTextButton button = new ImageTextButton(name.substring(0, 1).toUpperCase() + name.substring(1),
-                                                         style);
+      final ImageTextButton button =
+        new ImageTextButton(name.substring(0, 1).toUpperCase() + name.substring(1), style);
       button.getImageCell().padRight(10);
       final String newChapterName = name;
       button.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -182,7 +155,9 @@ public class EditorMode implements Screen {
     for (String groupName : editorGroups.keys()) {
       Table group = new Table();
       group.padLeft(10).padBottom(20);
-      group.add(new Label(groupName.toUpperCase(), new Label.LabelStyle(groupFont, Color.WHITE)))
+      group
+        .add(new Label(groupName.toUpperCase(),
+                       new Label.LabelStyle(Shared.FONT_MAP.get("editor.header.ttf"), Color.WHITE)))
         .padBottom(10).left().row();
       Table icons = new Table();
       group.add(icons).left().row();
@@ -197,17 +172,6 @@ public class EditorMode implements Screen {
     background.setAlign(Align.bottomLeft);
     background.setScale(Shared.BACKGROUND_SCALE);
     levelStage.addActor(background);
-  }
-
-  /**
-   * Unloads the assets for the level editor with the given manager.
-   */
-  public void unloadContent(AssetManager manager) {
-    for (String s : assets) {
-      if (manager.isLoaded(s)) {
-        manager.unload(s);
-      }
-    }
   }
 
   /**

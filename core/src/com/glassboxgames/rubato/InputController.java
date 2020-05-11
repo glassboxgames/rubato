@@ -1,13 +1,15 @@
 package com.glassboxgames.rubato;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.*;
 
+/**
+ * Controller for getting inputs from the player.
+ */
 public class InputController {
   /** Whether the debug input was entered */
-  private boolean debug;
-  /** Whether the devMode input was entered */
-  private boolean devMode;
+  private boolean debugPressed;
+  /** Whether the dev mode input was entered */
+  private boolean devModePressed;
   /** The devSelect input 0-9 */
   private int devSelect;
   /** The devChange increment/decrement input */
@@ -15,21 +17,26 @@ public class InputController {
 
   /** Whether the exit button was pressed */
   private boolean exitPressed;
-  /** Whether the reset button was pressed */
-  private boolean resetPressed;
-  /** Whether the edit button was pressed */
-  private boolean editPressed;
+  /** Whether the up button was pressed */
+  private boolean upPressed;
+  /** Whether the down button was pressed */
+  private boolean downPressed;
+  /** Whether the left button was pressed */
+  private boolean leftPressed;
+  /** Whether the left button was held */
+  private boolean leftHeld;
+  /** Whether the right button was pressed */
+  private boolean rightPressed;
+  /** Whether the right button was held */
+  private boolean rightHeld;
   /** Whether the jump button was pressed */
   private boolean jumpPressed;
   /** Whether the jump button was held */
   private boolean jumpHeld;
   /** Whether the attack button was pressed */
   private boolean attackPressed;
-
-  /** Horizontal movement input */
-  private int horizontal;
-  /** Vertical direction input */
-  private int vertical;
+  /** Whether the confirm button was pressed */
+  private boolean confirmPressed;
 
   /** The singleton instance of the input controller */
   private static InputController controller = null;
@@ -52,15 +59,15 @@ public class InputController {
   /**
    * Returns whether the debug input was entered.
    */
-  public boolean didDebug() {
-    return debug;
+  public boolean pressedDebug() {
+    return debugPressed;
   }
 
   /**
    * Returns whether the devMode input was entered.
    */
-  public boolean didDevMode() {
-    return devMode;
+  public boolean pressedDevMode() {
+    return devModePressed;
   }
 
   /**
@@ -78,58 +85,79 @@ public class InputController {
   }
 
   /**
+   * Returns whether the player pressed the confirm key (for menus).
+   */
+  public boolean pressedConfirm() {
+    return confirmPressed;
+  }
+
+  /**
    * Returns whether the player exit the game.
    */
-  public boolean didExit() {
+  public boolean pressedExit() {
     return exitPressed;
   }
 
   /**
-   * Returns whether the player reset the game.
+   * Returns whether the player pressed the up button.
    */
-  public boolean didReset() {
-    return resetPressed;
+  public boolean pressedUp() {
+    return upPressed;
   }
 
   /**
-   * Returns whether the player presesd the edit button.
+   * Returns whether the player pressed the down button.
    */
-  public boolean didEdit() {
-    return editPressed;
+  public boolean pressedDown() {
+    return downPressed;
   }
 
   /**
-   * Returns the horizontal movement input from the player.
+   * Returns whether the player pressed the left button.
    */
-  public int getHorizontal() {
-    return horizontal;
+  public boolean pressedLeft() {
+    return leftPressed;
   }
 
   /**
-   * Returns the vertical direction input from the player.
+   * Returns whether the player kept holding left.
    */
-  public int getVertical() {
-    return vertical;
+  public boolean heldLeft() {
+    return leftHeld;
+  }
+
+  /**
+   * Returns whether the player pressed the right button.
+   */
+  public boolean pressedRight() {
+    return rightPressed;
+  }
+
+  /**
+   * Returns whether the player kept holding right.
+   */
+  public boolean heldRight() {
+    return rightHeld;
   }
 
   /**
    * Returns whether the player input a jump.
    */
-  public boolean didJump() {
+  public boolean pressedJump() {
     return jumpPressed;
   }
 
   /**
    * Returns whether the player kept holding jump.
    */
-  public boolean didHoldJump() {
+  public boolean heldJump() {
     return jumpHeld;
   }
 
   /**
    * Returns whether the player pressed attack.
    */
-  public boolean didAttack() {
+  public boolean pressedAttack() {
     return attackPressed;
   }
 
@@ -137,69 +165,34 @@ public class InputController {
    * Reads the input from the player.
    */
   public void readInput() {
-    readKeyboard();
-  }
+    SaveController save = SaveController.getInstance();
+    
+    confirmPressed = Gdx.input.isKeyJustPressed(Input.Keys.ENTER);
+    exitPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
+    debugPressed = Gdx.input.isKeyJustPressed(Input.Keys.SLASH);
+    devModePressed = Gdx.input.isKeyJustPressed(Input.Keys.PERIOD);
 
-  /**
-   * Reads the input from the player's keyboard.
-   */
-  private void readKeyboard() {
-    debug = Gdx.input.isKeyJustPressed(Input.Keys.SLASH);
-    devMode = Gdx.input.isKeyJustPressed(Input.Keys.PERIOD);
-    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-      devSelect = 1;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-      devSelect = 2;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
-      devSelect = 3;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
-      devSelect = 4;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
-      devSelect = 5;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
-      devSelect = 6;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) {
-      devSelect = 7;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
-      devSelect = 8;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) {
-      devSelect = 9;
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
-      devSelect = 0;
-    } else {
-      devSelect = -1;
+    for (int i = 0; i < 10; i++) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.valueOf(i + ""))) {
+        devSelect = i;
+      }
     }
+
     devChange = 0;
     if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
       devChange += 1;
-    }
-    if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
+    } else if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
       devChange -= 1;
     }
 
-    // TODO: maybe secondary to allow gamepad override
-
-    exitPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
-    resetPressed = Gdx.input.isKeyJustPressed(Input.Keys.R);
-    editPressed = Gdx.input.isKeyJustPressed(Input.Keys.E);
-    attackPressed = Gdx.input.isKeyJustPressed(Input.Keys.K);
-    jumpPressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
-    jumpHeld = Gdx.input.isKeyPressed(Input.Keys.SPACE);
-
-    horizontal = 0;
-    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-      horizontal += 1;
-    }
-    if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-      horizontal -= 1;
-    }
-
-    vertical = 0;
-    if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-      vertical += 1;
-    }
-    if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-      vertical -= 1;
-    }
+    upPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_UP));
+    downPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_DOWN));
+    leftPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_LEFT));
+    leftHeld = Gdx.input.isKeyPressed(save.getBoundKeycode(Shared.ACTION_LEFT));
+    rightPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_RIGHT));
+    rightHeld = Gdx.input.isKeyPressed(save.getBoundKeycode(Shared.ACTION_RIGHT));
+    attackPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_ATTACK));
+    jumpPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_JUMP));
+    jumpHeld = Gdx.input.isKeyPressed(save.getBoundKeycode(Shared.ACTION_JUMP));
   }
 }

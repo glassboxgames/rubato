@@ -1,11 +1,13 @@
 package com.glassboxgames.rubato.serialize;
 
+import com.badlogic.gdx.utils.*;
+
 /**
  * Simple class for serializing savegame data.
  */
 public class SaveData {
-  /** Number of chapters unlocked */
-  public int chaptersUnlocked;
-  /** Number of levels unlocked in the last unlocked chapter */
-  public int levelsUnlocked;
+  /** Unlocked level count mapping */
+  public ObjectMap<String, Integer> unlocked;
+  /** Custom key mapping */
+  public ObjectMap<String, String> bindings;
 }

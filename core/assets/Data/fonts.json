@@ -1,0 +1,18 @@
+{
+  "main_menu.title.ttf": [1, 96, 8],
+  "main_menu.selected.ttf": [1, 48, 8],
+  "main_menu.deselected.ttf": [0, 48, 8],
+
+  "editor.header.ttf": [2, 14, 6],
+  "editor.item.ttf": [0, 18, 0],
+
+  "game.dev.ttf": [1, 24, 0],
+  "game.pause_label.ttf": [1, 36, 8],
+  "game.pause_text.ttf": [0, 48, 8],
+
+  "select.level_number.ttf": [2, 36, 8],
+
+  "settings.header.ttf": [2, 24, 16],
+  "settings.selected.ttf": [1, 36, 8],
+  "settings.deselected.ttf": [0, 36, 8],
+}

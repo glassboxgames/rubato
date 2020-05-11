@@ -17,8 +17,6 @@ import com.glassboxgames.rubato.entity.*;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
-import static com.glassboxgames.rubato.GameMode.GameState.*;
-
 /**
  * Mode controller for the main gameplay loop.
  */
@@ -53,35 +51,17 @@ public class GameMode implements Screen {
   /** Pause code for returning to main menu */
   public static final int PAUSE_MENU = 3;
 
-  /** Overlay fade rate */
-  private static final float FADE_RATE = 0.1f;
-  /** Dev mode font key */
-  private static final String DEV_FONT = "game_mode_dev_font.ttf";
-  /** Dev mode font size */
-  private static final int DEV_FONT_SIZE = 24;
   /** Dev mode draw offset */
   private static final float DEV_DRAW_OFFSET = 20f;
+  /** Overlay fade rate */
+  private static final float FADE_RATE = 0.1f;
 
-  /** Blank tile for overlays */
-  private static final String UI_BLANK_FILE = "User Interface/blank.png";
-  /** Pause menu label font key */
-  private static final String PAUSE_LABEL_FONT = "game_mode_pause_label_font.ttf";
-  /** Pause menu label font size */
-  private static final int PAUSE_LABEL_FONT_SIZE = 36;
-  /** Pause menu subtext font key */
-  private static final String PAUSE_SUBTEXT_FONT = "game_mode_pause_subtext_font.ttf";
-  /** Pause menu subtext font size */
-  private static final int PAUSE_SUBTEXT_FONT_SIZE = 48;
-
-  /** Texture paths */
-  private static final String RESUME_DEFAULT_FILE = "User Interface/Buttons/resume_button.png";
-  private static final String RESUME_HIGHLIGHT_FILE = "User Interface/Buttons/resume_button_highlighted.png";
-  private static final String RESET_DEFAULT_FILE = "User Interface/Buttons/reset_button.png";
-  private static final String RESET_HIGHLIGHT_FILE = "User Interface/Buttons/reset_button_highlighted.png";
-  private static final String LEVELS_DEFAULT_FILE = "User Interface/Buttons/levels_button.png";
-  private static final String LEVELS_HIGHLIGHT_FILE = "User Interface/Buttons/levels_button_highlighted.png";
-  private static final String MENU_DEFAULT_FILE = "User Interface/Buttons/menu_button.png";
-  private static final String MENU_HIGHLIGHT_FILE = "User Interface/Buttons/menu_button_highlighted.png";
+  /** Sound effects */
+  private static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
+  private static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
+  private static final String CHECKPOINT_SOUND = "Sounds/Environment/Checkpoint.mp3";
+  private static final String ATTACK_HIT_SOUND = "Sounds/Attacking/AttackHit.mp3";
+  private static final String DEATH_SOUND = "Sounds/Death/Death.mp3";
 
   /** Gravity **/
   private static final float GRAVITY = -50f;
@@ -93,22 +73,8 @@ public class GameMode implements Screen {
   private boolean exiting;
   /** Exit code for when the screen exits */
   private int exitCode;
-  /** Pause overlay texture */
-  private Texture uiBlank;
-  /** Resume button textures */
-  private Texture resumeDefault, resumeHighlight;
-  /** Reset button textures */
-  private Texture resetDefault, resetHighlight;
-  /** Level selector button textures */
-  private Texture levelsDefault, levelsHighlight;
-  /** Back to menu button textures */
-  private Texture menuDefault, menuHighlight;
-  /** Fonts for pause menu */
-  private BitmapFont pauseLabelFont, pauseSubtextFont;
-  /** Font for displaying dev mode options */
-  private BitmapFont devModeFont;
   /** Array tracking all loaded assets (for unloading purposes) */
-  private Array<String> assets;
+  private Array<String> assets = new Array<String>();
 
   /** Canvas on which to draw content */
   private GameCanvas canvas;
@@ -163,7 +129,6 @@ public class GameMode implements Screen {
     this.listener = listener;
 
     assets = new Array();
-    gameState = INTRO;
     uiPos = new Vector2();
     devSelect = -1;
 
@@ -187,38 +152,6 @@ public class GameMode implements Screen {
    * @param manager asset manager to use
    */
   public void preloadContent(AssetManager manager) {
-    manager.load(DEV_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE,
-                                               DEV_FONT_SIZE));
-    assets.add(DEV_FONT);
-    manager.load(PAUSE_LABEL_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.SEMIBOLD_FONT_FILE,
-                                               PAUSE_LABEL_FONT_SIZE));
-    assets.add(PAUSE_LABEL_FONT);
-    manager.load(PAUSE_SUBTEXT_FONT, BitmapFont.class,
-                 Shared.createFontLoaderParams(Shared.REGULAR_FONT_FILE,
-                                               DEV_FONT_SIZE));
-    assets.add(PAUSE_SUBTEXT_FONT);
-
-    manager.load(UI_BLANK_FILE, Texture.class);
-    assets.add(UI_BLANK_FILE);
-    manager.load(RESUME_DEFAULT_FILE, Texture.class);
-    assets.add(RESUME_DEFAULT_FILE);
-    manager.load(RESUME_HIGHLIGHT_FILE, Texture.class);
-    assets.add(RESUME_HIGHLIGHT_FILE);
-    manager.load(RESET_DEFAULT_FILE, Texture.class);
-    assets.add(RESET_DEFAULT_FILE);
-    manager.load(RESET_HIGHLIGHT_FILE, Texture.class);
-    assets.add(RESET_HIGHLIGHT_FILE);
-    manager.load(LEVELS_DEFAULT_FILE, Texture.class);
-    assets.add(LEVELS_DEFAULT_FILE);
-    manager.load(LEVELS_HIGHLIGHT_FILE, Texture.class);
-    assets.add(LEVELS_HIGHLIGHT_FILE);
-    manager.load(MENU_DEFAULT_FILE, Texture.class);
-    assets.add(MENU_DEFAULT_FILE);
-    manager.load(MENU_HIGHLIGHT_FILE, Texture.class);
-    assets.add(MENU_HIGHLIGHT_FILE);
-
     // Sound Assets
     manager.load(Shared.GRASS_RUN_SOUND, Sound.class);
     assets.add(Shared.GRASS_RUN_SOUND);
@@ -237,24 +170,10 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Pulls the loaded textures from the asset manager for the game.
-   * Initializes UI elements that depend on those textures.
+   * Pulls the loaded assets from the asset manager for the game.
    * @param manager the asset manager to use
    */
   public void loadContent(AssetManager manager) {
-    devModeFont = manager.get(DEV_FONT, BitmapFont.class);
-    uiBlank = manager.get(UI_BLANK_FILE, Texture.class);
-    pauseLabelFont = manager.get(PAUSE_LABEL_FONT, BitmapFont.class);
-    pauseSubtextFont = manager.get(PAUSE_SUBTEXT_FONT, BitmapFont.class);
-    resumeDefault = manager.get(RESUME_DEFAULT_FILE, Texture.class);
-    resumeHighlight = manager.get(RESUME_HIGHLIGHT_FILE, Texture.class);
-    resetDefault = manager.get(RESET_DEFAULT_FILE, Texture.class);
-    resetHighlight = manager.get(RESET_HIGHLIGHT_FILE, Texture.class);
-    levelsDefault = manager.get(LEVELS_DEFAULT_FILE, Texture.class);
-    levelsHighlight = manager.get(LEVELS_HIGHLIGHT_FILE, Texture.class);
-    menuDefault = manager.get(MENU_DEFAULT_FILE, Texture.class);
-    menuHighlight = manager.get(MENU_HIGHLIGHT_FILE, Texture.class);
-
     // Allocate sounds
     SoundController sounds = SoundController.getInstance();
     sounds.allocate(manager, Shared.GRASS_RUN_SOUND);
@@ -263,39 +182,70 @@ public class GameMode implements Screen {
     sounds.allocate(manager, Shared.CHECKPOINT_SOUND);
     sounds.allocate(manager, Shared.DEATH_SOUND);
 
-    // Initialize pause menu
-    pauseStage = new Stage();
-    pauseTable = new Table();
-    pauseTable.setFillParent(true);
-    pauseTable.add(new Label("paused", new Label.LabelStyle(pauseLabelFont, Color.WHITE)));
-    pauseTable.row();
-
-    pauseButtons = new Array<Button>();
-    pauseButtonGroup = new HorizontalGroup();
-    addPauseButton("resume", resumeDefault, resumeHighlight);
-    addPauseButton("reset", resetDefault, resetHighlight);
-    addPauseButton("levels", levelsDefault, levelsHighlight);
-    addPauseButton("menu", menuDefault, menuHighlight);
-    pauseButtonGroup.space(50).padTop(50).rowBottom();
-
-    pauseTable.add(pauseButtonGroup);
-    pauseStage.addActor(pauseTable);
-
     for (State state : states) {
       state.loadContent(manager);
     }
   }
 
   /**
-   * Adds a button with the given label and texture to the pause menu.
+   * Initializes the game mode UI.
    */
-  private void addPauseButton(String text, Texture defaultTexture, Texture highlightTexture) {
-    ImageButton button = new ImageButton(new TextureRegionDrawable(defaultTexture),
-                                         null,
-                                         new TextureRegionDrawable(highlightTexture));
+  public void initUI() {
+    pauseStage = new Stage();
+    pauseTable = new Table();
+    pauseTable.setFillParent(true);
+    pauseTable.add(new Label("paused",
+                             new Label.LabelStyle(Shared.FONT_MAP.get("game.pause_text.ttf"), Color.WHITE)));
+    pauseTable.row();
+
+    pauseButtons = new Array<Button>();
+    pauseButtonGroup = new HorizontalGroup();
+    addPauseButton(PAUSE_RESUME, "resume");
+    addPauseButton(PAUSE_RESET, "reset");
+    addPauseButton(PAUSE_LEVELS, "levels");
+    addPauseButton(PAUSE_MENU, "menu");
+    pauseButtonGroup.space(50).padTop(50).rowBottom();
+
+    pauseTable.add(pauseButtonGroup);
+    pauseStage.addActor(pauseTable);
+  }
+
+  /**
+   * Adds a button to the pause menu.
+   */
+  private void addPauseButton(final int index, String key) {
+    final ImageButton button =
+      new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key + "_deselected")), null,
+                      new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key + "_selected")));
     button.row();
-    button.add(new Label(text, new Label.LabelStyle(pauseLabelFont, Color.WHITE))).padTop(20);
+    button
+      .add(new Label(key, new Label.LabelStyle(Shared.FONT_MAP.get("game.pause_label.ttf"), Color.WHITE)))
+      .padTop(20);
     button.setWidth(100);
+    button.addListener(new ClickListener(Input.Buttons.LEFT) {
+      public void clicked(InputEvent e, float x, float y) {
+        paused = false;
+        switch (index) {
+        case PAUSE_RESET:
+          startExit(EXIT_RESET);
+          break;
+        case PAUSE_LEVELS:
+          startExit(EXIT_LEVELS);
+          break;
+        case PAUSE_MENU:
+          startExit(EXIT_MENU);
+          break;
+        }
+      }
+
+      public void enter(InputEvent e, float x, float y, int pointer, Actor from) {
+        button.setChecked(true);
+      }
+
+      public void exit(InputEvent e, float x, float y, int pointer, Actor to) {
+        button.setChecked(false);
+      }
+    });
     pauseButtonGroup.addActor(button);
     pauseButtons.add(button);
   }
@@ -326,7 +276,7 @@ public class GameMode implements Screen {
       level.deactivatePhysics(world);
     }
     level = new LevelContainer(data, manager);
-    gameState = INTRO;
+    gameState = GameState.INTRO;
     this.editable = editable;
     paused = false;
     exiting = false;
@@ -346,7 +296,7 @@ public class GameMode implements Screen {
    */
   private void updateSound() {
     SoundController soundController = SoundController.getInstance();
-    if (gameState == PLAY) {
+    if (gameState == GameState.PLAY) {
       Player player = level.getPlayer();
       if (player.isRunning() && !paused) {
         if (!soundController.isActive(Shared.GRASS_RUN_SOUND)) {
@@ -373,189 +323,162 @@ public class GameMode implements Screen {
    * Updates the state of the game.
    * @param delta time in seconds since last frame
    */
-  private void update(float delta) {
-    switch(gameState) {
-      case INTRO:
-        if (level != null) {
-          level.activatePhysics(world);
-          gameState = PLAY;
-          break;
-        }
-      case PLAY:
-        if (paused) {
-          if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            resumeGame();
-          }
-          if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
-            || Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-            switch (pauseIndex) {
-            case PAUSE_RESUME:
-              resumeGame();
-              break;
-            case PAUSE_RESET:
-              startExit(EXIT_RESET);
-              break;
-            case PAUSE_LEVELS:
-              startExit(EXIT_LEVELS);
-              break;
-            case PAUSE_MENU:
-              startExit(EXIT_MENU);
-              break;
-            }
-          }
-          int n = pauseButtons.size;
-          if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)
-            || Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            pauseIndex = (pauseIndex + n - 1) % n;
-          } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)
-            || Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            pauseIndex = (pauseIndex + 1) % n;
-          }
-          for (Button button : pauseButtons) {
-            button.setChecked(button == pauseButtons.get(pauseIndex));
-          }
-          pauseStage.act(delta);
+  protected void update(float delta) {
+    if (gameState == GameState.INTRO) {
+      if (level != null) {
+        level.activatePhysics(world);
+        gameState = GameState.PLAY;
+      }
+    } else if (gameState == GameState.PLAY) {
+      if (exiting) {
+        if (overlayFade < 1) {
+          overlayFade = Math.min(overlayFade + FADE_RATE, 1);
         } else {
-          if (exiting) {
-            if (overlayFade < 1) {
-              overlayFade = Math.min(overlayFade + FADE_RATE, 1);
-            } else {
-              listener.exitScreen(this, exitCode);
-              return;
-            }
-          } else if (overlayFade > 0) {
-            overlayFade = Math.max(overlayFade - FADE_RATE, 0);
-          }
-            
-          InputController input = InputController.getInstance();
-          input.readInput();
-          if (input.didExit()) {
-            if (editable) {
-              startExit(EXIT_EDIT);
-              return;
-            } else {
-              pauseGame();
-            }
-            return;
-          }
-          if (input.didDebug()) {
-            debug = !debug;
-          }
-          if (input.didDevMode()) {
-            devMode = !devMode;
-            devSelect = -1;
-          }
-          if (devMode) {
-            if (input.getDevSelect() != -1) {
-              devSelect = input.getDevSelect();
-            }
-            int devChange = input.getDevChange();
-            if (devChange != 0) {
-              switch (devSelect) {
-                case -1:
-                  break;
-                case 1:
-                  // Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
-                  break;
-                case 2:
-                  Player.maxXSpeed += devChange * 0.5;
-                  break;
-                case 3:
-                  Player.maxYSpeed += devChange * 0.5;
-                  break;
-                case 4:
-                  Player.minJumpDuration += devChange * 1;
-                  break;
-                case 5:
-                  Player.maxJumpDuration += devChange * 1;
-                  break;
-                case 8:
-                  break;
-                case 9:
-                  break;
-                case 0:
-                  Enemy.damage += devChange * 5;
-                  break;
-              }
-            }
-          }
+          listener.exitScreen(this, exitCode);
+          return;
+        }
+      } else if (overlayFade > 0) {
+        overlayFade = Math.max(overlayFade - FADE_RATE, 0);
+      }
 
-          Player player = level.getPlayer();
-          if (player.isActive()) {
-            Vector2 pos = player.getPosition();
-            if (pos.x >= level.getWidth()) {
-              startExit(editable ? EXIT_RESET : EXIT_COMPLETE);
-            }
-            float height = player.getTexture().getHeight() / Shared.PPM;
-            if (pos.y < 0) {
-              player.setAlive(false);
-            }
+      InputController input = InputController.getInstance();
+      input.readInput();
 
-            player.tryFace();
-            player.setInputVector(input.getHorizontal(), input.getVertical());
-            if (input.didJump()) {
-              player.tryJump();
-            } else if (input.didHoldJump()) {
-              player.tryExtendJump();
-            }
-            if (input.didAttack()) {
-              player.tryAttack();
-            }
+      if (paused) {
+        if (input.pressedExit()) {
+          paused = false;
+        }
 
-            player.update(delta);
+        pauseStage.act(delta);
+      } else {
+        if (input.pressedExit()) {
+          if (editable) {
+            startExit(EXIT_EDIT);
           } else {
+            pauseGame();
+          }          
+          return;
+        }
+        if (input.pressedDebug()) {
+          debug = !debug;
+        }
+        if (input.pressedDevMode()) {
+          devMode = !devMode;
+          devSelect = -1;
+        }
+        if (devMode) {
+          if (input.getDevSelect() != -1) {
+            devSelect = input.getDevSelect();
+          }
+          int devChange = input.getDevChange();
+          if (devChange != 0) {
+            switch (devSelect) {
+            case -1:
+              break;
+            case 1:
+              // Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
+              break;
+            case 2:
+              Player.maxXSpeed += devChange * 0.5;
+              break;
+            case 3:
+              Player.maxYSpeed += devChange * 0.5;
+              break;
+            case 4:
+              Player.minJumpDuration += devChange * 1;
+              break;
+            case 5:
+              Player.maxJumpDuration += devChange * 1;
+              break;
+            }
+          }
+        }
+
+        Player player = level.getPlayer();
+        if (player.isActive()) {
+          Vector2 pos = player.getPosition();
+
+          if (pos.x >= level.getWidth()) {
+            startExit(editable ? EXIT_RESET : EXIT_COMPLETE);
+          }
+
+          if (pos.y < 0) {
             startExit(EXIT_RESET);
           }
 
-          Array<Enemy> enemies = level.getEnemies();
-          Array<Enemy> removedEnemies = new Array<Enemy>();
-          Array<Enemy> addedEnemies = new Array<Enemy>();
-          for (Enemy enemy : enemies) {
-            if (enemy.shouldRemove()) {
-              enemy.deactivatePhysics(world);
-              removedEnemies.add(enemy);
-            } else {
-              enemy.update(delta);
-              if (enemy instanceof Wisp) {
-                Array<Enemy> spawned = ((Wisp) enemy).getSpawned();
-                for (Enemy spawn : spawned) {
-                  spawn.activatePhysics(world);
-                  addedEnemies.add(spawn);
-                }
-                spawned.clear();
-              }
-            }
+          int horizontal = 0;
+          if (input.heldLeft()) {
+            horizontal -= 1;
+          } else if (input.heldRight()) {
+            horizontal += 1;
           }
-          enemies.removeAll(removedEnemies, true);
-          enemies.addAll(addedEnemies);
+          
+          player.setInput(horizontal);
+          player.tryFace();
 
-          Array<Platform> platforms = level.getPlatforms();
-          Array<Platform> removedPlatforms = new Array<Platform>();
-          for (Platform platform : platforms) {
-            if (platform.shouldRemove()) {
-              platform.deactivatePhysics(world);
-              removedPlatforms.add(platform);
-            } else {
-              platform.update(delta);
-            }
+          if (input.pressedJump()) {
+            player.tryJump();
+          } else if (input.heldJump()) {
+            player.tryExtendJump();
           }
-          platforms.removeAll(removedPlatforms, true);
-          level.getCheckpoint().update(delta);
 
-          if (player.isActive()) {
-            player.sync();
+          if (input.pressedAttack()) {
+            player.tryAttack();
           }
-          for (Enemy enemy : level.getEnemies()) {
-            enemy.sync();
-          }
-          for (Platform platform : level.getPlatforms()) {
-            platform.sync();
-          }
-          level.getCheckpoint().sync();
 
-          world.step(1 / 60f, 8, 3);
+          player.update(delta);
+        } else {
+          startExit(EXIT_RESET);
         }
-        break;
+
+        Array<Enemy> enemies = level.getEnemies();
+        Array<Enemy> removedEnemies = new Array<Enemy>();
+        Array<Enemy> addedEnemies = new Array<Enemy>();
+        for (Enemy enemy : enemies) {
+          if (enemy.shouldRemove()) {
+            enemy.deactivatePhysics(world);
+            removedEnemies.add(enemy);
+          } else {
+            enemy.update(delta);
+            if (enemy instanceof Wisp) {
+              Array<Enemy> spawned = ((Wisp) enemy).getSpawned();
+              for (Enemy spawn : spawned) {
+                spawn.activatePhysics(world);
+                addedEnemies.add(spawn);
+              }
+              spawned.clear();
+            }
+          }
+        }
+        enemies.removeAll(removedEnemies, true);
+        enemies.addAll(addedEnemies);
+
+        Array<Platform> platforms = level.getPlatforms();
+        Array<Platform> removedPlatforms = new Array<Platform>();
+        for (Platform platform : platforms) {
+          if (platform.shouldRemove()) {
+            platform.deactivatePhysics(world);
+            removedPlatforms.add(platform);
+          } else {
+            platform.update(delta);
+          }
+        }
+        platforms.removeAll(removedPlatforms, true);
+        level.getCheckpoint().update(delta);
+
+        if (player.isActive()) {
+          player.sync();
+        }
+        for (Enemy enemy : level.getEnemies()) {
+          enemy.sync();
+        }
+        for (Platform platform : level.getPlatforms()) {
+          platform.sync();
+        }
+        level.getCheckpoint().sync();
+
+        world.step(1 / 60f, 8, 3);
+      }
     }
 
     updateSound();
@@ -567,64 +490,59 @@ public class GameMode implements Screen {
   private void draw() {
     canvas.clear();
 
-    switch (gameState) {
-      case INTRO:
-        break;
-      case PLAY: {
-        level.draw(canvas, debug);
+    if (gameState == GameState.PLAY) {
+      level.draw(canvas, debug);
 
-        if (overlayFade > 0) {
-          canvas.begin(Shared.PPM, Shared.PPM);
-          canvas.drawBackground(uiBlank, new Color(0, 0, 0, overlayFade), level.getWidth(), level.getHeight());
-          canvas.end();
-        }
+      Player player = level.getPlayer();
+      if (player.isActive()) {
+        Vector2 delta = player.getPosition().scl(Shared.PPM).sub(canvas.getCameraPos()).scl(0.25f);
+        float width = level.getWidth() * Shared.PPM;
+        float height = level.getHeight() * Shared.PPM;
+        canvas.moveCamera(canvas.getCameraPos().add(delta), width, height);
+        Vector2 pos = canvas.getCameraPos();
+        uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2,
+                                  0, width - canvas.getWidth()) + DEV_DRAW_OFFSET,
+                  MathUtils.clamp(pos.y + canvas.getHeight() / 2,
+                                  canvas.getHeight(), height) - DEV_DRAW_OFFSET);
+      }
 
-        Player player = level.getPlayer();
-        if (player.isActive()) {
-          Vector2 delta = player.getPosition().scl(Shared.PPM).sub(canvas.getCameraPos()).scl(0.25f);
-          float width = level.getWidth() * Shared.PPM;
-          float height = level.getHeight() * Shared.PPM;
-          canvas.moveCamera(canvas.getCameraPos().add(delta), width, height);
-          Vector2 pos = canvas.getCameraPos();
-          uiPos.set(MathUtils.clamp(pos.x - canvas.getWidth() / 2,
-                                    0, width - canvas.getWidth()) + DEV_DRAW_OFFSET,
-                    MathUtils.clamp(pos.y + canvas.getHeight() / 2,
-                                    canvas.getHeight(), height) - DEV_DRAW_OFFSET);
-        }
+      if (devMode) {
+        float xOffset = uiPos.x;
+        float yOffset = uiPos.y - DEV_DRAW_OFFSET;
+        float deltaOffset = 2 * DEV_DRAW_OFFSET;
+        canvas.begin();
+        // drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,
+        //          xOffset, yOffset);
+        drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED,
+                 xOffset, yOffset - deltaOffset);
+        drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED,
+                 xOffset, yOffset - 2 * deltaOffset);
+        drawText(4, "Min Jump Duration", Player.minJumpDuration, Player.MIN_JUMP_DURATION,
+                 xOffset, yOffset - 3 * deltaOffset);
+        drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION,
+                 xOffset, yOffset - 4 * deltaOffset);
+        // drawText(6, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
+        //  xOffset, yOffset - 5 * deltaOffset);
+        // drawText(7, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
+        //  xOffset, yOffset - 6 * deltaOffset);
+        // drawText(0, "Enemy Damage", Enemy.damage, Enemy.DAMAGE,
+        //          xOffset, yOffset - 9 * deltaOffset);
+        canvas.end();
+      }
 
-        if (devMode) {
-          float xOffset = uiPos.x;
-          float yOffset = uiPos.y - DEV_DRAW_OFFSET;
-          float deltaOffset = 2 * DEV_DRAW_OFFSET;
-          canvas.begin();
-          // drawText(1, "Jump Impulse", Player.jumpImpulse, Player.JUMP_IMPULSE,
-          //          xOffset, yOffset);
-          drawText(2, "Max X Speed", Player.maxXSpeed, Player.MAX_X_SPEED,
-            xOffset, yOffset - deltaOffset);
-          drawText(3, "Max Y Speed", Player.maxYSpeed, Player.MAX_Y_SPEED,
-            xOffset, yOffset - 2 * deltaOffset);
-          drawText(4, "Min Jump Duration", Player.minJumpDuration, Player.MIN_JUMP_DURATION,
-            xOffset, yOffset - 3 * deltaOffset);
-          drawText(5, "Max Jump Duration", Player.maxJumpDuration, Player.MAX_JUMP_DURATION,
-            xOffset, yOffset - 4 * deltaOffset);
-          // drawText(6, "Dash Duration", Player.dashDuration, Player.DASH_DURATION,
-          //  xOffset, yOffset - 5 * deltaOffset);
-          // drawText(7, "Dash Speed", Player.dashSpeed, Player.DASH_SPEED,
-          //  xOffset, yOffset - 6 * deltaOffset);
-          drawText(0, "Enemy Damage", Enemy.damage, Enemy.DAMAGE,
-            xOffset, yOffset - 9 * deltaOffset);
-          canvas.end();
-        }
+      if (paused) {
+        canvas.begin(Shared.PPM, Shared.PPM);
+        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
+                              new Color(0, 0, 0, 0.4f), level.getWidth(), level.getHeight());
+        canvas.end();
+        pauseStage.draw();
+      }
 
-        if (paused) {
-          canvas.begin(Shared.PPM, Shared.PPM);
-          canvas.drawBackground(uiBlank, new Color(0, 0, 0, 0.4f), level.getWidth(), level.getHeight());
-          canvas.end();
-
-          pauseStage.draw();
-          break;
-        }
-        break;
+      if (overlayFade > 0) {
+        canvas.begin(Shared.PPM, Shared.PPM);
+        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
+                              new Color(0, 0, 0, overlayFade), level.getWidth(), level.getHeight());
+        canvas.end();
       }
     }
   }
@@ -656,7 +574,7 @@ public class GameMode implements Screen {
     }
     String text =
       "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
-    canvas.drawText(text, devModeFont, color, x, y);
+    canvas.drawText(text, Shared.FONT_MAP.get("game.dev.ttf"), color, x, y);
   }
 
   @Override
