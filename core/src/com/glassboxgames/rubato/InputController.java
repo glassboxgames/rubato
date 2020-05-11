@@ -17,10 +17,6 @@ public class InputController {
 
   /** Whether the exit button was pressed */
   private boolean exitPressed;
-  /** Whether the up button was pressed */
-  private boolean upPressed;
-  /** Whether the down button was pressed */
-  private boolean downPressed;
   /** Whether the left button was pressed */
   private boolean leftPressed;
   /** Whether the left button was held */
@@ -99,20 +95,6 @@ public class InputController {
   }
 
   /**
-   * Returns whether the player pressed the up button.
-   */
-  public boolean pressedUp() {
-    return upPressed;
-  }
-
-  /**
-   * Returns whether the player pressed the down button.
-   */
-  public boolean pressedDown() {
-    return downPressed;
-  }
-
-  /**
    * Returns whether the player pressed the left button.
    */
   public boolean pressedLeft() {
@@ -185,8 +167,6 @@ public class InputController {
       devChange -= 1;
     }
 
-    upPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_UP));
-    downPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_DOWN));
     leftPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_LEFT));
     leftHeld = Gdx.input.isKeyPressed(save.getBoundKeycode(Shared.ACTION_LEFT));
     rightPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_RIGHT));

@@ -8,9 +8,7 @@
 "bindings": {
 	"left": "Left",
 	"attack": "F",
-	"up": "Up",
 	"right": "Right",
-	"down": "Down",
 	"jump": "Space"
 }
 }

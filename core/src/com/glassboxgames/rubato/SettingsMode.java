@@ -97,8 +97,6 @@ public class SettingsMode implements Screen {
     table.add(new Label("CONTROLS",
                         new Label.LabelStyle(Shared.FONT_MAP.get("settings.header.ttf"), Color.WHITE)))
       .left().row();
-    createBinding("up");
-    createBinding("down");
     createBinding("left");
     createBinding("right");
     createBinding("jump");
@@ -115,11 +113,12 @@ public class SettingsMode implements Screen {
   /**
    * Creates a binding item.
    */
-  private void createBinding(final String action) {
+  private void createBinding(String action) {
     final Binding binding = new Binding();
-    final SaveController save = SaveController.getInstance();
+    binding.action = action;
     binding.label = new Label(action, labelStyle);
-    binding.button = new TextButton(save.getBoundKey(action), deselectedStyle);
+    binding.key = SaveController.getInstance().getBoundKey(binding.action);
+    binding.button = new TextButton(binding.key, deselectedStyle);
     binding.button.getLabel().setAlignment(Align.right);
     binding.button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent event, float x, float y) {
@@ -130,9 +129,13 @@ public class SettingsMode implements Screen {
       public boolean keyDown(InputEvent e, int keycode) {
         String key = Input.Keys.toString(keycode);
         if (ALLOWED_KEYS.contains(key)) {
-          save.bindKey(action, key);
-          binding.key = key;
-          binding.button.setText(key);
+          for (Binding other : bindings) {
+            if (other != binding && other.key.equals(key)) {
+              other.setKey(binding.key);
+              break;
+            }
+          }
+          binding.setKey(key);
           cancelRebinding();
         }
         return true;
@@ -218,7 +221,7 @@ public class SettingsMode implements Screen {
   /**
    * Wrapper class for a binding item.
    */
-  private static class Binding {
+  private class Binding {
     /** Label for description */
     public Label label;
     /** Button for rebinding */
@@ -227,5 +230,16 @@ public class SettingsMode implements Screen {
     public String key;
     /** Index in binding array */
     public int index;
+    /** Action string */
+    public String action;
+
+    /**
+     * Binds the given key.
+     */
+    public void setKey(String newKey) {
+      key = newKey;
+      SaveController.getInstance().bindKey(action, key);
+      button.setText(key);
+    }
   }
 }
