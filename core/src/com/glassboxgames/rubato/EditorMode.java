@@ -28,8 +28,6 @@ public class EditorMode implements Screen {
   private static final String EDITOR_FILE = "Data/editor.json";
   /** Ghost grid size */
   private static final int GRID_SIZE = 5;
-  /** Amount to add to furthest platform for level width bound */
-  private static final float WIDTH_OFFSET = 0.4f;
   /** Map movement speed */
   private static final int MAP_MOVE_SPEED = 15;
 
@@ -376,7 +374,7 @@ public class EditorMode implements Screen {
       furthestX = Math.max(furthestX, platform.x);
       furthestY = Math.max(furthestY, platform.y);
     }
-    data.width = MathUtils.clamp(furthestX + WIDTH_OFFSET,
+    data.width = MathUtils.clamp(furthestX,
                                  Gdx.graphics.getWidth() / Shared.PPM,
                                  background.getWidth() / Shared.PPM);
     data.height = furthestY + Gdx.graphics.getHeight() / 2 / Shared.PPM;
