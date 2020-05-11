@@ -407,13 +407,15 @@ public class EditorMode implements Screen {
     }
 
     float furthestX = data.checkpoint.x;
+    float furthestY = Gdx.graphics.getHeight() / 2 / Shared.PPM;
     for (PlatformData platform : data.platforms) {
       furthestX = Math.max(furthestX, platform.x);
+      furthestY = Math.max(furthestY, platform.y);
     }
     data.width = MathUtils.clamp(furthestX + WIDTH_OFFSET,
                                  Gdx.graphics.getWidth() / Shared.PPM,
                                  background.getWidth() / Shared.PPM);
-    data.height = background.getHeight() / Shared.PPM;
+    data.height = furthestY + Gdx.graphics.getHeight() / 2 / Shared.PPM;
 
     return data;
   }

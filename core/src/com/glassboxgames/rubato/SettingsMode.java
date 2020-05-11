@@ -28,7 +28,7 @@ public class SettingsMode implements Screen {
   public static final String ADAGIO_ICON_FILE = "User Interface/Main Menu/adagio_head_51x61.png";
   public static final String SEMIBOLD_FONT_FILE = "Fonts/Rajdhani-SemiBold.ttf";
   public static final String REGULAR_FONT_FILE = "Fonts/Rajdhani-Regular.ttf";
-  public static final String DEFAULT_BACKGROUND = "Backgrounds/Mountains/mountains.png";
+  public static final String DEFAULT_BACKGROUND = "Backgrounds/mountains.png";
   protected static final String EDITOR_FILE = "Data/editor.json";
   protected static final String UI_SKIN = "Data/uiskin.json";
   protected static final String SLIDER_BG = "User Interface/Buttons/slider_rect.png";

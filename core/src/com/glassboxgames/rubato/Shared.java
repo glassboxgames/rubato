@@ -40,11 +40,11 @@ public final class Shared {
   /** File containing the texture shortname map */
   public static final String TEXTURE_MAP_FILE = "Data/textures.json";
   /** Map of texture shortnames to file paths */
-  public static final ObjectMap<String, String> TEXTURE_PATHS =
-    JSON.fromJson(ObjectMap.class, Gdx.files.internal(TEXTURE_MAP_FILE));
+  public static final OrderedMap<String, String> TEXTURE_PATHS =
+    JSON.fromJson(OrderedMap.class, Gdx.files.internal(TEXTURE_MAP_FILE));
   /** Map of texture shortnames to textures */
-  public static final ObjectMap<String, Texture> TEXTURE_MAP =
-    new ObjectMap<String, Texture>();
+  public static final OrderedMap<String, Texture> TEXTURE_MAP =
+    new OrderedMap<String, Texture>();
   /** Array of level data arrays, ordered by chapter */
   public static final Array<Array<LevelData>> CHAPTER_LEVELS = new Array<Array<LevelData>>();
 

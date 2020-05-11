@@ -1,0 +1,166 @@
+{
+"width": 39.4,
+"height": 341.49335,
+"chapter": "forest",
+"player": {
+	"x": 6.22,
+	"y": 11.773334
+},
+"enemies": [],
+"platforms": [
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 0.84
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 1.64
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 2.44
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 3.24
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 3.9066668
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 4.7066665
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 5.5066667
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 6.306667
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 7.1066666
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 7.9066668
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 8.706667
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 9.506667
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 10.306666
+	},
+	{
+		"type": "tb_forest",
+		"x": 6.1666665,
+		"y": 10.973333
+	},
+	{
+		"type": "crumbling",
+		"x": 39,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 37.4,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 34.866665,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 34,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 30.8,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 29.066668,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 27.066668,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 25.066668,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 23.066668,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 21.066668,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 19.2,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 17.066668,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 13.866667,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 10.4,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 8.4,
+		"y": 9
+	},
+	{
+		"type": "crumbling",
+		"x": 7.8,
+		"y": 9
+	}
+],
+"checkpoint": {
+	"x": 38.853333,
+	"y": 10.166667
+}
+}

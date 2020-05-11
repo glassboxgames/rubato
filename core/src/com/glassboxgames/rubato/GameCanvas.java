@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Class controlling all the draw methods for Rubato.
@@ -380,6 +381,30 @@ public class GameCanvas {
     }
     spriteBatch.setColor(Color.WHITE);
     spriteBatch.draw(image, 0, 0, w, h);
+  }
+
+  /**
+   * Draw the background images, layered with parallax scrolling.
+   *
+   * @param images Textures to draw as an overlay
+   */
+  public void drawBackground(Array<Texture> images) {
+    if (active != DrawPass.STANDARD) {
+      Gdx.app.error("GameCanvas", "Cannot draw without active begin()", new IllegalStateException());
+      return;
+    }
+    int len = images.size;
+    if (len == 0) {
+      return;
+    } else if (len == 1) {
+      drawBackground(images.get(0));
+      return;
+    }
+    for (int i = len - 1; i >= 0; i--) {
+      float parallax = 0.5f * (1 + (float) i / (len - 1));
+      spriteBatch.setColor(Color.WHITE);
+      spriteBatch.draw(images.get(i), (cameraPos.x - getWidth() / 2) * parallax, cameraPos.y - getHeight() / 2);
+    }
   }
 
   /**

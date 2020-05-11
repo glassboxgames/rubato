@@ -16,11 +16,15 @@
   },
   {
     "key": "plains",
-    "maps": [],
+    "maps": [
+      "Levels/test.json"
+    ],
   },
   {
     "key": "desert",
-    "maps": [],
+    "maps": [
+      "Levels/parallax.json"
+    ],
   },
   {
     "key": "mountains",

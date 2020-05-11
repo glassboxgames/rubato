@@ -23,8 +23,8 @@ public class LevelContainer {
 
   /** The dimensions of the level */
   private float width, height;
-  /** The level background texture */
-  private Texture background;
+  /** The level background layer textures */
+  private Array<Texture> backgroundLayers;
   /** The player object for this level */
   private Player player;
   /** The enemies in this level */
@@ -45,7 +45,12 @@ public class LevelContainer {
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
     height = data.height;
-    background = Shared.TEXTURE_MAP.get(data.chapter);
+    backgroundLayers = new Array<>();
+    for (String key : Shared.TEXTURE_MAP.keys()) {
+      if (key.startsWith(data.chapter + "_layer_")) {
+        backgroundLayers.add(Shared.TEXTURE_MAP.get(key));
+      }
+    }
     player = new Player(data.player.x, data.player.y);
     enemies = new Array<Enemy>();
     for (EnemyData enemyData : data.enemies) {
@@ -244,10 +249,8 @@ public class LevelContainer {
    */
   public void draw(GameCanvas canvas, boolean debug) {
     canvas.removeShader();
-    canvas.begin(Shared.BACKGROUND_SCALE, Shared.BACKGROUND_SCALE);
-    canvas.drawBackground(background);
-    canvas.end();
     canvas.begin();
+    canvas.drawBackground(backgroundLayers);
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
