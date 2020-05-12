@@ -1,10 +1,10 @@
 package com.glassboxgames.rubato.entity;
 
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
-import com.glassboxgames.rubato.GameCanvas;
-import com.glassboxgames.rubato.Shared;
+import com.glassboxgames.rubato.*;
 
 /**
  * Abstract class to represent any enemy in Rubato.
@@ -50,8 +50,6 @@ public abstract class Enemy extends Entity {
    */
   public void lowerHealth(float damage) {
     health = Math.max(0, health - damage);
-    if (isSuspended()) {
-    }
   }
 
   /**
@@ -94,8 +92,6 @@ public abstract class Enemy extends Entity {
       body.setTransform(prevPosCache, body.getAngle());
       body.setLinearVelocity(prevVelCache);
     }
-
-    advanceState();
   }
 
   /**

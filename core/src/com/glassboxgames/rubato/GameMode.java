@@ -67,9 +67,8 @@ public class GameMode implements Screen {
 
   /** Gravity **/
   private static final float GRAVITY = -50f;
-  /** Boundary thresholds */
-  private static final float X_BOUND = 1;
-  private static final float Y_BOUND = 2;
+  /** Bottom boundary */
+  private static final float Y_BOUND = 0.3f;
   
   /** Whether this screen is in the process of exiting */
   private boolean exiting;
@@ -416,8 +415,8 @@ public class GameMode implements Screen {
             startExit(editable ? EXIT_RESET : EXIT_COMPLETE);
           }
 
-          if (pos.y < 0) {
-            startExit(EXIT_RESET);
+          if (pos.y < Y_BOUND) {
+            player.setAlive(false);
           }
 
           int horizontal = 0;

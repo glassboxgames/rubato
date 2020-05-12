@@ -203,9 +203,23 @@ public class LevelContainer {
    * @param debug whether to draw collider shapes
    */
   public void draw(GameCanvas canvas, boolean debug) {
-    canvas.removeShader();
     canvas.begin();
+
+    Shared.RIPPLE_SHADER.begin();
+    Shared.RIPPLE_SHADER.setUniformf("u_resolution", new Vector2(width * Shared.PPM, height * Shared.PPM));
+    Shared.RIPPLE_SHADER.setUniformf("u_center",
+                                     new Vector2(Shared.PPM * checkpoint.getPosition().x
+                                                 - canvas.getCameraPos().x + canvas.getWidth() / 2,
+                                                 Shared.PPM * checkpoint.getPosition().y
+                                                 - canvas.getCameraPos().y + canvas.getHeight() / 2));
+    float frame = checkpoint.isActivated() ? checkpoint.getInternalCount() * 0.5f : 0;
+    Shared.RIPPLE_SHADER.setUniformf("u_frame", frame);
+    Shared.RIPPLE_SHADER.end();
+
+    canvas.setShader(Shared.RIPPLE_SHADER);
     canvas.drawBackground(backgroundLayers);
+    canvas.removeShader();
+
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
@@ -214,6 +228,7 @@ public class LevelContainer {
       enemy.draw(canvas);
     }
     player.draw(canvas);
+
     canvas.end();
 
     if (debug) {

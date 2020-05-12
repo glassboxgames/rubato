@@ -37,6 +37,8 @@ public class Player extends Entity {
   public static final int ATTACK_IMPULSE_DURATION = 8;
   /** Attack cooldown */
   public static final int ATTACK_COOLDOWN = 0;
+  /** Drain particle lifespan */
+  private static final int DRAIN_DURATION = 30;
 
   /** Player state constants */
   public static final int STATE_IDLE = 0;
@@ -63,13 +65,15 @@ public class Player extends Entity {
   private int attackCooldown;
 
   /** Whether the player is currently active */
-  protected boolean active;
+  private boolean active;
   /** Enemies that have been hit by the current active attack */
   private ObjectSet<Enemy> enemiesHit;
   /** Entities that the player is currently using as ground */
   private ObjectSet<Entity> entitiesUnderfoot;
   /** Entities that the player is adjacent to */
   private ObjectSet<Entity> entitiesAdjacent;
+  /** Set of drain particle effects */
+  private ObjectSet<DrainEffect> drainEffects;
 
   /** The singleton instance of the sound controller */
   SoundController soundController = SoundController.getInstance();
@@ -87,6 +91,7 @@ public class Player extends Entity {
     enemiesHit = new ObjectSet<Enemy>();
     entitiesUnderfoot = new ObjectSet<Entity>();
     entitiesAdjacent = new ObjectSet<Entity>();
+    drainEffects = new ObjectSet<DrainEffect>();
     active = true;
   }
 
@@ -148,7 +153,7 @@ public class Player extends Entity {
         setState(STATE_IDLE);
       }
     } else if (stateIndex != STATE_DEAD) {
-      soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.25f);
+      // soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.25f);
       setState(STATE_DEAD);
     }
   }
@@ -214,6 +219,19 @@ public class Player extends Entity {
    */
   public ObjectSet<Enemy> getEnemiesHit() {
     return enemiesHit;
+  }
+
+  /**
+   * Starts a drain particle effect from the given start position.
+   */
+  public void startDrain(Vector2 start) {
+    DrainEffect effect = new DrainEffect();
+    effect.load(Gdx.files.internal("Particles/drain.pe"), Gdx.files.internal("Particles"));
+    effect.start = new Vector2(start);
+    effect.pos = new Vector2(start);
+    effect.lifespan = DRAIN_DURATION;
+    effect.start();
+    drainEffects.add(effect);
   }
 
   /**
@@ -301,7 +319,6 @@ public class Player extends Entity {
   @Override
   public void update(float delta) {
     super.update(delta);
-
     if (stateIndex == STATE_DEAD) {
       body.setLinearVelocity(0, 0);
       if (getCount() >= getState().getLength()) {
@@ -341,6 +358,17 @@ public class Player extends Entity {
       
     body.setLinearVelocity(getVelocity().set(MathUtils.clamp(getVelocity().x, -maxXSpeed, maxXSpeed),
                                              MathUtils.clamp(getVelocity().y, -maxYSpeed, maxYSpeed)));
+
+    Array<DrainEffect> toRemove = new Array<DrainEffect>();
+    for (DrainEffect effect : drainEffects) {
+      effect.update(delta);
+      if (effect.isComplete()) {
+        toRemove.add(effect);
+      }
+    }
+    for (DrainEffect effect : toRemove) {
+      drainEffects.remove(effect);
+    }
   }
 
   @Override
@@ -351,7 +379,30 @@ public class Player extends Entity {
   @Override
   public void draw(GameCanvas canvas) {
     if (active) {
+      for (DrainEffect effect : drainEffects) {
+        canvas.drawParticleEffect(effect);
+      }
       super.draw(canvas);
+    }
+  }
+
+  /**
+   * Wrapper class for a drain particle effect.
+   */
+  private class DrainEffect extends ParticleEffect {
+    /** Position of the particle effect */
+    public Vector2 pos;
+    /** Starting position of the particle effect */
+    public Vector2 start;
+    /** Remaining lifespan */
+    public int lifespan;
+
+    @Override
+    public void update(float delta) {
+      super.update(delta);
+      pos.set(start).add(getPosition().sub(start).scl(1 - (float)lifespan / DRAIN_DURATION));
+      setPosition(pos.x * Shared.PPM, pos.y * Shared.PPM);
+      lifespan--;
     }
   }
 }

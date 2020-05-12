@@ -60,8 +60,10 @@ public final class Shared {
   /** Array of level data arrays, ordered by chapter */
   public static final Array<Array<LevelData>> CHAPTER_LEVELS = new Array<Array<LevelData>>();
 
-  /** The desaturation shader */
+  /** The shaders */
+  public static final ShaderProgram PASSTHROUGH_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/passthrough.vsr"), Gdx.files.internal("Shaders/passthrough.fsr"));
   public static final ShaderProgram DESAT_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/desat.vsr"), Gdx.files.internal("Shaders/desat.fsr"));
+  public static final ShaderProgram RIPPLE_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/ripple.vsr"), Gdx.files.internal("Shaders/ripple.fsr"));
 
   /** Sound files */
   public static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";

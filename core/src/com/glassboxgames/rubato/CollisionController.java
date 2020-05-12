@@ -94,17 +94,6 @@ public class CollisionController implements ContactListener {
 
   @Override
   public void postSolve(Contact contact, ContactImpulse impulse) {}
-
-  /**
-   * Attacks the given enemy with the given player.
-   */
-  private void attack(Player player, Enemy enemy) {
-    ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
-    if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
-      enemy.lowerHealth(Player.ATTACK_DAMAGE);
-      soundController.play(Shared.ATTACK_HIT_SOUND, Shared.ATTACK_HIT_SOUND, false, 0.25f);
-    }
-  }
   
   /**
    * Handles a collision starting between a player and an enemy.
@@ -114,7 +103,14 @@ public class CollisionController implements ContactListener {
 
     if (playerCollider.isHitbox() && enemyCollider.isHurtbox()) {
       if (player.isAttacking()) {
-        attack(player, enemy);
+        ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
+        if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
+          enemy.lowerHealth(Player.ATTACK_DAMAGE);
+          soundController.play(Shared.ATTACK_HIT_SOUND, Shared.ATTACK_HIT_SOUND, false, 0.25f);
+          if (enemy.isSuspended()) {
+            player.startDrain(enemy.getPosition());
+          }
+        }
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
@@ -129,7 +125,9 @@ public class CollisionController implements ContactListener {
         player.addAdjacent(enemy);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
-      enemy.setTarget(player.getPosition());
+      if (!enemy.isSuspended()) {
+        enemy.setTarget(player.getPosition());
+      }
     }
   }
 
@@ -143,7 +141,9 @@ public class CollisionController implements ContactListener {
     } else if (playerCollider.isWallSensor() && enemyCollider.isHurtbox()) {
       player.removeAdjacent(enemy);
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
-      enemy.setTarget(null);
+      if (!enemy.isSuspended()) {
+        enemy.setTarget(null);
+      }
     }
   }
 

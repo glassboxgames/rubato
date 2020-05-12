@@ -20,6 +20,8 @@ public class Checkpoint extends Entity {
   
   /** Whether this checkpoint has been activated */
   private boolean activated;
+  /** How many frames checkpoint has been activated for */
+  public float activatedFrames = 0;
 
   /** Particle effects */
   private ParticleEffect activeEffect;
@@ -76,6 +78,7 @@ public class Checkpoint extends Entity {
   public void update(float delta) {
     super.update(delta);
     if (activated) {
+      activatedFrames++;
       Vector2 pos = getPosition().sub(0.25f, 0.65f).scl(Shared.PPM);
       for (ParticleEmitter emitter : activeEffect.getEmitters()) {
         emitter.setPosition(pos.x, pos.y);
@@ -98,7 +101,7 @@ public class Checkpoint extends Entity {
    * Returns whether this checkpoint has been activated.
    */
   public boolean isActivated() {
-    return activated;
+    return stateIndex == STATE_ACTIVE;
   }
 
   @Override
