@@ -33,8 +33,10 @@ public class Player extends Entity {
   public static final float ATTACK_DAMAGE = 3f;
   /** Attack impulse */
   public static final Vector2 ATTACK_IMPULSE = new Vector2(0f, 5f);
-  /** Attack impulse duration */
+  /** Attack impulse normal duration */
   public static final int ATTACK_IMPULSE_DURATION = 8;
+  /** Attack impulse short duration, used for repeated air attacks */
+  public static final int ATTACK_IMPULSE_SHORT_DURATION = 4;
   /** Attack cooldown */
   public static final int ATTACK_COOLDOWN = 0;
   /** Drain particle lifespan */
@@ -61,8 +63,12 @@ public class Player extends Entity {
 
   /** How long the player has been attacking */
   private int attackTime;
+  /** Duration of the attack impulse */
+  private int attackDuration;
   /** Remaining attack cooldown */
   private int attackCooldown;
+  /** Whether the player's attacks should be short */
+  private boolean attackShort;
 
   /** Whether the player is currently active */
   private boolean active;
@@ -129,8 +135,6 @@ public class Player extends Entity {
    */
   public void tryAttack() {
     if ((stateIndex != STATE_DEAD) && !isAttacking() && attackCooldown < 0) {
-      String sound = Shared.SOUND_PATHS.get("attack_swing");
-      SoundController.getInstance().play(sound, sound, false, 0.1f);
       setState(STATE_ATTACK);
     }
   }
@@ -256,7 +260,17 @@ public class Player extends Entity {
     super.enterState();
     switch (stateIndex) {
     case STATE_ATTACK:
+      String sound = Shared.SOUND_PATHS.get("attack_swing");
+      SoundController.getInstance().play(sound, sound, false, 0.1f);
       attackTime = 0;
+      if (attackShort) {
+        attackDuration = ATTACK_IMPULSE_SHORT_DURATION;
+      } else {
+        attackDuration = ATTACK_IMPULSE_DURATION;
+        if (!isGrounded()) {
+          attackShort = true;
+        }
+      }
       break;
     case STATE_JUMP:
       jumpTime = 0;
@@ -358,11 +372,15 @@ public class Player extends Entity {
 
     if (isAttacking()) {
       attackTime++;
-      if (attackTime < ATTACK_IMPULSE_DURATION) {
+      if (attackTime < attackDuration) {
         body.applyLinearImpulse(ATTACK_IMPULSE, getPosition(), true);
       }
     } else if (attackCooldown >= 0) {
       attackCooldown--;
+    }
+
+    if (isGrounded()) {
+      attackShort = false;
     }
 
     /* ------- all physics should be applied before this line! ------- */

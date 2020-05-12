@@ -112,6 +112,8 @@ public class GameMode implements Screen {
   private int devSelect;
   /** Whether the current level is editable */
   private boolean editable;
+  /** When the player started the current level (in milliseconds) */
+  private long startTime;
 
   /**
    * Instantiate a GameMode.
@@ -266,6 +268,8 @@ public class GameMode implements Screen {
     exiting = false;
     overlayFade = 1;
     resumeGame();
+    startTime = TimeUtils.millis();
+    System.out.println("started level");
   }
 
   /**
@@ -298,11 +302,18 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Exit with the given exit code, triggering a fade out.
+   * Exits with the given exit code, triggering a fade out.
    */
   private void startExit(int code) {
     exiting = true;
     exitCode = code;
+  }
+
+  /**
+   * Returns the number of milliseconds spent on this level.
+   */
+  public long getLevelTime() {
+    return TimeUtils.timeSinceMillis(startTime);
   }
 
   /**

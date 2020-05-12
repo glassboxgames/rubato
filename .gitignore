@@ -1,5 +1,6 @@
 ## Java
 
+*.app
 *.exe
 *.jar
 *.zip
