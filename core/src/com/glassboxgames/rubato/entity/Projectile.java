@@ -6,7 +6,8 @@ import com.badlogic.gdx.utils.*;
 
 public class Projectile extends Enemy {
   /** Projectile state variables */
-  public static final int STATE_IDLE = 0;
+  public static final int STATE_ACTIVE = 0;
+  public static final int STATE_SUSPENDED = 1;
   /** Projectile state array */
   public static Array<State> states = null;
 
@@ -26,7 +27,7 @@ public class Projectile extends Enemy {
    * @param life life of projectile
    */
   public Projectile(float x, float y, Vector2 velocity, int life) {
-    super(x, y, STATE_IDLE);
+    super(x, y, STATE_ACTIVE);
     this.velocity = new Vector2(velocity);
     this.life = life;
     bodyDef.gravityScale = 0f;
@@ -49,12 +50,24 @@ public class Projectile extends Enemy {
   public void enterState() {
     super.enterState();
     switch (stateIndex) {
-    case STATE_IDLE:
+    case STATE_ACTIVE:
       body.setLinearVelocity(velocity);
       break;
     }
   }
 
+  @Override
+  public void advanceState() {
+    super.advanceState();
+    switch (stateIndex) {
+    case STATE_ACTIVE:
+      if (isSuspended()) {
+        setState(STATE_SUSPENDED);
+        break;
+      }
+    }
+  }
+    
   @Override
   public void update(float delta) {
     super.update(delta);

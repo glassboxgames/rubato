@@ -1,6 +1,10 @@
 [
   {
-    "path": "Idle/",
-    "loop": false,
+    "path": "Active/",
+    "loop": true,
+  },
+  {
+    "path": "Suspended/",
+    "loop": true,
   },
 ]

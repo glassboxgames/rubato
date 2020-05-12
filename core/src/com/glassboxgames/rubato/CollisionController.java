@@ -94,6 +94,20 @@ public class CollisionController implements ContactListener {
 
   @Override
   public void postSolve(Contact contact, ContactImpulse impulse) {}
+
+  /**
+   * Attacks the given enemy with the given player.
+   */
+  private void attack(Player player, Enemy enemy) {
+    ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
+    if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
+      enemy.lowerHealth(Player.ATTACK_DAMAGE);
+      soundController.play(Shared.ATTACK_HIT_SOUND, Shared.ATTACK_HIT_SOUND, false, 0.25f);
+      if (enemy.isSuspended()) {
+        player.startDrain(enemy.getPosition());
+      }
+    }
+  }
   
   /**
    * Handles a collision starting between a player and an enemy.
@@ -102,15 +116,10 @@ public class CollisionController implements ContactListener {
                               Enemy enemy, Entity.Collider enemyCollider) {
 
     if (playerCollider.isHitbox() && enemyCollider.isHurtbox()) {
-      if (player.isAttacking()) {
-        ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
-        if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
-          enemy.lowerHealth(Player.ATTACK_DAMAGE);
-          soundController.play(Shared.ATTACK_HIT_SOUND, Shared.ATTACK_HIT_SOUND, false, 0.25f);
-          if (enemy.isSuspended()) {
-            player.startDrain(enemy.getPosition());
-          }
-        }
+      attack(player, enemy);
+    } else if (playerCollider.isHitbox() && enemyCollider.isHitbox()) {
+      if (enemy instanceof Projectile) {
+        attack(player, enemy);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
       if (!enemy.isSuspended()) {
@@ -179,10 +188,12 @@ public class CollisionController implements ContactListener {
    */
   private void startCollision(Enemy e1, Entity.Collider collider1,
                               Enemy e2, Entity.Collider collider2) {
-    if (collider1.isHurtbox() && collider2.isHurtbox()) {
+    if (collider1.isHitbox() && collider2.isHurtbox()) {
       if (e1 instanceof Projectile && e2.isSuspended()) {
         e1.setRemove(true);
-      } else if (e2 instanceof Projectile && e1.isSuspended()) {
+      }
+    } else if (collider2.isHitbox() && collider1.isHurtbox()) {
+      if (e2 instanceof Projectile && e1.isSuspended()) {
         e2.setRemove(true);
       }
     }
