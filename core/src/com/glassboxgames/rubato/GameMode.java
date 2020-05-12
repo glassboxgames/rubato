@@ -68,7 +68,7 @@ public class GameMode implements Screen {
   /** Exit code for when the screen exits */
   private int exitCode;
   /** Array tracking all loaded assets (for unloading purposes) */
-  private Array<String> assets = new Array<String>();
+  private Array<String> assets;
 
   /** Canvas on which to draw content */
   private GameCanvas canvas;
@@ -310,7 +310,7 @@ public class GameMode implements Screen {
    * Updates the state of the game.
    * @param delta time in seconds since last frame
    */
-  protected void update(float delta) {
+  private void update(float delta) {
     if (gameState == GameState.INTRO) {
       if (level != null) {
         level.activatePhysics(world);
@@ -396,7 +396,8 @@ public class GameMode implements Screen {
           int horizontal = 0;
           if (input.heldLeft()) {
             horizontal -= 1;
-          } else if (input.heldRight()) {
+          }
+          if (input.heldRight()) {
             horizontal += 1;
           }
           
@@ -528,7 +529,7 @@ public class GameMode implements Screen {
       if (paused) {
         canvas.begin(Shared.PPM, Shared.PPM);
         canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-                              new Color(0, 0, 0, 0.4f), level.getWidth(), level.getHeight());
+                              new Color(0, 0, 0, 0.4f), canvas.getWidth(), canvas.getHeight());
         canvas.end();
         pauseStage.draw();
       } else {

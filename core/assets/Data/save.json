@@ -2,8 +2,8 @@
 "unlocked": {
 	"mountains": 0,
 	"desert": 0,
-	"forest": 8,
-	"plains": 1
+	"forest": 0,
+	"plains": 0
 },
 "bindings": {
 	"left": "Left",

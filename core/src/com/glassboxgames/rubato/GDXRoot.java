@@ -23,6 +23,8 @@ public class GDXRoot extends Game implements ScreenListener {
   private LoadingMode loadingMode;
   /** Mode for playing the game */
   private GameMode gameMode;
+  /** Mode for drawing cutscenes */
+  private CutsceneMode cutsceneMode;
   /** Mode for editing levels */
   private EditorMode editorMode;
   /** Mode for selecting level */
@@ -65,6 +67,7 @@ public class GDXRoot extends Game implements ScreenListener {
     loadingMode = new LoadingMode(canvas, manager, this);
     mainMenu = new MainMenu(this);
     gameMode = new GameMode(canvas, this);
+    cutsceneMode = new CutsceneMode(canvas, this);
     editorMode = new EditorMode(this);
     selectMode = new SelectMode(this);
     settingsMode = new SettingsMode(this);
@@ -77,6 +80,7 @@ public class GDXRoot extends Game implements ScreenListener {
     canvas.resize();
     mainMenu.resize(width, height);
     gameMode.resize(width, height);
+    cutsceneMode.resize(width, height);
     editorMode.resize(width, height);
     super.resize(width, height);
   }
@@ -100,8 +104,9 @@ public class GDXRoot extends Game implements ScreenListener {
     }
     gameMode.unloadContent(manager);
     mainMenu.dispose();
-    editorMode.dispose();
     gameMode.dispose();
+    cutsceneMode.dispose();
+    editorMode.dispose();
     selectMode.dispose();
     settingsMode.dispose();
     setScreen(null);
@@ -142,7 +147,20 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
-        setScreen(selectMode);
+        SaveController save = SaveController.getInstance();
+        int unlocked = save.getLevelsUnlocked(chapterIndex);
+        if (unlocked == 0) {
+          level = levels.get(levelIndex);
+          if (unlocked < levels.size) {
+            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
+          } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
+            save.setLevelsUnlocked(chapterIndex + 1, 1);
+          }
+          cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(chapterIndex) + "_cutscene");
+          setScreen(cutsceneMode);
+        } else {
+          setScreen(selectMode);
+        }
       } else if (exitCode == MainMenu.EXIT_EDITOR) {
         setScreen(editorMode);
       } else if (exitCode == MainMenu.EXIT_SETTINGS) {
@@ -166,12 +184,19 @@ public class GDXRoot extends Game implements ScreenListener {
       } else if (exitCode == GameMode.EXIT_LEVELS) {
         setScreen(selectMode);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
-        // TODO add chapter advance
         levelIndex++;
         if (levelIndex >= levels.size) {
-          levelIndex = 0;
-          level = levels.get(levelIndex);
-          setScreen(selectMode);
+          if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
+            levelIndex = 0;
+            chapterIndex++;
+            levels = Shared.CHAPTER_LEVELS.get(chapterIndex);
+            level = levels.get(levelIndex);
+            cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(chapterIndex) + "_cutscene");
+          } else {
+            level = null;
+            cutsceneMode.setCutscene("end_cutscene");
+          }
+          setScreen(cutsceneMode);
         } else {
           level = levels.get(levelIndex);
           gameMode.initLevel(level, manager, false);
@@ -186,15 +211,27 @@ public class GDXRoot extends Game implements ScreenListener {
         if (levelIndex == unlocked - 1) {
           if (unlocked < levels.size) {
             save.setLevelsUnlocked(chapterIndex, unlocked + 1);
-          } else if (chapterIndex < Shared.CHAPTER_NAMES.size) {
+          } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
             save.setLevelsUnlocked(chapterIndex + 1, 1);
-          } else {
-            // game end logic 
           }
         }
       } else {
         Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode,
                       new RuntimeException());
+        Gdx.app.exit();
+      }
+    } else if (screen == cutsceneMode) {
+      if (exitCode == CutsceneMode.EXIT_ESCAPE) {
+        setScreen(selectMode);
+      } else if (exitCode == CutsceneMode.EXIT_COMPLETE) {
+        if (level != null) {
+          gameMode.initLevel(level, manager, false);
+          setScreen(gameMode);
+        } else {
+          // TODO credit screen?
+          setScreen(mainMenu);
+        }
+      } else {
         Gdx.app.exit();
       }
     } else if (screen == editorMode) {

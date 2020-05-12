@@ -329,19 +329,29 @@ public class GameCanvas {
   }
 
   /**
-   * Moves the camera horizontally based on player position,
-   * clamping the camera within the level. All units are in pixels.
+   * Moves the camera to the given position. All units are in pixels.
    *
-   * @param pos player position in the world
-   * @param levelWidth width of the level
-   * @param levelHeight height of the level
+   * @param pos new camera position
    */
-  public void moveCamera(Vector2 pos, float levelWidth, float levelHeight) {
+  public void moveCamera(Vector2 pos) {
+    camera.position.set(pos.x, pos.y, camera.position.z);
+    camera.update();
+  }
+
+  /**
+   * Moves the camera to the given position, clamping the camera within the rectangle (0, 0) to (w, h).
+   * All units are in pixels.
+   *
+   * @param pos new camera position
+   * @param boundWidth boundary width
+   * @param boundHeight boundary height
+   */
+  public void moveCamera(Vector2 pos, float boundWidth, float boundHeight) {
     camera.position.set(pos.x, pos.y, camera.position.z);
     camera.position.x = MathUtils.clamp(camera.position.x,
-                                        getWidth() / 2, levelWidth - getWidth() / 2);
+                                        getWidth() / 2, boundWidth - getWidth() / 2);
     camera.position.y = MathUtils.clamp(camera.position.y,
-                                        getHeight() / 2, levelHeight - getHeight() / 2);
+                                        getHeight() / 2, boundHeight - getHeight() / 2);
     cameraPos.set(camera.position.x, camera.position.y);
     camera.update();
   }
