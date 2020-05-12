@@ -520,7 +520,7 @@ public class EditorMode implements Screen {
       }
 
       for (String name : chapterButtonMap.keys()) {
-        System.out.println(name + " " + chapterName);
+        // TODO fix weird bug where checked doesn't work after loading level
         chapterButtonMap.get(name).setChecked(name == chapterName);
       }
       background.setDrawable(backgroundMap.get(chapterName));
