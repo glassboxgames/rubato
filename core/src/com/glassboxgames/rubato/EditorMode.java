@@ -54,6 +54,8 @@ public class EditorMode implements Screen {
   private Ghost ghost;
   /** Button map for the level */
   private OrderedMap<String, Array<ImageButton>> levelMap;
+  /** Entity buttons, sorted by y coordinate */
+  private Array<ImageButton> levelButtons;
   /** Current chapter name */
   private String chapterName;
   /** Chapter button map */
@@ -80,6 +82,7 @@ public class EditorMode implements Screen {
     }
     backgroundMap = new ObjectMap<String, Drawable>();
     levelMap = new OrderedMap<String, Array<ImageButton>>();
+    levelButtons = new Array<ImageButton>();
     chapterName = Shared.CHAPTER_NAMES.get(Shared.CHAPTER_FOREST);
     chapterButtonMap = new ObjectMap<String, Button>();
   }
@@ -267,6 +270,18 @@ public class EditorMode implements Screen {
     }
     levelMap.get(key).add(button);
     levelStage.addActor(button);
+    int index = levelButtons.size;
+    for (int i = 0; i < levelButtons.size; i++) {
+      if (button.getY() < levelButtons.get(i).getY()) {
+        index = i;
+        break;
+      }
+    }
+    levelButtons.insert(index, button);
+    for (int i = 0; i < levelButtons.size; i++) {
+      levelButtons.get(i).setZIndex(i);
+    }
+    background.toBack();
   }
   
   /**
