@@ -28,6 +28,8 @@ public class EditorMode implements Screen {
   private static final String EDITOR_FILE = "Data/editor.json";
   /** Ghost grid size */
   private static final int GRID_SIZE = 5;
+  /** Ghost snap threshold */
+  private static final float SNAP_THRESHOLD = 200f;
   /** Map movement speed */
   private static final int MAP_MOVE_SPEED = 15;
 
@@ -458,10 +460,42 @@ public class EditorMode implements Screen {
       }
 
       if (ghost != null) {
-        float x = getViewportX() + getMouseX() - ghost.button.getWidth() / 2;
-        float y = getViewportY() + getMouseY() - ghost.button.getHeight() / 2;
+        float width = ghost.button.getWidth();
+        float height = ghost.button.getHeight();
+        float x = getViewportX() + getMouseX() - width / 2;
+        float y = getViewportY() + getMouseY() - height / 2;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+          Vector2 temp = new Vector2(x, y);
+          float dist = -1;
+          ImageButton closest = null;
+          for (Array<ImageButton> buttons : levelMap.values()) {
+            for (ImageButton button : buttons) {
+              float newDist = temp.dst(button.getX(), button.getY());
+              if (closest == null || newDist < dist) {
+                dist = newDist;
+                closest = button;
+              }
+            }
+          }
+        
+          if (closest != null && dist < SNAP_THRESHOLD) {
+            float otherX = closest.getX();
+            float otherY = closest.getY();
+            float otherWidth = closest.getWidth();
+            float otherHeight = closest.getHeight();
+            temp.sub(otherX, otherY);
+            if (Math.abs(temp.x) < Math.abs(temp.y)) {
+              x = otherX;
+            } else {
+              y = otherY;
+            }
+          }
+        }
+        
         ghost.button.setPosition(GRID_SIZE * Math.round(x / GRID_SIZE) - getViewportX(),
                                  GRID_SIZE * Math.round(y / GRID_SIZE) - getViewportY());
+        
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
           ghost.changeTexture(-1);
         }
