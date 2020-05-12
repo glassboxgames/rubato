@@ -58,13 +58,6 @@ public class GameMode implements Screen {
   /** Overlay fade rate */
   private static final float FADE_RATE = 0.1f;
 
-  /** Sound effects */
-  private static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
-  private static final String ATTACK_SWING_SOUND = "Sounds/Attacking/AttackSwing.mp3";
-  private static final String CHECKPOINT_SOUND = "Sounds/Environment/Checkpoint.mp3";
-  private static final String ATTACK_HIT_SOUND = "Sounds/Attacking/AttackHit.mp3";
-  private static final String DEATH_SOUND = "Sounds/Death/Death.mp3";
-
   /** Gravity **/
   private static final float GRAVITY = -50f;
   /** Bottom boundary */
@@ -153,18 +146,6 @@ public class GameMode implements Screen {
    * @param manager asset manager to use
    */
   public void preloadContent(AssetManager manager) {
-    // Sound Assets
-    manager.load(Shared.GRASS_RUN_SOUND, Sound.class);
-    assets.add(Shared.GRASS_RUN_SOUND);
-    manager.load(Shared.ATTACK_SWING_SOUND, Sound.class);
-    assets.add(Shared.ATTACK_SWING_SOUND);
-    manager.load(Shared.ATTACK_HIT_SOUND, Sound.class);
-    assets.add(Shared.ATTACK_HIT_SOUND);
-    manager.load(Shared.CHECKPOINT_SOUND, Sound.class);
-    assets.add(Shared.CHECKPOINT_SOUND);
-    manager.load(Shared.DEATH_SOUND, Sound.class);
-    assets.add(Shared.DEATH_SOUND);
-
     for (State state : states) {
       state.preloadContent(manager);
     }
@@ -175,14 +156,6 @@ public class GameMode implements Screen {
    * @param manager the asset manager to use
    */
   public void loadContent(AssetManager manager) {
-    // Allocate sounds
-    SoundController sounds = SoundController.getInstance();
-    sounds.allocate(manager, Shared.GRASS_RUN_SOUND);
-    sounds.allocate(manager, Shared.ATTACK_SWING_SOUND);
-    sounds.allocate(manager, Shared.ATTACK_HIT_SOUND);
-    sounds.allocate(manager, Shared.CHECKPOINT_SOUND);
-    sounds.allocate(manager, Shared.DEATH_SOUND);
-
     for (State state : states) {
       state.loadContent(manager);
     }
@@ -311,13 +284,14 @@ public class GameMode implements Screen {
     SoundController soundController = SoundController.getInstance();
     if (gameState == GameState.PLAY) {
       Player player = level.getPlayer();
+      String sound = Shared.SOUND_PATHS.get("run_grass");
       if (player.isRunning() && !paused) {
-        if (!soundController.isActive(Shared.GRASS_RUN_SOUND)) {
-          soundController.play(Shared.GRASS_RUN_SOUND, Shared.GRASS_RUN_SOUND, true, 0.35f);
+        if (!soundController.isActive(sound)) {
+          soundController.play(sound, sound, true, 0.35f);
         }
       } else {
-        if (soundController.isActive(Shared.GRASS_RUN_SOUND)) {
-          soundController.stop(Shared.GRASS_RUN_SOUND);
+        if (soundController.isActive(sound)) {
+          soundController.stop(sound);
         }
       }
     }

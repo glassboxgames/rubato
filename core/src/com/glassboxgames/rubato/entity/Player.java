@@ -75,9 +75,6 @@ public class Player extends Entity {
   /** Set of drain particle effects */
   private ObjectSet<DrainEffect> drainEffects;
 
-  /** The singleton instance of the sound controller */
-  SoundController soundController = SoundController.getInstance();
-
   /**
    * Instantiates a player with the given parameters.
    * @param x x-coordinate of center
@@ -132,7 +129,8 @@ public class Player extends Entity {
    */
   public void tryAttack() {
     if ((stateIndex != STATE_DEAD) && !isAttacking() && attackCooldown < 0) {
-      soundController.play(Shared.ATTACK_SWING_SOUND, Shared.ATTACK_SWING_SOUND, false, 0.1f);
+      String sound = Shared.SOUND_PATHS.get("attack_swing");
+      SoundController.getInstance().play(sound, sound, false, 0.1f);
       setState(STATE_ATTACK);
     }
   }
@@ -153,7 +151,8 @@ public class Player extends Entity {
         setState(STATE_IDLE);
       }
     } else if (stateIndex != STATE_DEAD) {
-      // soundController.play(Shared.DEATH_SOUND, Shared.DEATH_SOUND, false, 0.25f);
+      String sound = Shared.SOUND_PATHS.get("death");
+      // SoundController.getInstance().play(sound, sound, false, 0.25f);
       setState(STATE_DEAD);
     }
   }

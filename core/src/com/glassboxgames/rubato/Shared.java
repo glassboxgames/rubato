@@ -1,6 +1,7 @@
 package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
@@ -30,6 +31,10 @@ public final class Shared {
   public static final String SETTINGS_FILE = "Data/settings.json";
   /** File containing the texture shortname map */
   public static final String TEXTURE_MAP_FILE = "Data/textures.json";
+  /** File containing the font shortname map */
+  public static final String FONT_MAP_FILE = "Data/fonts.json";
+  /** File containing the sound shortname map */
+  public static final String SOUND_MAP_FILE = "Data/sounds.json";
 
   /** JSON serializer/deserializer */
   public static final Json JSON = new Json();
@@ -40,17 +45,12 @@ public final class Shared {
   /** Map of texture shortnames to textures */
   public static final OrderedMap<String, Texture> TEXTURE_MAP = new OrderedMap<String, Texture>();
 
+  /** Map of sound shortnames to sound file paths */
+  public static final OrderedMap<String, String> SOUND_PATHS =
+    JSON.fromJson(OrderedMap.class, Gdx.files.internal(SOUND_MAP_FILE));
+
   /** Font files, by weight */
   public static final Array<String> FONT_FILES = new Array<String>();
-  /** Bold font file path */
-  public static final String BOLD_FONT_FILE = "Fonts/Rajdhani-Bold.ttf";
-  /** Semibold font file path */
-  public static final String SEMIBOLD_FONT_FILE = "Fonts/Rajdhani-SemiBold.ttf";
-  /** Regular font file path */
-  public static final String REGULAR_FONT_FILE = "Fonts/Rajdhani-Regular.ttf";
-
-  /** File containing the font shortname map */
-  public static final String FONT_MAP_FILE = "Data/fonts.json";
   /** Map of font shortnames to font metadata arrays [weight, size, spacing] */
   public static final OrderedMap<String, Array<Float>> FONT_METADATA =
     JSON.fromJson(OrderedMap.class, Gdx.files.internal(FONT_MAP_FILE));

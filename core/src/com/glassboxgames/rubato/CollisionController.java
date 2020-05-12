@@ -9,9 +9,6 @@ public class CollisionController implements ContactListener {
   /** The singleton instance of the collision controller */
   private static CollisionController controller = null;
 
-  /** The singleton instance of the sound controller */
-  SoundController soundController = SoundController.getInstance();
-
   /**
    * Returns the singleton instance of the collision controller.
    */
@@ -102,7 +99,8 @@ public class CollisionController implements ContactListener {
     ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
     if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
       enemy.lowerHealth(Player.ATTACK_DAMAGE);
-      soundController.play(Shared.ATTACK_HIT_SOUND, Shared.ATTACK_HIT_SOUND, false, 0.25f);
+      String sound = Shared.SOUND_PATHS.get("attack_hit");
+      SoundController.getInstance().play(sound, sound, false, 0.25f);
       if (enemy.isSuspended()) {
         player.startDrain(enemy.getPosition());
       }
@@ -251,7 +249,8 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
       if (!checkpoint.isActivated()) {
         checkpoint.activate();
-        soundController.play(Shared.CHECKPOINT_SOUND, Shared.CHECKPOINT_SOUND, false, 0.25f);
+        String sound = Shared.SOUND_PATHS.get("checkpoint");
+        SoundController.getInstance().play(sound, sound, false, 0.25f);
       }
     }
   }

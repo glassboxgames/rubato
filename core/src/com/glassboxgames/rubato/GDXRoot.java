@@ -4,6 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
 import com.badlogic.gdx.assets.loaders.*;
 import com.badlogic.gdx.assets.loaders.resolvers.*;
+import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
@@ -51,6 +52,9 @@ public class GDXRoot extends Game implements ScreenListener {
     for (String path : Shared.TEXTURE_PATHS.values()) {
       manager.load(path, Texture.class);
     }
+    for (String path : Shared.SOUND_PATHS.values()) {
+      manager.load(path, Sound.class);
+    }
     for (String key : Shared.FONT_METADATA.keys()) {
       Array<Float> metadata = Shared.FONT_METADATA.get(key);
       manager.load(key, BitmapFont.class, Shared.createFontLoaderParams(metadata.get(0).intValue(),
@@ -84,6 +88,11 @@ public class GDXRoot extends Game implements ScreenListener {
         manager.unload(path);
       }
     }
+    for (String path : Shared.SOUND_PATHS.values()) {
+      if (manager.isLoaded(path)) {
+        manager.unload(path);
+      }
+    }
     for (String key : Shared.FONT_METADATA.keys()) {
       if (manager.isLoaded(key)) {
         manager.unload(key);
@@ -111,11 +120,14 @@ public class GDXRoot extends Game implements ScreenListener {
         for (String key : Shared.TEXTURE_PATHS.keys()) {
           Shared.TEXTURE_MAP.put(key, manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class));
         }
+        for (String key : Shared.SOUND_PATHS.keys()) {
+          SoundController.getInstance().allocate(manager, Shared.SOUND_PATHS.get(key));
+        }
         for (String key : Shared.FONT_METADATA.keys()) {
           Shared.FONT_MAP.put(key, manager.get(key, BitmapFont.class));
         }
-        gameMode.loadContent(manager);
 
+        gameMode.loadContent(manager);
         mainMenu.initUI();
         selectMode.initUI();
         gameMode.initUI();
