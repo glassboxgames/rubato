@@ -37,8 +37,8 @@ public class SelectMode implements Screen {
   private HorizontalGroup levelChooser;
   /** Button styles for level chooser */
   private ImageTextButton.ImageTextButtonStyle lockedLevelStyle, unlockedLevelStyle;
-  /** Button style maps for chapter chooser */
-  private ObjectMap<String, ImageButton.ImageButtonStyle> lockedChapterStyles, unlockedChapterStyles;
+  /** Button style arrays for chapter chooser */
+  private Array<ImageButton.ImageButtonStyle> lockedChapterStyles, unlockedChapterStyles;
 
   /** Current chapter */
   private int chapter;
@@ -70,8 +70,8 @@ public class SelectMode implements Screen {
     levelButtonsByChapter = new Array<Array<ImageTextButton>>();
     levelButtons = new Array<ImageTextButton>();
     backgrounds = new Array<Image>();
-    lockedChapterStyles = new ObjectMap<String, ImageButton.ImageButtonStyle>();
-    unlockedChapterStyles = new ObjectMap<String, ImageButton.ImageButtonStyle>();
+    lockedChapterStyles = new Array<ImageButton.ImageButtonStyle>();
+    unlockedChapterStyles = new Array<ImageButton.ImageButtonStyle>();
   }
 
   /**
@@ -96,8 +96,10 @@ public class SelectMode implements Screen {
       unlockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_unlocked"));
       unlockedStyle.imageOver = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_hovered"));
       unlockedStyle.imageChecked = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_selected"));
+      unlockedChapterStyles.add(unlockedStyle);
       ImageButton.ImageButtonStyle lockedStyle = new ImageButton.ImageButtonStyle();
       lockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_locked"));
+      lockedChapterStyles.add(lockedStyle);
       
       final ImageButton button =
         new ImageButton(save.getLevelsUnlocked(name) > 0 ? unlockedStyle : lockedStyle);
@@ -111,6 +113,7 @@ public class SelectMode implements Screen {
       button.addListener(new ClickListener(Input.Buttons.LEFT) {
         public void clicked(InputEvent e, float x, float y) {
           chapter = newChapter;
+          page = 0;
         }
       });
       chapterButtons.add(button);
@@ -252,7 +255,11 @@ public class SelectMode implements Screen {
       }
 
       for (int i = 0; i < chapterButtons.size; i++) {
-        chapterButtons.get(i).setChecked(chapter == i);
+        String name = Shared.CHAPTER_NAMES.get(i);
+        ImageButton button = chapterButtons.get(i);
+        button.setStyle(save.getLevelsUnlocked(name) > 0
+                        ? unlockedChapterStyles.get(i) : lockedChapterStyles.get(i));
+        button.setChecked(chapter == i);
       }
 
       levelButtons = levelButtonsByChapter.get(chapter);
@@ -289,6 +296,7 @@ public class SelectMode implements Screen {
   public void hide() {
     active = false;
     Gdx.input.setInputProcessor(null);
+    page = 0;
   }
 
   @Override

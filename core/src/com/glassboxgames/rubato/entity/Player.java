@@ -318,6 +318,18 @@ public class Player extends Entity {
   @Override
   public void update(float delta) {
     super.update(delta);
+
+    Array<DrainEffect> toRemove = new Array<DrainEffect>();
+    for (DrainEffect effect : drainEffects) {
+      effect.update(delta);
+      if (effect.isComplete()) {
+        toRemove.add(effect);
+      }
+    }
+    for (DrainEffect effect : toRemove) {
+      drainEffects.remove(effect);
+    }
+
     if (stateIndex == STATE_DEAD) {
       body.setLinearVelocity(0, 0);
       if (getCount() >= getState().getLength()) {
@@ -357,17 +369,6 @@ public class Player extends Entity {
       
     body.setLinearVelocity(getVelocity().set(MathUtils.clamp(getVelocity().x, -maxXSpeed, maxXSpeed),
                                              MathUtils.clamp(getVelocity().y, -maxYSpeed, maxYSpeed)));
-
-    Array<DrainEffect> toRemove = new Array<DrainEffect>();
-    for (DrainEffect effect : drainEffects) {
-      effect.update(delta);
-      if (effect.isComplete()) {
-        toRemove.add(effect);
-      }
-    }
-    for (DrainEffect effect : toRemove) {
-      drainEffects.remove(effect);
-    }
   }
 
   @Override

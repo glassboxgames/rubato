@@ -169,7 +169,6 @@ public class GameMode implements Screen {
     ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pause_icon")));
     pauseButton.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        System.out.println("clicked");
         pauseGame();
       }
     });

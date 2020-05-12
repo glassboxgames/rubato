@@ -219,7 +219,9 @@ public class CollisionController implements ContactListener {
     } else if (enemyCollider.isHurtbox() && platformCollider.isHurtbox()) {
       if (enemy instanceof Wyrm) {
         ((Wyrm)enemy).cancelAttack();
-      } else if (enemy instanceof Projectile) {
+      }
+    } else if (enemyCollider.isHitbox() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Projectile) {
         enemy.setRemove(true);
       }
     }
