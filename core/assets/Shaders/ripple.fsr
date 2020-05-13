@@ -21,6 +21,6 @@ void main() {
 	vec3 grey = vec3(color.r * 0.3 + color.g * 0.59 + color.b * 0.11);
 	float radius =  u_frame/30.0;
 	float ripple = smoothstep(0.2+radius, 0.05+radius, len)+0.3; 
-	color.rgb = color.rgb * ripple + grey * (1-ripple);
+	color.rgb = color.rgb * ripple + grey * (1.0-ripple);
 	gl_FragColor = color;
 }
