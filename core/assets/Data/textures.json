@@ -8,8 +8,8 @@
 
   "forest_cutscene": "Cutscenes/forest_cutscene.png",
   "plains_cutscene": "Cutscenes/plains_cutscene.png",
-  "desert_cutscene": "Cutscenes/end_cutscene.png",
-  "mountains_cutscene": "Cutscenes/end_cutscene.png",
+  "desert_cutscene": "Cutscenes/desert_cutscene.png",
+  "mountains_cutscene": "Cutscenes/mountains_cutscene.png",
   "end_cutscene": "Cutscenes/end_cutscene.png",
   
   "forest_layer_0": "Backgrounds/Forest/0.png",

@@ -148,15 +148,15 @@ public class GDXRoot extends Game implements ScreenListener {
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
         SaveController save = SaveController.getInstance();
-        int unlocked = save.getLevelsUnlocked(chapterIndex);
-        if (unlocked == 0) {
+        boolean newGame = save.getLevelsUnlocked(0) == 0;
+        if (newGame) {
           level = levels.get(levelIndex);
-          if (unlocked < levels.size) {
-            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
+          if (levels.size > 0) {
+            save.setLevelsUnlocked(chapterIndex, 1);
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
             save.setLevelsUnlocked(chapterIndex + 1, 1);
           }
-          cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(chapterIndex) + "_cutscene");
+          cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(0) + "_cutscene");
           setScreen(cutsceneMode);
         } else {
           setScreen(selectMode);
@@ -215,7 +215,10 @@ public class GDXRoot extends Game implements ScreenListener {
           if (unlocked < levels.size) {
             save.setLevelsUnlocked(chapterIndex, unlocked + 1);
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
-            save.setLevelsUnlocked(chapterIndex + 1, 1);
+            unlocked = save.getLevelsUnlocked(chapterIndex + 1);
+            if (unlocked < 1) {
+              save.setLevelsUnlocked(chapterIndex + 1, 1);
+            }
           }
         }
       } else {
