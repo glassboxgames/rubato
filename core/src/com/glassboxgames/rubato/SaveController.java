@@ -7,8 +7,10 @@ import com.glassboxgames.rubato.serialize.*;
  * Singleton controller for reading from and writing to the save file.
  */
 public class SaveController {
-  /** Savegame file */
-  private static final String SAVE_FILE = "Data/save.json";
+  /** Internal path to default savegame file */
+  private static final String INTERNAL_SAVE_FILE = "Data/save.json";
+  /** External path to savegame file */
+  private static final String EXTERNAL_SAVE_FILE = Shared.EXTERNAL_PATH + "save.json";
 
   /** Save data cache */
   private SaveData data;
@@ -32,9 +34,9 @@ public class SaveController {
    */
   private SaveController() {
     try {
-      data = Shared.JSON.fromJson(SaveData.class, Gdx.files.local(SAVE_FILE));
+      data = Shared.JSON.fromJson(SaveData.class, Gdx.files.external(EXTERNAL_SAVE_FILE));
     } catch (Exception e) {
-      data = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(SAVE_FILE));
+      data = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(INTERNAL_SAVE_FILE));
     }
   }
 
@@ -42,7 +44,7 @@ public class SaveController {
    * Writes the current data cache to the save file.
    */
   private void writeSave() {
-    Gdx.files.local(SAVE_FILE).writeString(Shared.JSON.prettyPrint(data), false);
+    Gdx.files.external(EXTERNAL_SAVE_FILE).writeString(Shared.JSON.prettyPrint(data), false);
   }
 
   /**

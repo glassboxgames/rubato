@@ -1,6 +1,6 @@
 {
   "platform": "mac",
-  "jdk": "openJDK8.zip",
+  "jdk": "jdk-9.0.4.zip",
   "executable": "rubato",
   "classpath": ["desktop/build/libs/desktop-1.0.jar"],
   "mainclass": "com.glassboxgames.rubato.desktop.DesktopLauncher",

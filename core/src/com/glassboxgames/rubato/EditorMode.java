@@ -433,9 +433,10 @@ public class EditorMode implements Screen {
       public void canceled() {}
 
       public void input(String text) {
-        Gdx.files.local(text).writeString(Shared.JSON.prettyPrint(exportLevel()), false);
+        Gdx.files.external(Shared.EXTERNAL_PATH + text).writeString(Shared.JSON.prettyPrint(exportLevel()),
+                                                                    false);
       }
-    }, "Save level to file", "Levels/", "");
+    }, "Save level to file", "", "Relative to ~/Rubato/");
   }
 
   /**
@@ -446,9 +447,9 @@ public class EditorMode implements Screen {
       public void canceled() {}
 
       public void input(String text) {
-        loadLevel(Shared.JSON.fromJson(LevelData.class, Gdx.files.local(text)));
+        loadLevel(Shared.JSON.fromJson(LevelData.class, Gdx.files.local(Shared.EXTERNAL_PATH + text)));
       }
-    }, "Load level from file", "Levels/", "");
+    }, "Load level from file", "", "Relative to ~/Rubato/");
   }
 
   /**

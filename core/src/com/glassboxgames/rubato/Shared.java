@@ -25,6 +25,8 @@ public final class Shared {
   public static final int CHAPTER_MOUNTAINS = 3;
   public static final Array<String> CHAPTER_NAMES = new Array<String>();
 
+  /** External user data path */
+  public static final String EXTERNAL_PATH = "Rubato/";
   /** Path to chapters */
   public static final String CHAPTERS_FILE = "Data/chapters.json";
   /** Saved settings file */
