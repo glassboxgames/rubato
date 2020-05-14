@@ -39,6 +39,8 @@
   },
   {
     "key": "mountains",
-    "maps": ["Levels/test.json", "Levels/test.json"],
+    "maps": [
+      "Levels/test.json"
+    ],
   },
 ]
