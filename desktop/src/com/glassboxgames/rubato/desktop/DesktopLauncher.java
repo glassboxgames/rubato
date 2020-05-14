@@ -8,7 +8,7 @@ public class DesktopLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
     config.title = "Rubato";
-		config.forceExit = false;
+		config.forceExit = true;
 		config.vSyncEnabled = true;
     config.width = 1200;
     config.height = 675;
