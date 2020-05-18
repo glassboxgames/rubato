@@ -61,8 +61,6 @@ public final class Shared {
 
   /** Array of level data arrays, ordered by chapter */
   public static final Array<Array<LevelData>> CHAPTER_LEVELS = new Array<Array<LevelData>>();
-  /** Array of cutscenes, ordered by chapter */
-  public static final Array<String> CHAPTER_CUTSCENES = new Array<String>();
 
   /** The shaders */
   public static final ShaderProgram PASSTHROUGH_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/passthrough.vsr"), Gdx.files.internal("Shaders/passthrough.fsr"));

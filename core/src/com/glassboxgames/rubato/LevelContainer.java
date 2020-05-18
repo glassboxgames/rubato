@@ -23,6 +23,8 @@ public class LevelContainer {
 
   /** The dimensions of the level */
   private float width, height;
+  /** The chapter of the level */
+  private String chapter;
   /** The level background layer textures */
   private Array<Texture> backgroundLayers;
   /** The player object for this level */
@@ -45,9 +47,10 @@ public class LevelContainer {
   public LevelContainer(LevelData data, AssetManager manager) {
     width = data.width;
     height = data.height;
+    chapter = data.chapter;
     backgroundLayers = new Array<>();
     for (String key : Shared.TEXTURE_MAP.keys()) {
-      if (key.startsWith(data.chapter + "_layer_")) {
+      if (key.startsWith(chapter + "_layer_")) {
         backgroundLayers.add(Shared.TEXTURE_MAP.get(key));
       }
     }
@@ -163,6 +166,13 @@ public class LevelContainer {
   }
 
   /**
+   * Returns the chapter of this level.
+   */
+  public String getChapter() {
+    return chapter;
+  }
+
+  /**
    * Returns the player object for this level.
    */
   public Player getPlayer() {
@@ -198,28 +208,40 @@ public class LevelContainer {
   }
 
   /**
-   * Draws this level to the given canvas.
+   * Draws this level's background to the given canvas.
    * @param canvas the canvas to draw on
-   * @param debug whether to draw collider shapes
+   * @param complete whether the level is the last level of the chapter
    */
-  public void draw(GameCanvas canvas, boolean debug) {
+  public void drawBackground(GameCanvas canvas, boolean complete) {
     canvas.begin();
 
-    Shared.RIPPLE_SHADER.begin();
-    Shared.RIPPLE_SHADER.setUniformf("u_resolution", new Vector2(width * Shared.PPM, height * Shared.PPM));
-    Shared.RIPPLE_SHADER.setUniformf("u_center",
-                                     new Vector2(Shared.PPM * checkpoint.getPosition().x
-                                                 - canvas.getCameraPos().x + canvas.getWidth() / 2,
-                                                 Shared.PPM * checkpoint.getPosition().y
-                                                 - canvas.getCameraPos().y + canvas.getHeight() / 2));
-    float frame = checkpoint.isActivated() ? checkpoint.getInternalCount() * 0.5f : 0;
-    Shared.RIPPLE_SHADER.setUniformf("u_frame", frame);
-    Shared.RIPPLE_SHADER.end();
+    if (!complete) {
+      Shared.RIPPLE_SHADER.begin();
+      Shared.RIPPLE_SHADER.setUniformf("u_resolution", new Vector2(width * Shared.PPM, height * Shared.PPM));
+      Shared.RIPPLE_SHADER.setUniformf("u_center",
+                                       new Vector2(Shared.PPM * checkpoint.getPosition().x
+                                                   - canvas.getCameraPos().x + canvas.getWidth() / 2,
+                                                   Shared.PPM * checkpoint.getPosition().y
+                                                   - canvas.getCameraPos().y + canvas.getHeight() / 2));
+      float frame = checkpoint.isActivated() ? checkpoint.getInternalCount() * 0.5f : 0;
+      Shared.RIPPLE_SHADER.setUniformf("u_frame", frame);
+      Shared.RIPPLE_SHADER.end();
+    }
 
     canvas.setShader(Shared.RIPPLE_SHADER);
     canvas.drawBackground(backgroundLayers);
     canvas.removeShader();
 
+    canvas.end();
+  }
+
+  /**
+   * Draws this level's entities to the given canvas.
+   * @param canvas the canvas to draw on
+   * @param debug whether to draw collider shapes
+   */
+  public void drawEntities(GameCanvas canvas, boolean debug) {
+    canvas.begin();
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
@@ -228,7 +250,6 @@ public class LevelContainer {
       enemy.draw(canvas);
     }
     player.draw(canvas);
-
     canvas.end();
 
     if (debug) {
