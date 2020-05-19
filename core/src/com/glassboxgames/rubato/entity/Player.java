@@ -45,10 +45,11 @@ public class Player extends Entity {
   /** Player state constants */
   public static final int STATE_IDLE = 0;
   public static final int STATE_RUN = 1;
-  public static final int STATE_FALL = 2;
-  public static final int STATE_JUMP = 3;
-  public static final int STATE_ATTACK = 4;
-  public static final int STATE_DEAD = 5;
+  public static final int STATE_RISE = 2;
+  public static final int STATE_FALL = 3;
+  public static final int STATE_JUMP = 4;
+  public static final int STATE_ATTACK = 5;
+  public static final int STATE_DEAD = 6;
 
   /** Player states */
   public static Array<State> states = null;
@@ -299,11 +300,18 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_ATTACK:
       if (getCount() > getState().getLength()) {
-        setState(STATE_FALL);
+        setState(STATE_RISE);
       }
       break;
     case STATE_JUMP:
       if (jumpTime >= jumpDuration) {
+        setState(STATE_RISE);
+      }
+      break;
+    case STATE_RISE:
+      if (isGrounded()) {
+        setState(input != 0 ? STATE_RUN : STATE_IDLE);
+      } else if (getVelocity().y < 0) {
         setState(STATE_FALL);
       }
       break;
@@ -314,14 +322,14 @@ public class Player extends Entity {
       break;
     case STATE_RUN:
       if (!isGrounded()) {
-        setState(STATE_FALL);
+        setState(STATE_RISE);
       } else if (input == 0) {
         setState(STATE_IDLE);
       }
       break;
     case STATE_IDLE:
       if (!isGrounded()) {
-        setState(STATE_FALL);
+        setState(STATE_RISE);
       } else if (input != 0) {
         setState(STATE_RUN);
       }

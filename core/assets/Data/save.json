@@ -9,6 +9,7 @@
 	"left": "Left",
 	"attack": "F",
 	"right": "Right",
-	"jump": "Space"
+	"jump": "Space",
+  "reset": "R"
 }
 }

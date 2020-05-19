@@ -305,8 +305,10 @@ public class GameMode implements Screen {
    * Exits with the given exit code, triggering a fade out.
    */
   private void startExit(int code) {
-    exiting = true;
-    exitCode = code;
+    if (!exiting) {
+      exiting = true;
+      exitCode = code;
+    }
   }
 
   /**
@@ -362,6 +364,9 @@ public class GameMode implements Screen {
         if (input.pressedDevMode()) {
           devMode = !devMode;
           devSelect = -1;
+        }
+        if (input.pressedReset()) {
+          startExit(EXIT_RESET);
         }
         if (devMode) {
           if (input.getDevSelect() != -1) {

@@ -8,6 +8,10 @@
     "loop": true,
   },
   {
+    "path": "Rise/",
+    "loop": true,
+  },
+  {
     "path": "Idle/",
     "loop": true,
   },

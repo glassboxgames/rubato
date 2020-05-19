@@ -120,7 +120,7 @@ public class CollisionController implements ContactListener {
         attack(player, enemy);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
-      if (!enemy.isSuspended()) {
+      if (!player.isAttacking() && !enemy.isSuspended()) {
         player.setAlive(false);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {

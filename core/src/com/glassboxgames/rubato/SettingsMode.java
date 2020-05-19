@@ -103,6 +103,7 @@ public class SettingsMode implements Screen {
     createBinding("right");
     createBinding("jump");
     createBinding("attack");
+    createBinding("reset");
 
     for (Binding binding : bindings) {
       Table item = new Table();

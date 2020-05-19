@@ -84,6 +84,7 @@ public final class Shared {
   public static final String ACTION_RIGHT = "right";
   public static final String ACTION_JUMP = "jump";
   public static final String ACTION_ATTACK = "attack";
+  public static final String ACTION_RESET = "reset";
 
   static {
     JSON.setOutputType(JsonWriter.OutputType.json);
