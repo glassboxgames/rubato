@@ -15,6 +15,8 @@ import com.glassboxgames.rubato.entity.*;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
+import java.util.Comparator;
+
 /**
  * Mode controller for the level editor.
  */
@@ -384,6 +386,13 @@ public class EditorMode implements Screen {
         }
       }
     }
+    data.platforms.sort(new Comparator<PlatformData>() {
+      @Override
+      public int compare(PlatformData o1, PlatformData o2) {
+        return (int) Math.signum(o1.y - o2.y);
+      }
+    });
+
 
     float furthestX = data.checkpoint.x;
     float furthestY = Gdx.graphics.getHeight() / 2 / Shared.PPM;
@@ -447,7 +456,7 @@ public class EditorMode implements Screen {
       public void canceled() {}
 
       public void input(String text) {
-        loadLevel(Shared.JSON.fromJson(LevelData.class, Gdx.files.local(Shared.EXTERNAL_PATH + text)));
+        loadLevel(Shared.JSON.fromJson(LevelData.class, Gdx.files.external(Shared.EXTERNAL_PATH + text)));
       }
     }, "Load level from file", "", "Relative to ~/Rubato/");
   }

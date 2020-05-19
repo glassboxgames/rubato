@@ -123,7 +123,9 @@ public class GDXRoot extends Game implements ScreenListener {
     if (screen == loadingMode) {
       if (exitCode == LoadingMode.EXIT_DONE) {
         for (String key : Shared.TEXTURE_PATHS.keys()) {
-          Shared.TEXTURE_MAP.put(key, manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class));
+          Texture texture = manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class);
+          texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+          Shared.TEXTURE_MAP.put(key, texture);
         }
         for (String key : Shared.SOUND_PATHS.keys()) {
           SoundController.getInstance().allocate(manager, Shared.SOUND_PATHS.get(key));
@@ -175,7 +177,7 @@ public class GDXRoot extends Game implements ScreenListener {
         chapterIndex = selectMode.getChapter();
         levelIndex = selectMode.getLevel();
         level = Shared.CHAPTER_LEVELS.get(chapterIndex).get(levelIndex);
-        gameMode.initLevel(level, manager, false);
+        gameMode.initLevel(level, manager, false, false);
         setScreen(gameMode);
       }
     } else if (screen == gameMode) {
@@ -184,6 +186,18 @@ public class GDXRoot extends Game implements ScreenListener {
       } else if (exitCode == GameMode.EXIT_LEVELS) {
         setScreen(selectMode);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
+        SaveController save = SaveController.getInstance();
+        int unlocked = save.getLevelsUnlocked(chapterIndex);
+        if (levelIndex == unlocked - 1) {
+          if (unlocked < levels.size) {
+            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
+          } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
+            unlocked = save.getLevelsUnlocked(chapterIndex + 1);
+            if (unlocked < 1) {
+              save.setLevelsUnlocked(chapterIndex + 1, 1);
+            }
+          }
+        }
         long millis = gameMode.getLevelTime();
         System.out.printf("completed in %d:%02d.%03d\n",
                           millis / 1000 / 60, millis / 1000 % 60, millis % 1000);
@@ -202,25 +216,14 @@ public class GDXRoot extends Game implements ScreenListener {
           setScreen(cutsceneMode);
         } else {
           level = levels.get(levelIndex);
-          gameMode.initLevel(level, manager, false);
+          gameMode.initLevel(level, manager, levelIndex == levels.size - 1, false);
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
-        gameMode.initLevel(level, manager, gameMode.isEditable());
+        gameMode.initLevel(level, manager, gameMode.isCompletion(), gameMode.isEditable());
       } else if (exitCode == GameMode.EXIT_EDIT) {
         setScreen(editorMode);
       } else if (exitCode == GameMode.EXIT_CHECKPOINT) {
-        SaveController save = SaveController.getInstance();
-        int unlocked = save.getLevelsUnlocked(chapterIndex);
-        if (levelIndex == unlocked - 1) {
-          if (unlocked < levels.size) {
-            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
-          } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
-            unlocked = save.getLevelsUnlocked(chapterIndex + 1);
-            if (unlocked < 1) {
-              save.setLevelsUnlocked(chapterIndex + 1, 1);
-            }
-          }
-        }
+        // checkpoint logic
       } else {
         Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode,
                       new RuntimeException());
@@ -231,7 +234,7 @@ public class GDXRoot extends Game implements ScreenListener {
         setScreen(selectMode);
       } else if (exitCode == CutsceneMode.EXIT_COMPLETE) {
         if (level != null) {
-          gameMode.initLevel(level, manager, false);
+          gameMode.initLevel(level, manager, false, false);
           setScreen(gameMode);
         } else {
           // TODO credit screen?
@@ -245,7 +248,7 @@ public class GDXRoot extends Game implements ScreenListener {
         setScreen(mainMenu);
       } else if (exitCode == EditorMode.EXIT_TEST) {
         level = editorMode.exportLevel();
-        gameMode.initLevel(level, manager, true);
+        gameMode.initLevel(level, manager, false, true);
         setScreen(gameMode);
       } else {
         Gdx.app.exit();

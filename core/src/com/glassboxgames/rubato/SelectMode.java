@@ -142,7 +142,7 @@ public class SelectMode implements Screen {
     unlockedLevelStyle.fontColor = Color.WHITE;
     for (int c = 0; c < Shared.CHAPTER_LEVELS.size; c++) {
       Array<ImageTextButton> buttons = new Array<ImageTextButton>();
-      for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size; l++) {
+      for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size - 1; l++) {
         final ImageTextButton button = new ImageTextButton(Integer.toString(l + 1), lockedLevelStyle);
         button.clearChildren();
         button.add(button.getLabel()).padBottom(40).row();
