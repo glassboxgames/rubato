@@ -11,5 +11,11 @@
 	"right": "Right",
 	"jump": "Space",
   "reset": "R"
-}
+},
+  "times": {
+	"mountains": 0,
+	"desert": 0,
+	"forest": 0,
+	"plains": 0
+  }
 }

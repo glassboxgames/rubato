@@ -198,9 +198,6 @@ public class GDXRoot extends Game implements ScreenListener {
             }
           }
         }
-        long millis = gameMode.getLevelTime();
-        System.out.printf("completed in %d:%02d.%03d\n",
-                          millis / 1000 / 60, millis / 1000 % 60, millis % 1000);
         levelIndex++;
         if (levelIndex >= levels.size) {
           if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
