@@ -312,7 +312,7 @@ public class GameMode implements Screen {
     completion = nextCompletion;
     editable = nextEditable;
     
-    level = new LevelContainer(nextData);
+    level = new LevelContainer(nextData, nextCompletion);
     chapterInfo.setVisible(false);
     chapterIcon.setDrawable(Shared.getDrawable(level.getChapter() + "_plain"));
     chapterComplete.setVisible(false);
@@ -345,13 +345,6 @@ public class GameMode implements Screen {
       : String.format("%d:%02d:%02d.%03d", hrs, mins % 60, secs % 60, millis % 1000);
     chapterTime.setText(time);
     chapterTime.setVisible(true);
-  }
-
-  /**
-   * Returns whether the level is editable.
-   */
-  public boolean isCompletion() {
-    return completion;
   }
 
   /**
@@ -585,12 +578,15 @@ public class GameMode implements Screen {
     canvas.clear();
 
     if (gameState == GameState.PLAY) {
-      level.drawBackground(canvas, completion);
+      level.drawBackground(canvas);
       if (completion) {
         Shared.drawOverlay(0.2f);
         chapterStage.draw();
       }
-      level.drawEntities(canvas, debug);
+      level.drawEntities(canvas);
+      if (debug) {
+        level.drawDebug(canvas);
+      }
 
       Player player = level.getPlayer();
       if (!exiting && player.isActive()) {

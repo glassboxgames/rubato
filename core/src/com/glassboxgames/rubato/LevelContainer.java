@@ -18,6 +18,9 @@ import com.glassboxgames.util.*;
  * This class represents everything inside a single level.
  */
 public class LevelContainer {
+  /** Ripple shader */
+  private static final ShaderProgram RIPPLE_SHADER =
+    new ShaderProgram(Gdx.files.internal("Shaders/ripple.vsr"), Gdx.files.internal("Shaders/ripple.fsr"));
   /** Width of the wall fixture */
   private static final float WALL_WIDTH = 0.5f;
 
@@ -39,12 +42,15 @@ public class LevelContainer {
   private BodyDef wallDef;
   /** The walls in this level */
   private Body leftWall, rightWall;
+  /** Whether this level is the last level in its chapter */
+  private boolean completion;
 
   /**
    * Instantiates a LevelContainer from a LevelData object.
    * @param data the level data container
+   * @param completion whether this is a chapter completion level
    */
-  public LevelContainer(LevelData data) {
+  public LevelContainer(LevelData data, boolean completion) {
     width = data.width;
     height = data.height;
     chapter = data.chapter;
@@ -66,6 +72,7 @@ public class LevelContainer {
     checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
     wallDef = new BodyDef();
     wallDef.type = BodyDef.BodyType.StaticBody;
+    this.completion = completion;
   }
 
   /**
@@ -208,27 +215,35 @@ public class LevelContainer {
   }
 
   /**
+   * Activates the ripple shader for this level.
+   */
+  private void setRippleShader(GameCanvas canvas) {
+    if (!completion) {
+      RIPPLE_SHADER.begin();
+      RIPPLE_SHADER.setUniformf("u_max_length", width * Shared.PPM);
+      RIPPLE_SHADER.setUniformf("u_adagio",
+                                new Vector2(Shared.PPM * player.getPosition().x
+                                            - canvas.getCameraPos().x + canvas.getWidth() / 2,
+                                            Shared.PPM * player.getPosition().y
+                                            - canvas.getCameraPos().y + canvas.getHeight() / 2));
+      RIPPLE_SHADER.setUniformf("u_checkpoint",
+                                new Vector2(Shared.PPM * checkpoint.getPosition().x
+                                            - canvas.getCameraPos().x + canvas.getWidth() / 2,
+                                            Shared.PPM * checkpoint.getPosition().y
+                                            - canvas.getCameraPos().y + canvas.getHeight() / 2));
+      RIPPLE_SHADER.setUniformf("u_frame", checkpoint.isActivated() ? checkpoint.getInternalCount() : 0);
+      RIPPLE_SHADER.end();
+      canvas.setShader(RIPPLE_SHADER);
+    }
+  }
+
+  /**
    * Draws this level's background to the given canvas.
    * @param canvas the canvas to draw on
-   * @param completion whether the level is the last level of the chapter
    */
-  public void drawBackground(GameCanvas canvas, boolean completion) {
+  public void drawBackground(GameCanvas canvas) {
     canvas.begin();
-
-    if (!completion) {
-      Shared.RIPPLE_SHADER.begin();
-      Shared.RIPPLE_SHADER.setUniformf("u_resolution", new Vector2(width * Shared.PPM, height * Shared.PPM));
-      Shared.RIPPLE_SHADER.setUniformf("u_center",
-                                       new Vector2(Shared.PPM * checkpoint.getPosition().x
-                                                   - canvas.getCameraPos().x + canvas.getWidth() / 2,
-                                                   Shared.PPM * checkpoint.getPosition().y
-                                                   - canvas.getCameraPos().y + canvas.getHeight() / 2));
-      float frame = checkpoint.isActivated() ? checkpoint.getInternalCount() * 0.5f : 0;
-      Shared.RIPPLE_SHADER.setUniformf("u_frame", frame);
-      Shared.RIPPLE_SHADER.end();
-    }
-
-    canvas.setShader(Shared.RIPPLE_SHADER);
+    setRippleShader(canvas);
     canvas.drawBackground(backgroundLayers);
     canvas.removeShader();
     canvas.end();
@@ -237,33 +252,37 @@ public class LevelContainer {
   /**
    * Draws this level's entities to the given canvas.
    * @param canvas the canvas to draw on
-   * @param debug whether to draw collider shapes
    */
-  public void drawEntities(GameCanvas canvas, boolean debug) {
+  public void drawEntities(GameCanvas canvas) {
     canvas.begin();
+    setRippleShader(canvas);
     for (Platform platform : platforms) {
       platform.draw(canvas);
     }
+    canvas.removeShader();
     checkpoint.draw(canvas);
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
     player.draw(canvas);
     canvas.end();
+  }
 
-    if (debug) {
-      canvas.beginDebug();
-      for (Platform platform : platforms) {
-        platform.drawPhysics(canvas);
-      }
-      checkpoint.drawPhysics(canvas);
-      for (Enemy enemy : enemies) {
-        enemy.drawPhysics(canvas);
-      }
-      if (player.isActive()) {
-        player.drawPhysics(canvas);
-      }
-      canvas.endDebug();
+  /**
+   * Draws this level in debug mode.
+   */
+  public void drawDebug(GameCanvas canvas) {
+    canvas.beginDebug();
+    for (Platform platform : platforms) {
+      platform.drawPhysics(canvas);
     }
+    checkpoint.drawPhysics(canvas);
+    for (Enemy enemy : enemies) {
+      enemy.drawPhysics(canvas);
+    }
+    if (player.isActive()) {
+      player.drawPhysics(canvas);
+    }
+    canvas.endDebug();
   }
 }
