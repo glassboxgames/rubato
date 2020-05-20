@@ -37,8 +37,11 @@ public class Player extends Entity {
   public static final int ATTACK_IMPULSE_DURATION = 8;
   /** Attack impulse short duration, used for repeated air attacks */
   public static final int ATTACK_IMPULSE_SHORT_DURATION = 4;
-  /** Attack cooldown */
-  public static final int ATTACK_COOLDOWN = 0;
+  /** Jump buffer frames */
+  private static final int JUMP_BUFFER = 2;
+  /** Attack buffer frames */
+  private static final int ATTACK_BUFFER = 5;
+
   /** Drain particle lifespan */
   private static final int DRAIN_DURATION = 30;
 
@@ -66,10 +69,12 @@ public class Player extends Entity {
   private int attackTime;
   /** Duration of the attack impulse */
   private int attackDuration;
-  /** Remaining attack cooldown */
-  private int attackCooldown;
   /** Whether the player's attacks should be short */
-  private boolean attackShort;
+  private boolean shortAttack;
+  /** Whether the player is buffering an attack */
+  private boolean bufferingAttack;
+  /** Frames since grounded */
+  private int framesSinceGrounded;
 
   /** Whether the player is currently active */
   private boolean active;
@@ -115,7 +120,7 @@ public class Player extends Entity {
    * Tries to start a jump.
    */
   public void tryJump() {
-    if ((stateIndex != STATE_DEAD) && !isJumping() && isGrounded()) {
+    if (stateIndex != STATE_DEAD && !isJumping() && (isGrounded() || framesSinceGrounded < JUMP_BUFFER)) {
       setState(STATE_JUMP);
     } 
   }
@@ -124,7 +129,7 @@ public class Player extends Entity {
    * Tries to extend an existing jump.
    */
   public void tryExtendJump() {
-    if ((stateIndex != STATE_DEAD) && isJumping()) {
+    if (stateIndex != STATE_DEAD && isJumping()) {
       if (jumpDuration < maxJumpDuration) {
         jumpDuration++;
       }
@@ -135,8 +140,12 @@ public class Player extends Entity {
    * Tries to start a player attack.
    */
   public void tryAttack() {
-    if ((stateIndex != STATE_DEAD) && !isAttacking() && attackCooldown < 0) {
-      setState(STATE_ATTACK);
+    if (stateIndex != STATE_DEAD) {
+      if (!isAttacking()) {
+        setState(STATE_ATTACK);
+      } else if (getCount() > getState().getLength() - ATTACK_BUFFER) {
+        bufferingAttack = true;
+      }
     }
   }
 
@@ -264,12 +273,12 @@ public class Player extends Entity {
       String sound = Shared.SOUND_PATHS.get("attack_swing");
       SoundController.getInstance().play(sound, sound, false, 0.1f);
       attackTime = 0;
-      if (attackShort) {
+      if (shortAttack) {
         attackDuration = ATTACK_IMPULSE_SHORT_DURATION;
       } else {
         attackDuration = ATTACK_IMPULSE_DURATION;
-        if (!isGrounded()) {
-          attackShort = true;
+        if (!(isGrounded() || framesSinceGrounded < JUMP_BUFFER)) {
+          shortAttack = true;
         }
       }
       break;
@@ -289,7 +298,6 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_ATTACK:
       attackTime = -1;
-      attackCooldown = ATTACK_COOLDOWN;
       enemiesHit.clear();
       break;
     }
@@ -301,6 +309,10 @@ public class Player extends Entity {
     case STATE_ATTACK:
       if (getCount() > getState().getLength()) {
         setState(STATE_RISE);
+        if (bufferingAttack) {
+          bufferingAttack = false;
+          setState(STATE_ATTACK);
+        }
       }
       break;
     case STATE_JUMP:
@@ -383,12 +395,13 @@ public class Player extends Entity {
       if (attackTime < attackDuration) {
         body.applyLinearImpulse(ATTACK_IMPULSE, getPosition(), true);
       }
-    } else if (attackCooldown >= 0) {
-      attackCooldown--;
     }
 
     if (isGrounded()) {
-      attackShort = false;
+      shortAttack = false;
+      framesSinceGrounded = 0;
+    } else {
+      framesSinceGrounded++;
     }
 
     /* ------- all physics should be applied before this line! ------- */

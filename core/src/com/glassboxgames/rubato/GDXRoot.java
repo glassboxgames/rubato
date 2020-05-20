@@ -22,7 +22,7 @@ public class GDXRoot extends Game implements ScreenListener {
   private static final int NUM_FADE_STATES = 4;
 
   /** Fade state duration */
-  private static final int FADE_STATE_DURATION = 20;
+  private static final int FADE_STATE_DURATION = 15;
 
   /** Drawing context to display graphics */
   private GameCanvas canvas;
@@ -145,7 +145,6 @@ public class GDXRoot extends Game implements ScreenListener {
         if (fadeState == FADE_DELAY) {
           setScreen(nextScreen);
         }
-        
         fadeCount = 0;
         fadeState = (fadeState + 1) % NUM_FADE_STATES;
       }

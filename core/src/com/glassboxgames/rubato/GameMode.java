@@ -570,7 +570,7 @@ public class GameMode implements Screen {
         }
         checkpoint.sync();
 
-        world.step(1 / 60f, 8, 3);
+        world.step(delta, 8, 3);
 
         gameStage.act(delta);
       }
