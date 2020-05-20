@@ -667,6 +667,7 @@ public class GameMode implements Screen {
   @Override
   public void render(float delta) {
     if (active) {
+      // if (Gdx.input.isKeyJustPressed(Input.Keys.D)) 
       update(delta);
       draw();
     }
@@ -716,9 +717,15 @@ public class GameMode implements Screen {
 
   @Override
   public void dispose() {
-    gameStage.dispose();
-    pauseStage.dispose();
-    chapterStage.dispose();
+    if (gameStage != null) {
+      gameStage.dispose();
+    }
+    if (pauseStage != null) {
+      pauseStage.dispose();
+    }
+    if (chapterStage != null) {
+      chapterStage.dispose();
+    }
     if (world != null) {
       world.dispose();
       world = null;

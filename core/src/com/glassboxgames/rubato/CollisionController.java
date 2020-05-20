@@ -43,6 +43,7 @@ public class CollisionController implements ContactListener {
         startCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
       } else if (o1.entity instanceof Enemy && o2.entity instanceof Enemy) {
         startCollision((Enemy)o1.entity, o1, (Enemy) o2.entity, o2);
+        startCollision((Enemy)o2.entity, o2, (Enemy) o1.entity, o1);
       } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
         startCollision((Enemy)o1.entity, o1, (Platform)o2.entity, o2);
       } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
@@ -74,6 +75,7 @@ public class CollisionController implements ContactListener {
         endCollision((Player)o2.entity, o2, (Platform)o1.entity, o1);
       } else if (o1.entity instanceof Enemy && o2.entity instanceof Enemy) {
         endCollision((Enemy)o1.entity, o1, (Enemy) o2.entity, o2);
+        endCollision((Enemy)o2.entity, o2, (Enemy) o1.entity, o1);
       } else if (o1.entity instanceof Enemy && o2.entity instanceof Platform) {
         endCollision((Enemy)o1.entity, o1, (Platform) o2.entity, o2);
       } else if (o2.entity instanceof Enemy && o1.entity instanceof Platform) {
@@ -127,10 +129,6 @@ public class CollisionController implements ContactListener {
       if (enemy.isSuspended()) {
         player.addUnderfoot(enemy);
       }
-    } else if (playerCollider.isWallSensor() && enemyCollider.isHurtbox()) {
-      if (enemy.isSuspended()) {
-        player.addAdjacent(enemy);
-      }
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       if (!enemy.isSuspended()) {
         enemy.setTarget(player.getPosition());
@@ -145,8 +143,6 @@ public class CollisionController implements ContactListener {
                             Enemy enemy, Entity.Collider enemyCollider) {
     if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
       player.removeUnderfoot(enemy);
-    } else if (playerCollider.isWallSensor() && enemyCollider.isHurtbox()) {
-      player.removeAdjacent(enemy);
     } else if (playerCollider.isHurtbox() && enemyCollider.isVisionSensor()) {
       if (!enemy.isSuspended()) {
         enemy.setTarget(null);
@@ -162,8 +158,6 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.addUnderfoot(platform);
       platform.visit();
-    } else if (playerCollider.isWallSensor() && platformCollider.isHurtbox()) {
-      player.addAdjacent(platform);
     } else if (playerCollider.isHurtbox() && platformCollider.isHitbox()) {
       player.setAlive(false);
     }
@@ -176,8 +170,6 @@ public class CollisionController implements ContactListener {
                             Platform platform, Entity.Collider platformCollider) {
     if (playerCollider.isGroundSensor() && platformCollider.isHurtbox()) {
       player.removeUnderfoot(platform);
-    } else if (playerCollider.isWallSensor() && platformCollider.isHurtbox()) {
-      player.removeAdjacent(platform);
     }
   }
   
@@ -190,18 +182,56 @@ public class CollisionController implements ContactListener {
       if (e1 instanceof Projectile && e2.isSuspended()) {
         e1.setRemove(true);
       }
-    } else if (collider2.isHitbox() && collider1.isHurtbox()) {
-      if (e2 instanceof Projectile && e1.isSuspended()) {
-        e2.setRemove(true);
+    } else if (collider1.isGroundSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).addUnderfoot(e2);
       }
-    }
+    } else if (collider1.isFrontEdgeSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).addAtFrontEdge(e2);
+      }
+    } else if (collider1.isBackEdgeSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).addAtBackEdge(e2);
+      }
+    } else if (collider1.isAheadSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).addAhead(e2);
+      }
+    } else if (collider1.isBehindSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).addBehind(e2);
+      }
+    }    
   }
 
   /**
    * Handles a collision ending between two enemies.
    */
   private void endCollision(Enemy e1, Entity.Collider collider1,
-                            Enemy e2, Entity.Collider collider2) {}
+                            Enemy e2, Entity.Collider collider2) {
+    if (collider1.isGroundSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).removeUnderfoot(e2);
+      }
+    } else if (collider1.isFrontEdgeSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).removeAtFrontEdge(e2);
+      }
+    } else if (collider1.isBackEdgeSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).removeAtBackEdge(e2);
+      }
+    } else if (collider1.isAheadSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).removeAhead(e2);
+      }
+    } else if (collider1.isBehindSensor() && collider2.isHurtbox()) {
+      if (e1 instanceof Spider) {
+        ((Spider)e1).removeBehind(e2);
+      }
+    }    
+  }
 
   /**
    * Handles a collision starting between an enemy and a platform.
@@ -212,9 +242,21 @@ public class CollisionController implements ContactListener {
       if (enemy instanceof Spider) {
         ((Spider)enemy).addUnderfoot(platform);
       }
-    } else if (enemyCollider.isEdgeSensor() && platformCollider.isHurtbox()) {
+    } else if (enemyCollider.isFrontEdgeSensor() && platformCollider.isHurtbox()) {
       if (enemy instanceof Spider) {
-        ((Spider)enemy).setEdge(false);
+        ((Spider)enemy).addAtFrontEdge(platform);
+      }
+    } else if (enemyCollider.isBackEdgeSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).addAtBackEdge(platform);
+      }
+    } else if (enemyCollider.isAheadSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).addAhead(platform);
+      }
+    } else if (enemyCollider.isBehindSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).addBehind(platform);
       }
     } else if (enemyCollider.isHurtbox() && platformCollider.isHurtbox()) {
       if (enemy instanceof Wyrm) {
@@ -236,13 +278,25 @@ public class CollisionController implements ContactListener {
       if (enemy instanceof Spider) {
         ((Spider)enemy).removeUnderfoot(platform);
       }
-    } else if (enemyCollider.isEdgeSensor() && platformCollider.isHurtbox()) {
+    } else if (enemyCollider.isFrontEdgeSensor() && platformCollider.isHurtbox()) {
       if (enemy instanceof Spider) {
-        ((Spider)enemy).setEdge(true);
+        ((Spider)enemy).removeAtFrontEdge(platform);
+      }
+    } else if (enemyCollider.isBackEdgeSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).removeAtBackEdge(platform);
+      }
+    } else if (enemyCollider.isAheadSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).removeAhead(platform);
+      }
+    } else if (enemyCollider.isBehindSensor() && platformCollider.isHurtbox()) {
+      if (enemy instanceof Spider) {
+        ((Spider)enemy).removeBehind(platform);
       }
     }
   }
-
+  
   /**
    * Handles a collision starting between a player and a checkpoint.
    */

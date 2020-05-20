@@ -1,5 +1,9 @@
 [
   {
+    "path": "Idle/",
+    "loop": true,
+  },
+  {
     "path": "Wander/",
     "loop": true,
   },

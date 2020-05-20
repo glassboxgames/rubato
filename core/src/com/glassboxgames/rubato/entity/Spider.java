@@ -8,14 +8,17 @@ import com.glassboxgames.rubato.*;
 
 public class Spider extends Enemy {
   /** Spider state constants */
-  public static final int STATE_WANDER = 0;
-  public static final int STATE_WINDUP = 1;
-  public static final int STATE_ATTACK = 2;
+  public static final int STATE_IDLE = 0;
+  public static final int STATE_WANDER = 1;
+  public static final int STATE_WINDUP = 2;
+  public static final int STATE_ATTACK = 3;
   /** Spider states */
   public static Array<State> states = null;
 
   /** Max horizontal speed */
   private static final float MAX_X_SPEED = 1f;
+  /** Max vertical speed */
+  private static final float MAX_Y_SPEED = 9f;
   /** Max health */
   private static final float MAX_HEALTH = 1f;
   /** Attack launch impulse */
@@ -23,10 +26,16 @@ public class Spider extends Enemy {
 
   /** Temporary vector */
   private Vector2 temp = new Vector2();
-  /** Whether the spider is at an edge */
-  private boolean edge;
   /** Set of entities considered underfoot */
   private ObjectSet<Entity> entitiesUnderfoot;
+  /** Set of entities ahead */
+  private ObjectSet<Entity> entitiesAhead;
+  /** Set of entities ahead */
+  private ObjectSet<Entity> entitiesBehind;
+  /** Set of entities at front edge */
+  private ObjectSet<Entity> entitiesAtFrontEdge;
+  /** Set of entities at back edge */
+  private ObjectSet<Entity> entitiesAtBackEdge;
 
   /**
    * Instantiates a spider enemy with the given parameters.
@@ -34,8 +43,12 @@ public class Spider extends Enemy {
    * @param y y-coordinate
    */
   public Spider(float x, float y) {
-    super(x, y, STATE_WANDER);
+    super(x, y, STATE_IDLE);
     entitiesUnderfoot = new ObjectSet<Entity>();
+    entitiesAhead = new ObjectSet<Entity>();
+    entitiesBehind = new ObjectSet<Entity>();
+    entitiesAtFrontEdge = new ObjectSet<Entity>();
+    entitiesAtBackEdge = new ObjectSet<Entity>();
   }
 
   /**
@@ -51,12 +64,35 @@ public class Spider extends Enemy {
     return states;
   }
 
+  /**
+   * Returns whether this spider can move forward.
+   */
+  private boolean canMove() {
+    return entitiesAhead.isEmpty() && !entitiesAtFrontEdge.isEmpty();
+  }
+
+  /**
+   * Returns whether this spider can turn around.
+   */
+  private boolean canTurn() {
+    return entitiesBehind.isEmpty() && !entitiesAtBackEdge.isEmpty();
+  }
+
   @Override
   public void advanceState() {
     switch (stateIndex) {
+    case STATE_IDLE:
+      if (getTarget() != null) {
+        setState(STATE_WINDUP);
+      } else if (canMove() || canTurn()) {
+        setState(STATE_WANDER);
+      }
+      break;
     case STATE_WANDER:
       if (getTarget() != null) {
         setState(STATE_WINDUP);
+      } else if (!canMove() && !canTurn()) {
+        setState(STATE_IDLE);
       }
       break;
     case STATE_WINDUP:
@@ -66,7 +102,7 @@ public class Spider extends Enemy {
       break;
     case STATE_ATTACK:
       if (isGrounded() && getCount() >= getState().getLength()) {
-        setState(STATE_WANDER);
+        setState(STATE_IDLE);
       }
       break;
     }
@@ -76,6 +112,9 @@ public class Spider extends Enemy {
   public void enterState() {
     super.enterState();
     switch (stateIndex) {
+    case STATE_IDLE:
+      body.setLinearVelocity(0, 0);
+      break;
     case STATE_WINDUP:
       body.setLinearVelocity(0, 0);
       float delta = getTarget().x - getPosition().x;
@@ -107,36 +146,18 @@ public class Spider extends Enemy {
     super.update(delta);
     switch (stateIndex) {
     case STATE_WANDER:
-      if (isAtEdge()) {
+      if (entitiesAtFrontEdge.isEmpty() || !entitiesAhead.isEmpty()) {
         turnAround();
       }
       body.setLinearVelocity(MAX_X_SPEED * getDirection(), 0);
       break;
-    case STATE_ATTACK:
-      if (getCount() >= getState().getLength() && isGrounded()) {
-        body.setLinearVelocity(0, 0);
-      }
-      break;
     }
+    body.setLinearVelocity(getVelocity().x, MathUtils.clamp(getVelocity().y, -MAX_Y_SPEED, MAX_Y_SPEED));
   }
 
   @Override
   public float getMaxHealth() {
     return MAX_HEALTH;
-  }
-
-  /**
-   * Sets whether this enemy's sensor detects an edge.
-   */
-  public void setEdge(boolean edge) {
-    this.edge = edge;
-  }
-
-  /**
-   * Returns whether this enemy's sensor detects an edge.
-   */
-  public boolean isAtEdge() {
-    return edge;
   }
 
   /**
@@ -151,6 +172,62 @@ public class Spider extends Enemy {
    */
   public void removeUnderfoot(Entity entity) {
     entitiesUnderfoot.remove(entity);
+  }
+
+  /**
+   * Adds an ahead entity.
+   */
+  public void addAhead(Entity entity) {
+    entitiesAhead.add(entity);
+  }
+
+  /**
+   * Removes an ahead entity.
+   */
+  public void removeAhead(Entity entity) {
+    entitiesAhead.remove(entity);
+  }
+
+  /**
+   * Adds a behind entity.
+   */
+  public void addBehind(Entity entity) {
+    entitiesBehind.add(entity);
+  }
+
+  /**
+   * Removes a behind entity.
+   */
+  public void removeBehind(Entity entity) {
+    entitiesBehind.remove(entity);
+  }
+
+  /**
+   * Adds a front edge entity.
+   */
+  public void addAtFrontEdge(Entity entity) {
+    entitiesAtFrontEdge.add(entity);
+  }
+
+  /**
+   * Removes a front edge entity.
+   */
+  public void removeAtFrontEdge(Entity entity) {
+    entitiesAtFrontEdge.remove(entity);
+  }
+
+  /**
+   * Adds a back edge entity.
+   */
+  public void addAtBackEdge(Entity entity) {
+    entitiesAtBackEdge.add(entity);
+  }
+
+  /**
+   * Removes a back edge entity.
+   */
+  public void removeAtBackEdge(Entity entity) {
+    entitiesAtBackEdge.remove(entity);
   }
 
   /**

@@ -15,7 +15,7 @@ public class Player extends Entity {
   public static final float MAX_X_SPEED = 4f;
   public static float maxXSpeed = MAX_X_SPEED;
   /** Max vertical speed */
-  public static final float MAX_Y_SPEED = 8f;
+  public static final float MAX_Y_SPEED = 9f;
   public static float maxYSpeed = MAX_Y_SPEED;
   /** Movement impulse */
   public static final float MOVE_IMPULSE = 1f;
@@ -82,8 +82,6 @@ public class Player extends Entity {
   private ObjectSet<Enemy> enemiesHit;
   /** Entities that the player is currently using as ground */
   private ObjectSet<Entity> entitiesUnderfoot;
-  /** Entities that the player is adjacent to */
-  private ObjectSet<Entity> entitiesAdjacent;
   /** Set of drain particle effects */
   private ObjectSet<DrainEffect> drainEffects;
 
@@ -99,7 +97,6 @@ public class Player extends Entity {
     jumpDuration = -1;
     enemiesHit = new ObjectSet<Enemy>();
     entitiesUnderfoot = new ObjectSet<Entity>();
-    entitiesAdjacent = new ObjectSet<Entity>();
     drainEffects = new ObjectSet<DrainEffect>();
     active = true;
   }
@@ -211,20 +208,6 @@ public class Player extends Entity {
    */
   public boolean isGrounded() {
     return !entitiesUnderfoot.isEmpty();
-  }
-
-  /**
-   * Adds an entity to the list of entities adjacent.
-   */
-  public void addAdjacent(Entity entity) {
-    entitiesAdjacent.add(entity);
-  }
-
-  /**
-   * Removes an entity to the list of entities adjacent.
-   */
-  public void removeAdjacent(Entity entity) {
-    entitiesAdjacent.remove(entity);
   }
 
   /**
