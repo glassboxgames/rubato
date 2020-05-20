@@ -51,7 +51,7 @@ public class LevelContainer {
     backgroundLayers = new Array<>();
     for (String key : Shared.TEXTURE_MAP.keys()) {
       if (key.startsWith(chapter + "_layer_")) {
-        backgroundLayers.add(Shared.TEXTURE_MAP.get(key));
+        backgroundLayers.add(Shared.getTexture(key));
       }
     }
     player = new Player(data.player.x, data.player.y);
@@ -210,12 +210,12 @@ public class LevelContainer {
   /**
    * Draws this level's background to the given canvas.
    * @param canvas the canvas to draw on
-   * @param complete whether the level is the last level of the chapter
+   * @param completion whether the level is the last level of the chapter
    */
-  public void drawBackground(GameCanvas canvas, boolean complete) {
+  public void drawBackground(GameCanvas canvas, boolean completion) {
     canvas.begin();
 
-    if (!complete) {
+    if (!completion) {
       Shared.RIPPLE_SHADER.begin();
       Shared.RIPPLE_SHADER.setUniformf("u_resolution", new Vector2(width * Shared.PPM, height * Shared.PPM));
       Shared.RIPPLE_SHADER.setUniformf("u_center",
@@ -231,7 +231,6 @@ public class LevelContainer {
     canvas.setShader(Shared.RIPPLE_SHADER);
     canvas.drawBackground(backgroundLayers);
     canvas.removeShader();
-
     canvas.end();
   }
 

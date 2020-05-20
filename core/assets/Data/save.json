@@ -1,21 +1,23 @@
 {
-"unlocked": {
-	"mountains": 10,
-	"desert": 10,
-	"forest": 10,
-	"plains": 10
-},
-"bindings": {
-	"left": "Left",
-	"attack": "F",
-	"right": "Right",
-	"jump": "Space",
-  "reset": "R"
-},
+  "unlocked": {
+	  "mountains": 10,
+	  "desert": 10,
+	  "forest": 10,
+	  "plains": 10
+  },
+  "bindings": {
+	  "left": "Left",
+	  "attack": "F",
+	  "right": "Right",
+	  "jump": "Space",
+    "reset": "R"
+  },
   "times": {
-	"mountains": 0,
-	"desert": 0,
-	"forest": 0,
-	"plains": 0
-  }
+	  "mountains": 0,
+	  "desert": 0,
+	  "forest": 0,
+	  "plains": 0
+  },
+  "music": 1,
+  "sound": 1,
 }

@@ -119,4 +119,19 @@ public class SaveController {
   public void addTimeSpent(String chapter, long time) {
     setTimeSpent(chapter, getTimeSpent(chapter) + time);
   }
+
+  /**
+   * Sets the sound volume.
+   */
+  public void setSoundVolume(float volume) {
+    data.sound = volume;
+    writeSave();
+  }
+
+  /**
+   * Returns the sound volume.
+   */
+  public float getSoundVolume() {
+    return data.sound;
+  }
 }

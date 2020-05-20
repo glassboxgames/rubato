@@ -183,7 +183,7 @@ public class GameMode implements Screen {
   public void initUI() {
     // pause button
     gameStage = new Stage();
-    ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pause_icon")));
+    ImageButton pauseButton = new ImageButton(Shared.getDrawable("pause_icon"));
     pauseButton.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         pauseGame();
@@ -198,7 +198,7 @@ public class GameMode implements Screen {
     Table pauseTable = new Table();
     pauseTable.setFillParent(true);
     pauseTable.add(new Label("paused",
-                             new Label.LabelStyle(Shared.FONT_MAP.get("game.pause_text.ttf"), Color.WHITE)));
+                             new Label.LabelStyle(Shared.getFont("game.pause_text.ttf"), Color.WHITE)));
     pauseTable.row();
 
     pauseButtons = new Array<Button>();
@@ -220,12 +220,12 @@ public class GameMode implements Screen {
     chapterTable.top();
 
     chapterInfo = new Label("",
-      new Label.LabelStyle(Shared.FONT_MAP.get("game.chapter_name.ttf"), Color.WHITE));
+      new Label.LabelStyle(Shared.getFont("game.chapter_name.ttf"), Color.WHITE));
     chapterIcon = new Image();
     chapterComplete = new Label("COMPLETE",
-      new Label.LabelStyle(Shared.FONT_MAP.get("game.chapter_complete.ttf"), Color.WHITE));
+      new Label.LabelStyle(Shared.getFont("game.chapter_complete.ttf"), Color.WHITE));
     chapterTime = new Label("",
-      new Label.LabelStyle(Shared.FONT_MAP.get("game.chapter_time.ttf"), Color.WHITE));
+      new Label.LabelStyle(Shared.getFont("game.chapter_time.ttf"), Color.WHITE));
 
     chapterTable.add(chapterInfo).pad(40,0,10,0).row();
     chapterTable.add(chapterIcon).row();
@@ -238,11 +238,10 @@ public class GameMode implements Screen {
    */
   private void addPauseButton(final int index, String key) {
     final ImageButton button =
-      new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key + "_deselected")), null,
-                      new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key + "_selected")));
+      new ImageButton(Shared.getDrawable(key + "_deselected"), null, Shared.getDrawable(key + "_selected"));
     button.row();
     button
-      .add(new Label(key, new Label.LabelStyle(Shared.FONT_MAP.get("game.pause_label.ttf"), Color.WHITE)))
+      .add(new Label(key, new Label.LabelStyle(Shared.getFont("game.pause_label.ttf"), Color.WHITE)))
       .padTop(20);
     button.setWidth(100);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -315,7 +314,7 @@ public class GameMode implements Screen {
     
     level = new LevelContainer(nextData);
     chapterInfo.setVisible(false);
-    chapterIcon.setDrawable(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(level.getChapter() + "_plain")));
+    chapterIcon.setDrawable(Shared.getDrawable(level.getChapter() + "_plain"));
     chapterComplete.setVisible(false);
     chapterTime.setVisible(false);
 
@@ -333,7 +332,7 @@ public class GameMode implements Screen {
     int chapterNumber = Shared.CHAPTER_NAMES.indexOf(chapter, false) + 1;
     chapterInfo.setText("CHAPTER " + chapterNumber + ": " + chapter.toUpperCase());
     chapterInfo.setVisible(true);
-    chapterIcon.setDrawable(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(chapter + "_complete")));
+    chapterIcon.setDrawable(Shared.getDrawable(chapter + "_complete"));
     chapterIcon.setVisible(true);
     chapterComplete.setVisible(true);
     long millis = SaveController.getInstance().getTimeSpent(level.getChapter());
@@ -370,10 +369,10 @@ public class GameMode implements Screen {
     SoundController soundController = SoundController.getInstance();
     if (gameState == GameState.PLAY) {
       Player player = level.getPlayer();
-      String runSound = Shared.SOUND_PATHS.get("run_grass");
+      String runSound = Shared.getSoundPath("run_grass");
       if (player.isRunning() && !paused) {
         if (!soundController.isActive(runSound)) {
-          soundController.play(runSound, runSound, true, 0.35f);
+          soundController.play(runSound, runSound, true);
         }
       } else {
         if (soundController.isActive(runSound)) {
@@ -381,8 +380,8 @@ public class GameMode implements Screen {
         }
       }
       if (level.getCheckpoint().wasJustActivated()) {
-        String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
-        soundController.play(checkpointSound, checkpointSound, false, 0.25f);
+        String checkpointSound = Shared.getSoundPath("checkpoint");
+        soundController.play(checkpointSound, checkpointSound, false);
       }
     }
     soundController.update();
@@ -588,16 +587,13 @@ public class GameMode implements Screen {
     if (gameState == GameState.PLAY) {
       level.drawBackground(canvas, completion);
       if (completion) {
-        canvas.begin(Shared.PPM, Shared.PPM);
-        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-          new Color(0, 0, 0, 0.2f), canvas.getWidth(), canvas.getHeight());
-        canvas.end();
+        Shared.drawOverlay(0.2f);
         chapterStage.draw();
       }
       level.drawEntities(canvas, debug);
 
       Player player = level.getPlayer();
-      if (player.isActive()) {
+      if (!exiting && player.isActive()) {
         Vector2 delta = player.getPosition().scl(Shared.PPM).sub(canvas.getCameraPos()).scl(0.25f);
         float width = level.getWidth() * Shared.PPM;
         float height = level.getHeight() * Shared.PPM;
@@ -634,10 +630,7 @@ public class GameMode implements Screen {
       }
 
       if (paused) {
-        canvas.begin(Shared.PPM, Shared.PPM);
-        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-                              new Color(0, 0, 0, 0.4f), canvas.getWidth(), canvas.getHeight());
-        canvas.end();
+        Shared.drawOverlay(0.4f);
         pauseStage.draw();
       } else {
         gameStage.draw();
@@ -672,7 +665,7 @@ public class GameMode implements Screen {
     }
     String text =
       "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
-    canvas.drawText(text, Shared.FONT_MAP.get("game.dev.ttf"), color, x, y);
+    canvas.drawText(text, Shared.getFont("game.dev.ttf"), color, x, y);
   }
 
   @Override

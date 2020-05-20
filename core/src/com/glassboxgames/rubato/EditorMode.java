@@ -132,14 +132,14 @@ public class EditorMode implements Screen {
 
     Table biomes = new Table();
     biomes
-      .add(new Label("BIOME", new Label.LabelStyle(Shared.FONT_MAP.get("editor.header.ttf"), Color.WHITE)))
+      .add(new Label("BIOME", new Label.LabelStyle(Shared.getFont("editor.header.ttf"), Color.WHITE)))
       .padBottom(10).left().row();
     for (String name : Shared.CHAPTER_NAMES) {
-      Drawable deselected = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("choice_deselected"));
-      Drawable selected = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("choice_selected"));
+      Drawable deselected = Shared.getDrawable("choice_deselected");
+      Drawable selected = Shared.getDrawable("choice_selected");
       ImageTextButton.ImageTextButtonStyle style =
         new ImageTextButton.ImageTextButtonStyle();
-      style.font = Shared.FONT_MAP.get("editor.item.ttf");
+      style.font = Shared.getFont("editor.item.ttf");
       style.imageUp = deselected;
       style.imageChecked = selected;
       final ImageTextButton button =
@@ -151,7 +151,7 @@ public class EditorMode implements Screen {
           chapterName = newChapterName;
         }
       });
-      backgroundMap.put(name, new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name)));
+      backgroundMap.put(name, Shared.getDrawable(name));
       chapterButtonMap.put(name, button);
       biomes.add(button).padBottom(10).left().row();
     }
@@ -162,7 +162,7 @@ public class EditorMode implements Screen {
       group.padLeft(10).padBottom(20);
       group
         .add(new Label(groupName.toUpperCase(),
-                       new Label.LabelStyle(Shared.FONT_MAP.get("editor.header.ttf"), Color.WHITE)))
+                       new Label.LabelStyle(Shared.getFont("editor.header.ttf"), Color.WHITE)))
         .padBottom(10).left().row();
       Table icons = new Table();
       group.add(icons).left().row();
@@ -211,7 +211,7 @@ public class EditorMode implements Screen {
    * Creates an ImageButton from the given texture shortname.
    */
   private ImageButton createImageButton(String key) {
-    return new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key)));
+    return new ImageButton(Shared.getDrawable(key));
   }
 
   /**
@@ -607,7 +607,7 @@ public class EditorMode implements Screen {
       styles = new Array<ImageButton.ImageButtonStyle>();
       for (String texture : textures) {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(texture));
+        style.imageUp = Shared.getDrawable(texture);
         styles.add(style);
       }
       button = new ImageButton(styles.get(index));

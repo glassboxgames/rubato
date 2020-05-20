@@ -12,4 +12,8 @@ public class SaveData {
   public ObjectMap<String, String> bindings;
   /** Total time tracker */
   public ObjectMap<String, Long> times;
+  /** Music volume setting */
+  public float music;
+  /** Sound volume setting */
+  public float sound;
 }

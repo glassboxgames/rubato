@@ -52,8 +52,6 @@ public class GDXRoot extends Game implements ScreenListener {
 
   /** Next screen for transition */
   private Screen nextScreen;
-  /** Shape renderer for fading */
-  private ShapeRenderer fadeRenderer;
   /** Current fade state */
   private int fadeState;
   /** Current fade state counter */
@@ -83,7 +81,6 @@ public class GDXRoot extends Game implements ScreenListener {
                                                                         metadata.get(1).intValue(),
                                                                         metadata.get(2).intValue()));
     }
-    fadeRenderer = new ShapeRenderer();
     canvas = new GameCanvas();
     loadingMode = new LoadingMode(canvas, manager, this);
     mainMenu = new MainMenu(this);
@@ -133,13 +130,7 @@ public class GDXRoot extends Game implements ScreenListener {
         alpha = 1;
         break;
       }
-      Gdx.gl.glEnable(GL20.GL_BLEND);
-      Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-      fadeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-      fadeRenderer.setColor(0, 0, 0, alpha);
-      fadeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-      fadeRenderer.end();
-      Gdx.gl.glDisable(GL20.GL_BLEND);
+      Shared.drawOverlay(alpha);
       fadeCount++;
       if (fadeCount > FADE_STATE_DURATION) {
         if (fadeState == FADE_DELAY) {
@@ -185,6 +176,8 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void exitScreen(Screen screen, int exitCode) {
+    SoundController soundController = SoundController.getInstance();
+    SaveController saveController = SaveController.getInstance();
     Array<LevelData> levels = Shared.CHAPTER_LEVELS.get(chapterIndex);
     if (screen == loadingMode) {
       if (exitCode == LoadingMode.EXIT_DONE) {
@@ -194,7 +187,7 @@ public class GDXRoot extends Game implements ScreenListener {
           Shared.TEXTURE_MAP.put(key, texture);
         }
         for (String key : Shared.SOUND_PATHS.keys()) {
-          SoundController.getInstance().allocate(manager, Shared.SOUND_PATHS.get(key));
+          soundController.allocate(manager, Shared.getSoundPath(key));
         }
         for (String key : Shared.FONT_METADATA.keys()) {
           Shared.FONT_MAP.put(key, manager.get(key, BitmapFont.class));
@@ -207,6 +200,7 @@ public class GDXRoot extends Game implements ScreenListener {
         editorMode.initUI();
         settingsMode.initUI();
 
+        soundController.setVolume(saveController.getSoundVolume());
         setNextScreen(mainMenu);
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,
@@ -215,14 +209,13 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
-        SaveController save = SaveController.getInstance();
-        boolean newGame = save.getLevelsUnlocked(0) == 0;
+        boolean newGame = saveController.getLevelsUnlocked(0) == 0;
         if (newGame) {
           level = levels.get(levelIndex);
           if (levels.size > 0) {
-            save.setLevelsUnlocked(chapterIndex, 1);
+            saveController.setLevelsUnlocked(chapterIndex, 1);
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
-            save.setLevelsUnlocked(chapterIndex + 1, 1);
+            saveController.setLevelsUnlocked(chapterIndex + 1, 1);
           }
           cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(0) + "_cutscene");
           setNextScreen(cutsceneMode);
@@ -252,15 +245,14 @@ public class GDXRoot extends Game implements ScreenListener {
       } else if (exitCode == GameMode.EXIT_LEVELS) {
         setNextScreen(selectMode);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
-        SaveController save = SaveController.getInstance();
-        int unlocked = save.getLevelsUnlocked(chapterIndex);
+        int unlocked = saveController.getLevelsUnlocked(chapterIndex);
         if (levelIndex == unlocked - 1) {
           if (unlocked < levels.size) {
-            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
+            saveController.setLevelsUnlocked(chapterIndex, unlocked + 1);
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
-            unlocked = save.getLevelsUnlocked(chapterIndex + 1);
+            unlocked = saveController.getLevelsUnlocked(chapterIndex + 1);
             if (unlocked < 1) {
-              save.setLevelsUnlocked(chapterIndex + 1, 1);
+              saveController.setLevelsUnlocked(chapterIndex + 1, 1);
             }
           }
         }

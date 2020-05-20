@@ -165,8 +165,8 @@ public class Player extends Entity {
         setState(STATE_IDLE);
       }
     } else if (stateIndex != STATE_DEAD) {
-      String sound = Shared.SOUND_PATHS.get("death");
-      // SoundController.getInstance().play(sound, sound, false, 0.25f);
+      String sound = Shared.getSoundPath("death");
+      // SoundController.getInstance().play(sound, sound, false);
       setState(STATE_DEAD);
     }
   }
@@ -270,8 +270,8 @@ public class Player extends Entity {
     super.enterState();
     switch (stateIndex) {
     case STATE_ATTACK:
-      String sound = Shared.SOUND_PATHS.get("attack_swing");
-      SoundController.getInstance().play(sound, sound, false, 0.1f);
+      String sound = Shared.getSoundPath("attack_swing");
+      SoundController.getInstance().play(sound, sound, false);
       attackTime = 0;
       if (shortAttack) {
         attackDuration = ATTACK_IMPULSE_SHORT_DURATION;

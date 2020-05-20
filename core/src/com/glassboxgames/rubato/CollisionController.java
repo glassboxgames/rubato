@@ -99,8 +99,8 @@ public class CollisionController implements ContactListener {
     ObjectSet<Enemy> enemiesHit = player.getEnemiesHit();
     if (enemiesHit.add(enemy) && !enemy.isSuspended()) {
       enemy.lowerHealth(Player.ATTACK_DAMAGE);
-      String sound = Shared.SOUND_PATHS.get("attack_hit");
-      SoundController.getInstance().play(sound, sound, false, 0.25f);
+      String sound = Shared.getSoundPath("attack_hit");
+      SoundController.getInstance().play(sound, sound, false);
       if (enemy.isSuspended()) {
         player.startDrain(enemy.getPosition());
       }

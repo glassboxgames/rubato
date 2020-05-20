@@ -71,17 +71,16 @@ public class SettingsMode implements Screen {
    * Initializes the settings UI.
    */
   public void initUI() {
+    Label.LabelStyle headerStyle = new Label.LabelStyle(Shared.getFont("settings.header.ttf"), Color.WHITE);
     selectedStyle = new TextButton.TextButtonStyle();
-    // selectedStyle.up = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("highlight"));
-    selectedStyle.font = Shared.FONT_MAP.get("settings.selected.ttf");
+    selectedStyle.font = Shared.getFont("settings.selected.ttf");
     selectedStyle.fontColor = Color.WHITE;
     deselectedStyle = new TextButton.TextButtonStyle();
-    // deselectedStyle.up = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("no_highlight"));
-    deselectedStyle.font = Shared.FONT_MAP.get("settings.deselected.ttf");
+    deselectedStyle.font = Shared.getFont("settings.deselected.ttf");
     deselectedStyle.fontColor = Color.WHITE;
-    labelStyle = new Label.LabelStyle(Shared.FONT_MAP.get("settings.deselected.ttf"), Color.WHITE);
+    labelStyle = new Label.LabelStyle(Shared.getFont("settings.deselected.ttf"), Color.WHITE);
 
-    ImageButton home = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("home_icon")));
+    ImageButton home = new ImageButton(Shared.getDrawable("home_icon"));
     home.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         exitToMenu();
@@ -95,10 +94,43 @@ public class SettingsMode implements Screen {
     stage.addActor(table);
     table.setFillParent(true);
     table.pad(150, 90, 150, 90);
-      
-    table.add(new Label("CONTROLS",
-                        new Label.LabelStyle(Shared.FONT_MAP.get("settings.header.ttf"), Color.WHITE)))
-      .left().row();
+
+    table.add(new Label("AUDIO", headerStyle)).padTop(40).left().row();
+
+    Table music = new Table();
+    music.add(new Label("music", labelStyle)).left().growX();
+    final Slider musicSlider = new Slider(0f, 1f, 0.01f, false,
+                                          new Slider.SliderStyle(Shared.getDrawable("slider_track"),
+                                                                 Shared.getDrawable("slider_knob")));
+    musicSlider.setWidth(300);
+    // musicSlider.addListener(new ChangeListener() {
+    //   public void changed(ChangeEvent e, Actor actor) {
+    //     SoundController.getInstance().setVolume(soundSlider.getValue());
+    //     SaveController.getInstance()
+    //   }
+    // });
+    music.add(musicSlider).right();
+    table.add(music).growX().row();
+
+    final SaveController saveController = SaveController.getInstance();
+
+    Table sound = new Table();
+    sound.add(new Label("sfx", labelStyle)).left().growX();
+    final Slider soundSlider = new Slider(0f, 1f, 0.01f, false,
+                                          new Slider.SliderStyle(Shared.getDrawable("slider_track"),
+                                                                 Shared.getDrawable("slider_knob")));
+    soundSlider.setWidth(300);
+    soundSlider.setValue(saveController.getSoundVolume());
+    soundSlider.addListener(new ChangeListener() {
+      public void changed(ChangeEvent e, Actor actor) {
+        SoundController.getInstance().setVolume(soundSlider.getValue());
+        saveController.setSoundVolume(soundSlider.getValue());
+      }
+    });
+    sound.add(soundSlider).right();
+    table.add(sound).growX().row();
+    
+    table.add(new Label("CONTROLS", headerStyle)).padTop(40).left().row();
     createBinding("left");
     createBinding("right");
     createBinding("jump");
