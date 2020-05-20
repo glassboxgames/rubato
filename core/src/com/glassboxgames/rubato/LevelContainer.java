@@ -44,7 +44,7 @@ public class LevelContainer {
    * Instantiates a LevelContainer from a LevelData object.
    * @param data the level data container
    */
-  public LevelContainer(LevelData data, AssetManager manager) {
+  public LevelContainer(LevelData data) {
     width = data.width;
     height = data.height;
     chapter = data.chapter;

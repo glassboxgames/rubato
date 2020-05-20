@@ -8,11 +8,22 @@ import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
 public class GDXRoot extends Game implements ScreenListener {
+  /** Fade state values */
+  private static final int FADE_NONE = 0;
+  private static final int FADE_OUT = 1;
+  private static final int FADE_DELAY = 2;
+  private static final int FADE_IN = 3;
+  private static final int NUM_FADE_STATES = 4;
+
+  /** Fade state duration */
+  private static final int FADE_STATE_DURATION = 20;
+
   /** Drawing context to display graphics */
   private GameCanvas canvas;
   /** Manager for loading assets */
@@ -39,6 +50,15 @@ public class GDXRoot extends Game implements ScreenListener {
   /** Current level data */
   private LevelData level;
 
+  /** Next screen for transition */
+  private Screen nextScreen;
+  /** Shape renderer for fading */
+  private ShapeRenderer fadeRenderer;
+  /** Current fade state */
+  private int fadeState;
+  /** Current fade state counter */
+  private int fadeCount;
+
   public GDXRoot() {
     manager = new AssetManager();
     // Add font support to the asset manager
@@ -63,6 +83,7 @@ public class GDXRoot extends Game implements ScreenListener {
                                                                         metadata.get(1).intValue(),
                                                                         metadata.get(2).intValue()));
     }
+    fadeRenderer = new ShapeRenderer();
     canvas = new GameCanvas();
     loadingMode = new LoadingMode(canvas, manager, this);
     mainMenu = new MainMenu(this);
@@ -83,6 +104,52 @@ public class GDXRoot extends Game implements ScreenListener {
     cutsceneMode.resize(width, height);
     editorMode.resize(width, height);
     super.resize(width, height);
+  }
+
+  /**
+   * Starts the transition to the given screen.
+   */
+  public void setNextScreen(Screen next) {
+    if (fadeState == FADE_NONE) {
+      nextScreen = next;
+      fadeState = FADE_OUT;
+      fadeCount = 0;
+    }
+  }
+
+  @Override
+  public void render() {
+    super.render();
+    if (fadeState != FADE_NONE) {
+      float alpha;
+      switch (fadeState) {
+      case FADE_OUT:
+        alpha = (float)fadeCount / FADE_STATE_DURATION;
+        break;
+      case FADE_IN:
+        alpha = 1 - (float)fadeCount / FADE_STATE_DURATION;
+        break;
+      default:
+        alpha = 1;
+        break;
+      }
+      Gdx.gl.glEnable(GL20.GL_BLEND);
+      Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+      fadeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+      fadeRenderer.setColor(0, 0, 0, alpha);
+      fadeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+      fadeRenderer.end();
+      Gdx.gl.glDisable(GL20.GL_BLEND);
+      fadeCount++;
+      if (fadeCount > FADE_STATE_DURATION) {
+        if (fadeState == FADE_DELAY) {
+          setScreen(nextScreen);
+        }
+        
+        fadeCount = 0;
+        fadeState = (fadeState + 1) % NUM_FADE_STATES;
+      }
+    }
   }
 
   @Override
@@ -141,7 +208,7 @@ public class GDXRoot extends Game implements ScreenListener {
         editorMode.initUI();
         settingsMode.initUI();
 
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,
                       new RuntimeException());
@@ -159,32 +226,32 @@ public class GDXRoot extends Game implements ScreenListener {
             save.setLevelsUnlocked(chapterIndex + 1, 1);
           }
           cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(0) + "_cutscene");
-          setScreen(cutsceneMode);
+          setNextScreen(cutsceneMode);
         } else {
-          setScreen(selectMode);
+          setNextScreen(selectMode);
         }
       } else if (exitCode == MainMenu.EXIT_EDITOR) {
-        setScreen(editorMode);
+        setNextScreen(editorMode);
       } else if (exitCode == MainMenu.EXIT_SETTINGS) {
-        setScreen(settingsMode);
+        setNextScreen(settingsMode);
       } else if (exitCode == MainMenu.EXIT_QUIT) {
         Gdx.app.exit();
       }
     } else if (screen == selectMode) {
       if (exitCode == SelectMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == SelectMode.EXIT_PLAY) {
         chapterIndex = selectMode.getChapter();
         levelIndex = selectMode.getLevel();
         level = Shared.CHAPTER_LEVELS.get(chapterIndex).get(levelIndex);
-        gameMode.initLevel(level, manager, false, false);
-        setScreen(gameMode);
+        gameMode.setNextLevel(level, false, false);
+        setNextScreen(gameMode);
       }
     } else if (screen == gameMode) {
       if (exitCode == GameMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == GameMode.EXIT_LEVELS) {
-        setScreen(selectMode);
+        setNextScreen(selectMode);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
         SaveController save = SaveController.getInstance();
         int unlocked = save.getLevelsUnlocked(chapterIndex);
@@ -210,15 +277,16 @@ public class GDXRoot extends Game implements ScreenListener {
             level = null;
             cutsceneMode.setCutscene("end_cutscene");
           }
-          setScreen(cutsceneMode);
+          setNextScreen(cutsceneMode);
         } else {
           level = levels.get(levelIndex);
-          gameMode.initLevel(level, manager, levelIndex == levels.size - 1, false);
+          gameMode.setNextLevel(level, levelIndex == levels.size - 1, false);
+          setNextScreen(gameMode);
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
-        gameMode.initLevel(level, manager, gameMode.isCompletion(), gameMode.isEditable());
+        setNextScreen(gameMode);
       } else if (exitCode == GameMode.EXIT_EDIT) {
-        setScreen(editorMode);
+        setNextScreen(editorMode);
       } else if (exitCode == GameMode.EXIT_CHECKPOINT) {
         // checkpoint logic
       } else {
@@ -228,42 +296,42 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == cutsceneMode) {
       if (exitCode == CutsceneMode.EXIT_ESCAPE) {
-        setScreen(selectMode);
+        setNextScreen(selectMode);
       } else if (exitCode == CutsceneMode.EXIT_COMPLETE) {
         if (level != null) {
-          gameMode.initLevel(level, manager, false, false);
-          setScreen(gameMode);
+          gameMode.setNextLevel(level, false, false);
+          setNextScreen(gameMode);
         } else {
           // TODO credit screen?
-          setScreen(mainMenu);
+          setNextScreen(mainMenu);
         }
       } else {
         Gdx.app.exit();
       }
     } else if (screen == editorMode) {
       if (exitCode == EditorMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == EditorMode.EXIT_TEST) {
         level = editorMode.exportLevel();
-        gameMode.initLevel(level, manager, false, true);
-        setScreen(gameMode);
+        gameMode.setNextLevel(level, false, true);
+        setNextScreen(gameMode);
       } else {
         Gdx.app.exit();
       }
     } else if (screen == selectMode) {
       if (exitCode == SelectMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == SelectMode.EXIT_PLAY) {
         // TODO: convert pillar index into level index
         // levelIndex = selectMode.getSelectedCheckpoint();
-        setScreen(gameMode);
+        setNextScreen(gameMode);
       } else {
         Gdx.app.exit();
       }
     }
     else if (screen == settingsMode) {
       if (exitCode == SelectMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else {
         Gdx.app.exit();
       }

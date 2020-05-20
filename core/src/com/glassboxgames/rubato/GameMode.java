@@ -55,8 +55,6 @@ public class GameMode implements Screen {
 
   /** Dev mode draw offset */
   private static final float DEV_DRAW_OFFSET = 20f;
-  /** Overlay fade rate */
-  private static final float FADE_RATE = 0.1f;
 
   /** Gravity **/
   private static final float GRAVITY = -50f;
@@ -104,9 +102,6 @@ public class GameMode implements Screen {
   /** The stage for chapter completion */
   private Stage chapterStage;
 
-  /** Overlay fade (between 0 and 1) */
-  private float overlayFade;
-
   /** List of all entity states currently loaded */
   private Array<State> states;
   /** Current level */
@@ -127,6 +122,13 @@ public class GameMode implements Screen {
   /** When the player timer started (in ms); resets on resume */
   private long startTime;
 
+  /** Data for the next level */
+  private LevelData nextData;
+  /** Completion status for the next level */
+  private boolean nextCompletion;
+  /** Editable status for the next level */
+  private boolean nextEditable;
+  
   /**
    * Instantiate a GameMode.
    * @param canvas the canvas to draw on
@@ -245,8 +247,10 @@ public class GameMode implements Screen {
     button.setWidth(100);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        resumeGame();
         switch (index) {
+        case PAUSE_RESUME:
+          resumeGame();
+          break;
         case PAUSE_RESET:
           startExit(EXIT_RESET);
           break;
@@ -287,30 +291,38 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Creates the world level.
+   * Sets the level data and parameters for the next level.
    * @param data the serialized level data
-   * @param manager the asset manager to use
    * @param completion whether the level is the last level of the chapter
    * @param editable whether the level is editable
    */
-  public void initLevel(LevelData data, AssetManager manager, boolean completion, boolean editable) {
+  public void setNextLevel(LevelData data, boolean completion, boolean editable) {
+    nextData = data;
+    nextCompletion = completion;
+    nextEditable = editable;
+  }
+
+  /**
+   * Creates the world level.
+   */
+  public void initLevel() {
     if (level != null) {
       level.deactivatePhysics(world);
     }
-    level = new LevelContainer(data, manager);
+
+    completion = nextCompletion;
+    editable = nextEditable;
+    
+    level = new LevelContainer(nextData);
     chapterInfo.setVisible(false);
     chapterIcon.setDrawable(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(level.getChapter() + "_plain")));
     chapterComplete.setVisible(false);
     chapterTime.setVisible(false);
 
     gameState = GameState.INTRO;
-    this.completion = completion;
-    this.editable = editable;
     exiting = false;
-    overlayFade = 1;
     resumeGame();
     startTime = TimeUtils.millis();
-    System.out.println("started level");
   }
 
   /**
@@ -381,15 +393,12 @@ public class GameMode implements Screen {
    */
   private void startExit(int code) {
     if (!exiting) {
+      if (!paused) {
+        SaveController.getInstance().addTimeSpent(level.getChapter(),
+                                                  TimeUtils.timeSinceMillis(startTime));
+      }
       exiting = true;
-      exitCode = code;
-      SaveController.getInstance().addTimeSpent(level.getChapter(),
-                                                TimeUtils.timeSinceMillis(startTime));
-      long millis = SaveController.getInstance().getTimeSpent(level.getChapter());
-      long secs = millis / 1000;
-      long mins = secs / 60;
-      long hrs = mins / 60;
-      System.out.printf("spent %d:%02d:%02d.%03d so far\n", hrs, mins % 60, secs % 60, millis % 1000);
+      listener.exitScreen(this, code);
     }
   }
 
@@ -404,17 +413,6 @@ public class GameMode implements Screen {
         gameState = GameState.PLAY;
       }
     } else if (gameState == GameState.PLAY) {
-      if (exiting) {
-        if (overlayFade < 1) {
-          overlayFade = Math.min(overlayFade + FADE_RATE, 1);
-        } else {
-          listener.exitScreen(this, exitCode);
-          return;
-        }
-      } else if (overlayFade > 0) {
-        overlayFade = Math.max(overlayFade - FADE_RATE, 0);
-      }
-
       if (completion) {
         chapterStage.act(delta);
       }
@@ -644,13 +642,6 @@ public class GameMode implements Screen {
       } else {
         gameStage.draw();
       }
-
-      if (overlayFade > 0) {
-        canvas.begin(Shared.PPM, Shared.PPM);
-        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-                              new Color(0, 0, 0, overlayFade), level.getWidth(), level.getHeight());
-        canvas.end();
-      }
     }
   }
 
@@ -723,6 +714,7 @@ public class GameMode implements Screen {
 
   @Override
   public void show() {
+    initLevel();
     Gdx.input.setInputProcessor(gameStage);
     active = true;
   }
