@@ -10,16 +10,10 @@ public class SaveData {
   public ObjectMap<String, Integer> unlocked;
   /** Custom key mapping */
   public ObjectMap<String, String> bindings;
-  /** Time tracker */
-  public ObjectMap<String, TimeData> times;
-
-  /**
-   * Simple class for serializing time statistics for a chapter.
-   */
-  public static class TimeData {
-    /** Total seconds spent on this chapter */
-    public long total;
-    /** Record times (milliseconds), indexed by level */
-    public Array<Long> records;
-  }
+  /** Total time tracker */
+  public ObjectMap<String, Long> times;
+  /** Music volume setting */
+  public float music;
+  /** Sound volume setting */
+  public float sound;
 }

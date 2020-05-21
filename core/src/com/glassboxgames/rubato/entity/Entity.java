@@ -262,7 +262,7 @@ public abstract class Entity {
     ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(getCount());
     for (String name : sensorDefs.keys()) {
       sensors.put(name, createCollider(sensorDefs.get(name), Collider.Type.valueOf(name.toUpperCase())));
-    }    
+    }
   }
 
   /**
@@ -372,8 +372,10 @@ public abstract class Entity {
       HITBOX,
       HURTBOX,
       GROUND,
-      WALL,
-      EDGE,
+      AHEAD,
+      BEHIND,
+      FRONT_EDGE,
+      BACK_EDGE,
       VISION,
       FORWARD,
       CENTER,
@@ -434,10 +436,31 @@ public abstract class Entity {
     }
 
     /**
-     * Returns whether this collider is a wall sensor.
+     * Returns whether this collider is an ahead sensor.
      */
-    public boolean isWallSensor() {
-      return type == Type.WALL;
+    public boolean isAheadSensor() {
+      return type == Type.AHEAD;
+    }
+
+    /**
+     * Returns whether this collider is a behind sensor.
+     */
+    public boolean isBehindSensor() {
+      return type == Type.BEHIND;
+    }
+
+    /**
+     * Returns whether this collider is a front edge sensor.
+     */
+    public boolean isFrontEdgeSensor() {
+      return type == Type.FRONT_EDGE;
+    }
+
+    /**
+     * Returns whether this collider is a back edge sensor.
+     */
+    public boolean isBackEdgeSensor() {
+      return type == Type.BACK_EDGE;
     }
 
     /**
@@ -445,13 +468,6 @@ public abstract class Entity {
      */
     public boolean isCenterSensor() {
       return type == Type.CENTER;
-    }
-
-    /**
-     * Returns whether this collider is an edge sensor.
-     */
-    public boolean isEdgeSensor() {
-      return type == Type.EDGE;
     }
 
     /**

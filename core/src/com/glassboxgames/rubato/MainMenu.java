@@ -86,12 +86,12 @@ public class MainMenu implements Screen {
     table.right().bottom().padBottom(90);
 
     selectedStyle = new TextButton.TextButtonStyle();
-    selectedStyle.up = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("highlight"));
-    selectedStyle.font = Shared.FONT_MAP.get("main_menu.selected.ttf");
+    selectedStyle.up = Shared.getDrawable("highlight");
+    selectedStyle.font = Shared.getFont("main_menu.selected.ttf");
     selectedStyle.fontColor = Color.WHITE;
     deselectedStyle = new TextButton.TextButtonStyle();
-    deselectedStyle.up = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("no_highlight"));
-    deselectedStyle.font = Shared.FONT_MAP.get("main_menu.deselected.ttf");
+    deselectedStyle.up = Shared.getDrawable("no_highlight");
+    deselectedStyle.font = Shared.getFont("main_menu.deselected.ttf");
     deselectedStyle.fontColor = Color.WHITE;
 
     addMenuOption(EXIT_PLAY, "play");
@@ -100,9 +100,9 @@ public class MainMenu implements Screen {
     addMenuOption(EXIT_QUIT, "quit");
 
     HorizontalGroup title = new HorizontalGroup();
-    title.addActor(new Label("rubat", new Label.LabelStyle(Shared.FONT_MAP.get("main_menu.title.ttf"),
+    title.addActor(new Label("rubat", new Label.LabelStyle(Shared.getFont("main_menu.title.ttf"),
                                                            Color.WHITE)));
-    title.addActor(new Image(Shared.TEXTURE_MAP.get("adagio_head_icon")));
+    title.addActor(new Image(Shared.getTexture("adagio_head_icon")));
     title.space(8).padRight(90).right();
     table.add(title).right();
 

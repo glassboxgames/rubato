@@ -9,11 +9,12 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
     config.title = "Rubato";
 		config.forceExit = true;
-		config.vSyncEnabled = true;
+		config.vSyncEnabled = false;
     config.width = 1200;
     config.height = 675;
-    config.x = 0;
-    config.y = 0;
+    config.x = -1;
+    config.y = -1;
+    config.resizable = false;
 		new LwjglApplication(new GDXRoot(), config);
 	}
 }

@@ -24,7 +24,7 @@ public class Wisp extends Enemy {
   /** Projectile speed */
   private static final float PROJECTILE_SPEED = 4f;
   /** Projectile life */
-  private static final int PROJECTILE_LIFE = 90;
+  private static final int PROJECTILE_LIFE = 120;
 
   /** Direction to shoot projectile */
   private Vector2 shootDir;

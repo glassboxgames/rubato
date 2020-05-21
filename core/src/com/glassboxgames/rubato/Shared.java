@@ -5,7 +5,8 @@ import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.*;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.serialize.*;
 
@@ -61,13 +62,9 @@ public final class Shared {
 
   /** Array of level data arrays, ordered by chapter */
   public static final Array<Array<LevelData>> CHAPTER_LEVELS = new Array<Array<LevelData>>();
-  /** Array of cutscenes, ordered by chapter */
-  public static final Array<String> CHAPTER_CUTSCENES = new Array<String>();
 
-  /** The shaders */
-  public static final ShaderProgram PASSTHROUGH_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/passthrough.vsr"), Gdx.files.internal("Shaders/passthrough.fsr"));
-  public static final ShaderProgram DESAT_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/desat.vsr"), Gdx.files.internal("Shaders/desat.fsr"));
-  public static final ShaderProgram RIPPLE_SHADER = new ShaderProgram(Gdx.files.internal("Shaders/ripple.vsr"), Gdx.files.internal("Shaders/ripple.fsr"));
+  /** Shape renderer for overlays */
+  public static final ShapeRenderer OVERLAY_RENDERER = new ShapeRenderer();
 
   /** Sound files */
   public static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
@@ -84,6 +81,7 @@ public final class Shared {
   public static final String ACTION_RIGHT = "right";
   public static final String ACTION_JUMP = "jump";
   public static final String ACTION_ATTACK = "attack";
+  public static final String ACTION_RESET = "reset";
 
   static {
     JSON.setOutputType(JsonWriter.OutputType.json);
@@ -118,5 +116,54 @@ public final class Shared {
     params.fontParameters.size = size;
     params.fontParameters.spaceX = spacing;
     return params;
+  }
+
+  /**
+   * Returns the texture for the given key.
+   */
+  public static Texture getTexture(String key) {
+    return TEXTURE_MAP.get(key);
+  }
+
+  /**
+   * Returns a drawable-wrapped texture for the given key.
+   */
+  public static TextureRegionDrawable getDrawable(String key) {
+    return new TextureRegionDrawable(getTexture(key));
+  }
+
+  /**
+   * Returns the font for the given key.
+   */
+  public static BitmapFont getFont(String key) {
+    return FONT_MAP.get(key);
+  }
+
+  /**
+   * Returns the sound path for the given key.
+   */
+  public static String getSoundPath(String key) {
+    return SOUND_PATHS.get(key);
+  }
+
+  /**
+   * Draw an overlay with the given color.
+   */
+  public static void drawOverlay(Color color) {
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    ShapeRenderer renderer = OVERLAY_RENDERER;
+    renderer.begin(ShapeRenderer.ShapeType.Filled);
+    renderer.setColor(color);
+    renderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    renderer.end();
+    Gdx.gl.glDisable(GL20.GL_BLEND);
+  }
+
+  /**
+   * Draw a black overlay with the given alpha.
+   */
+  public static void drawOverlay(float alpha) {
+    drawOverlay(new Color(0, 0, 0, alpha));
   }
 }

@@ -33,6 +33,8 @@ public class InputController {
   private boolean attackPressed;
   /** Whether the confirm button was pressed */
   private boolean confirmPressed;
+  /** Whether the reset button was pressed */
+  private boolean resetPressed;
 
   /** The singleton instance of the input controller */
   private static InputController controller = null;
@@ -144,6 +146,13 @@ public class InputController {
   }
 
   /**
+   * Returns whether the player pressed reset.
+   */
+  public boolean pressedReset() {
+    return resetPressed;
+  }
+
+  /**
    * Reads the input from the player.
    */
   public void readInput() {
@@ -174,5 +183,6 @@ public class InputController {
     attackPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_ATTACK));
     jumpPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_JUMP));
     jumpHeld = Gdx.input.isKeyPressed(save.getBoundKeycode(Shared.ACTION_JUMP));
+    resetPressed = Gdx.input.isKeyJustPressed(save.getBoundKeycode(Shared.ACTION_RESET));
   }
 }

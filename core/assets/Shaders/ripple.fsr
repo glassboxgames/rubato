@@ -8,19 +8,18 @@ varying vec2 v_texCoords;
  
 // a special uniform for textures 
 uniform sampler2D u_texture;
-uniform vec2 u_center; 
-uniform vec2 u_resolution; 
+uniform vec2 u_checkpoint;
+uniform vec2 u_adagio;
+uniform float u_max_length;
 uniform float u_frame; 
  
 void main() {
-	vec4 color = v_color * texture2D(u_texture, v_texCoords); 
-	vec2 relativeCenter = u_center / u_resolution; 
-	vec2 relativePosition = gl_FragCoord.xy / u_resolution - relativeCenter; 
-	relativePosition.y = relativePosition.y * u_resolution.y / u_resolution.x;
-	float len = length(relativePosition); 
+	vec4 color = v_color * texture2D(u_texture, v_texCoords);
 	vec3 grey = vec3(color.r * 0.3 + color.g * 0.59 + color.b * 0.11);
-	float radius =  u_frame/30.0;
-	float ripple = smoothstep(0.2+radius, 0.05+radius, len)+0.3; 
-	color.rgb = color.rgb * ripple + grey * (1.0-ripple);
+  float adagio = 1 - smoothstep(0.0, 0.2, length(gl_FragCoord.xy - u_adagio) / u_max_length - 0.1);
+  float checkpoint =
+    1 - smoothstep(0.0, 0.2, length(gl_FragCoord.xy - u_checkpoint) / u_max_length - 0.1 - u_frame / 60.0);
+  float ripple = max(adagio, checkpoint);
+	color.rgb = color.rgb * ripple + grey * (1.0 - ripple);
 	gl_FragColor = color;
 }

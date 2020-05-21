@@ -10,6 +10,10 @@
   "game.pause_label.ttf": [1, 36, 8],
   "game.pause_text.ttf": [0, 48, 8],
 
+  "game.chapter_name.ttf": [2, 24, 2],
+  "game.chapter_complete.ttf": [2, 36, 4],
+  "game.chapter_time.ttf": [0, 48, 2],
+
   "select.level_number.ttf": [2, 36, 8],
 
   "settings.header.ttf": [2, 24, 16],

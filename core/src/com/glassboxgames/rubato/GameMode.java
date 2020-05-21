@@ -55,8 +55,6 @@ public class GameMode implements Screen {
 
   /** Dev mode draw offset */
   private static final float DEV_DRAW_OFFSET = 20f;
-  /** Overlay fade rate */
-  private static final float FADE_RATE = 0.1f;
 
   /** Gravity **/
   private static final float GRAVITY = -50f;
@@ -83,19 +81,26 @@ public class GameMode implements Screen {
 
   /** Whether this game mode is paused */
   private boolean paused;
-  /** Game stage */
-  private Stage gameStage;
-  /** Pause menu stage */
-  private Stage pauseStage;
-  /** Pause menu table */
-  private Table pauseTable;
   /** Pause menu buttons */
   private Array<Button> pauseButtons;
   /** Pause menu button group */
   private HorizontalGroup pauseButtonGroup;
 
-  /** Overlay fade (between 0 and 1) */
-  private float overlayFade;
+  /** Chapter info label */
+  private Label chapterInfo;
+  /** Chapter icon */
+  private Image chapterIcon;
+  /** Chapter complete label */
+  private Label chapterComplete;
+  /** Chapter time label */
+  private Label chapterTime;
+
+  /** Game stage */
+  private Stage gameStage;
+  /** Pause menu stage */
+  private Stage pauseStage;
+  /** The stage for chapter completion */
+  private Stage chapterStage;
 
   /** List of all entity states currently loaded */
   private Array<State> states;
@@ -110,11 +115,20 @@ public class GameMode implements Screen {
   private boolean devMode;
   /** Numerical selector for dev mode */
   private int devSelect;
+  /** Whether the current level is the chapter completion level */
+  private boolean completion;
   /** Whether the current level is editable */
   private boolean editable;
-  /** When the player started the current level (in milliseconds) */
+  /** When the player timer started (in ms); resets on resume */
   private long startTime;
 
+  /** Data for the next level */
+  private LevelData nextData;
+  /** Completion status for the next level */
+  private boolean nextCompletion;
+  /** Editable status for the next level */
+  private boolean nextEditable;
+  
   /**
    * Instantiate a GameMode.
    * @param canvas the canvas to draw on
@@ -167,22 +181,24 @@ public class GameMode implements Screen {
    * Initializes the game mode UI.
    */
   public void initUI() {
+    // pause button
     gameStage = new Stage();
-    ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pause_icon")));
+    ImageButton pauseButton = new ImageButton(Shared.getDrawable("pause_icon"));
     pauseButton.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         pauseGame();
       }
     });
     pauseButton.setX(20);
-    pauseButton.setY(Gdx.graphics.getHeight() - pauseButton.getHeight() - 20);
+    pauseButton.setY(Gdx.graphics.getHeight() - pauseButton.getHeight() - DEV_DRAW_OFFSET);
     gameStage.addActor(pauseButton);
-    
+
+    // pause menu
     pauseStage = new Stage();
-    pauseTable = new Table();
+    Table pauseTable = new Table();
     pauseTable.setFillParent(true);
     pauseTable.add(new Label("paused",
-                             new Label.LabelStyle(Shared.FONT_MAP.get("game.pause_text.ttf"), Color.WHITE)));
+                             new Label.LabelStyle(Shared.getFont("game.pause_text.ttf"), Color.WHITE)));
     pauseTable.row();
 
     pauseButtons = new Array<Button>();
@@ -195,6 +211,26 @@ public class GameMode implements Screen {
 
     pauseTable.add(pauseButtonGroup);
     pauseStage.addActor(pauseTable);
+
+    // chapter completion
+    chapterStage = new Stage();
+    Table chapterTable = new Table();
+    chapterStage.addActor(chapterTable);
+    chapterTable.setFillParent(true);
+    chapterTable.top();
+
+    chapterInfo = new Label("",
+      new Label.LabelStyle(Shared.getFont("game.chapter_name.ttf"), Color.WHITE));
+    chapterIcon = new Image();
+    chapterComplete = new Label("COMPLETE",
+      new Label.LabelStyle(Shared.getFont("game.chapter_complete.ttf"), Color.WHITE));
+    chapterTime = new Label("",
+      new Label.LabelStyle(Shared.getFont("game.chapter_time.ttf"), Color.WHITE));
+
+    chapterTable.add(chapterInfo).pad(40,0,10,0).row();
+    chapterTable.add(chapterIcon).row();
+    chapterTable.add(chapterComplete).pad(10,0,0,0).row();
+    chapterTable.add(chapterTime).pad(0,0,10,0).row();
   }
 
   /**
@@ -202,17 +238,18 @@ public class GameMode implements Screen {
    */
   private void addPauseButton(final int index, String key) {
     final ImageButton button =
-      new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key + "_deselected")), null,
-                      new TextureRegionDrawable(Shared.TEXTURE_MAP.get(key + "_selected")));
+      new ImageButton(Shared.getDrawable(key + "_deselected"), null, Shared.getDrawable(key + "_selected"));
     button.row();
     button
-      .add(new Label(key, new Label.LabelStyle(Shared.FONT_MAP.get("game.pause_label.ttf"), Color.WHITE)))
+      .add(new Label(key, new Label.LabelStyle(Shared.getFont("game.pause_label.ttf"), Color.WHITE)))
       .padTop(20);
     button.setWidth(100);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        resumeGame();
         switch (index) {
+        case PAUSE_RESUME:
+          resumeGame();
+          break;
         case PAUSE_RESET:
           startExit(EXIT_RESET);
           break;
@@ -253,23 +290,61 @@ public class GameMode implements Screen {
   }
 
   /**
-   * Creates the world level.
+   * Sets the level data and parameters for the next level.
    * @param data the serialized level data
-   * @param manager the asset manager to use
+   * @param completion whether the level is the last level of the chapter
    * @param editable whether the level is editable
    */
-  public void initLevel(LevelData data, AssetManager manager, boolean editable) {
+  public void setNextLevel(LevelData data, boolean completion, boolean editable) {
+    nextData = data;
+    nextCompletion = completion;
+    nextEditable = editable;
+  }
+
+  /**
+   * Creates the world level.
+   */
+  public void initLevel() {
     if (level != null) {
       level.deactivatePhysics(world);
     }
-    level = new LevelContainer(data, manager);
+
+    completion = nextCompletion;
+    editable = nextEditable;
+    
+    level = new LevelContainer(nextData, nextCompletion);
+    chapterInfo.setVisible(false);
+    chapterIcon.setDrawable(Shared.getDrawable(level.getChapter() + "_plain"));
+    chapterComplete.setVisible(false);
+    chapterTime.setVisible(false);
+
     gameState = GameState.INTRO;
-    this.editable = editable;
     exiting = false;
-    overlayFade = 1;
     resumeGame();
     startTime = TimeUtils.millis();
-    System.out.println("started level");
+  }
+
+  /**
+   * Populates the chapter completion stage.
+   */
+  public void setChapterCompletion() {
+    String chapter = level.getChapter();
+    int chapterNumber = Shared.CHAPTER_NAMES.indexOf(chapter, false) + 1;
+    chapterInfo.setText("CHAPTER " + chapterNumber + ": " + chapter.toUpperCase());
+    chapterInfo.setVisible(true);
+    chapterIcon.setDrawable(Shared.getDrawable(chapter + "_complete"));
+    chapterIcon.setVisible(true);
+    chapterComplete.setVisible(true);
+    long millis = SaveController.getInstance().getTimeSpent(level.getChapter());
+    long secs = millis / 1000;
+    long mins = secs / 60;
+    long hrs = mins / 60;
+    String time =
+      hrs == 0
+      ? String.format("%d:%02d.%03d", mins % 60, secs % 60, millis % 1000)
+      : String.format("%d:%02d:%02d.%03d", hrs, mins % 60, secs % 60, millis % 1000);
+    chapterTime.setText(time);
+    chapterTime.setVisible(true);
   }
 
   /**
@@ -287,15 +362,19 @@ public class GameMode implements Screen {
     SoundController soundController = SoundController.getInstance();
     if (gameState == GameState.PLAY) {
       Player player = level.getPlayer();
-      String sound = Shared.SOUND_PATHS.get("run_grass");
+      String runSound = Shared.getSoundPath("run_grass");
       if (player.isRunning() && !paused) {
-        if (!soundController.isActive(sound)) {
-          soundController.play(sound, sound, true, 0.35f);
+        if (!soundController.isActive(runSound)) {
+          soundController.play(runSound, runSound, true);
         }
       } else {
-        if (soundController.isActive(sound)) {
-          soundController.stop(sound);
+        if (soundController.isActive(runSound)) {
+          soundController.stop(runSound);
         }
+      }
+      if (level.getCheckpoint().wasJustActivated()) {
+        String checkpointSound = Shared.getSoundPath("checkpoint");
+        soundController.play(checkpointSound, checkpointSound, false);
       }
     }
     soundController.update();
@@ -305,15 +384,14 @@ public class GameMode implements Screen {
    * Exits with the given exit code, triggering a fade out.
    */
   private void startExit(int code) {
-    exiting = true;
-    exitCode = code;
-  }
-
-  /**
-   * Returns the number of milliseconds spent on this level.
-   */
-  public long getLevelTime() {
-    return TimeUtils.timeSinceMillis(startTime);
+    if (!exiting) {
+      if (!paused) {
+        SaveController.getInstance().addTimeSpent(level.getChapter(),
+                                                  TimeUtils.timeSinceMillis(startTime));
+      }
+      exiting = true;
+      listener.exitScreen(this, code);
+    }
   }
 
   /**
@@ -327,15 +405,8 @@ public class GameMode implements Screen {
         gameState = GameState.PLAY;
       }
     } else if (gameState == GameState.PLAY) {
-      if (exiting) {
-        if (overlayFade < 1) {
-          overlayFade = Math.min(overlayFade + FADE_RATE, 1);
-        } else {
-          listener.exitScreen(this, exitCode);
-          return;
-        }
-      } else if (overlayFade > 0) {
-        overlayFade = Math.max(overlayFade - FADE_RATE, 0);
+      if (completion) {
+        chapterStage.act(delta);
       }
 
       InputController input = InputController.getInstance();
@@ -362,6 +433,9 @@ public class GameMode implements Screen {
         if (input.pressedDevMode()) {
           devMode = !devMode;
           devSelect = -1;
+        }
+        if (input.pressedReset()) {
+          startExit(EXIT_RESET);
         }
         if (devMode) {
           if (input.getDevSelect() != -1) {
@@ -396,7 +470,11 @@ public class GameMode implements Screen {
           Vector2 pos = player.getPosition();
 
           if (pos.x >= level.getWidth()) {
-            startExit(editable ? EXIT_RESET : EXIT_COMPLETE);
+            if (editable) {
+              startExit(EXIT_RESET);
+            } else {
+              startExit(EXIT_COMPLETE);
+            }
           }
 
           if (pos.y < Y_BOUND) {
@@ -466,8 +544,11 @@ public class GameMode implements Screen {
         Checkpoint checkpoint = level.getCheckpoint();
         checkpoint.update(delta);
         if (checkpoint.wasJustActivated()) {
+          if (completion) {
+            setChapterCompletion();
+          }
           level.removeRightWall();
-          listener.exitScreen(this, EXIT_CHECKPOINT);
+          // listener.exitScreen(this, EXIT_CHECKPOINT);
         }
 
         if (player.isActive()) {
@@ -481,7 +562,7 @@ public class GameMode implements Screen {
         }
         checkpoint.sync();
 
-        world.step(1 / 60f, 8, 3);
+        world.step(delta, 8, 3);
 
         gameStage.act(delta);
       }
@@ -497,10 +578,18 @@ public class GameMode implements Screen {
     canvas.clear();
 
     if (gameState == GameState.PLAY) {
-      level.draw(canvas, debug);
+      level.drawBackground(canvas);
+      if (completion) {
+        Shared.drawOverlay(0.2f);
+        chapterStage.draw();
+      }
+      level.drawEntities(canvas);
+      if (debug) {
+        level.drawDebug(canvas);
+      }
 
       Player player = level.getPlayer();
-      if (player.isActive()) {
+      if (!exiting && player.isActive()) {
         Vector2 delta = player.getPosition().scl(Shared.PPM).sub(canvas.getCameraPos()).scl(0.25f);
         float width = level.getWidth() * Shared.PPM;
         float height = level.getHeight() * Shared.PPM;
@@ -537,20 +626,10 @@ public class GameMode implements Screen {
       }
 
       if (paused) {
-        canvas.begin(Shared.PPM, Shared.PPM);
-        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-                              new Color(0, 0, 0, 0.4f), canvas.getWidth(), canvas.getHeight());
-        canvas.end();
+        Shared.drawOverlay(0.4f);
         pauseStage.draw();
       } else {
         gameStage.draw();
-      }
-
-      if (overlayFade > 0) {
-        canvas.begin(Shared.PPM, Shared.PPM);
-        canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-                              new Color(0, 0, 0, overlayFade), level.getWidth(), level.getHeight());
-        canvas.end();
       }
     }
   }
@@ -582,12 +661,13 @@ public class GameMode implements Screen {
     }
     String text =
       "[" + num + "] " + name + ": " + new DecimalFormat("#.##").format(value);
-    canvas.drawText(text, Shared.FONT_MAP.get("game.dev.ttf"), color, x, y);
+    canvas.drawText(text, Shared.getFont("game.dev.ttf"), color, x, y);
   }
 
   @Override
   public void render(float delta) {
     if (active) {
+      // if (Gdx.input.isKeyJustPressed(Input.Keys.D)) 
       update(delta);
       draw();
     }
@@ -597,6 +677,9 @@ public class GameMode implements Screen {
    * Pauses the game.
    */
   private void pauseGame() {
+    if (!editable) {
+      SaveController.getInstance().addTimeSpent(level.getChapter(), TimeUtils.timeSinceMillis(startTime));
+    }
     Gdx.input.setInputProcessor(pauseStage);
     paused = true;
   }
@@ -605,6 +688,7 @@ public class GameMode implements Screen {
    * Resumes the game.
    */
   private void resumeGame() {
+    startTime = TimeUtils.millis();
     Gdx.input.setInputProcessor(gameStage);
     paused = false;
   }
@@ -620,6 +704,7 @@ public class GameMode implements Screen {
 
   @Override
   public void show() {
+    initLevel();
     Gdx.input.setInputProcessor(gameStage);
     active = true;
   }
@@ -632,7 +717,15 @@ public class GameMode implements Screen {
 
   @Override
   public void dispose() {
-    pauseStage.dispose();
+    if (gameStage != null) {
+      gameStage.dispose();
+    }
+    if (pauseStage != null) {
+      pauseStage.dispose();
+    }
+    if (chapterStage != null) {
+      chapterStage.dispose();
+    }
     if (world != null) {
       world.dispose();
       world = null;

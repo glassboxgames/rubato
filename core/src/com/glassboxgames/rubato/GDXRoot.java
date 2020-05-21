@@ -8,11 +8,22 @@ import com.badlogic.gdx.audio.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
 public class GDXRoot extends Game implements ScreenListener {
+  /** Fade state values */
+  private static final int FADE_NONE = 0;
+  private static final int FADE_OUT = 1;
+  private static final int FADE_DELAY = 2;
+  private static final int FADE_IN = 3;
+  private static final int NUM_FADE_STATES = 4;
+
+  /** Fade state duration */
+  private static final int FADE_STATE_DURATION = 15;
+
   /** Drawing context to display graphics */
   private GameCanvas canvas;
   /** Manager for loading assets */
@@ -38,6 +49,13 @@ public class GDXRoot extends Game implements ScreenListener {
   private int levelIndex;
   /** Current level data */
   private LevelData level;
+
+  /** Next screen for transition */
+  private Screen nextScreen;
+  /** Current fade state */
+  private int fadeState;
+  /** Current fade state counter */
+  private int fadeCount;
 
   public GDXRoot() {
     manager = new AssetManager();
@@ -85,6 +103,45 @@ public class GDXRoot extends Game implements ScreenListener {
     super.resize(width, height);
   }
 
+  /**
+   * Starts the transition to the given screen.
+   */
+  public void setNextScreen(Screen next) {
+    if (fadeState == FADE_NONE) {
+      nextScreen = next;
+      fadeState = FADE_OUT;
+      fadeCount = 0;
+    }
+  }
+
+  @Override
+  public void render() {
+    super.render();
+    if (fadeState != FADE_NONE) {
+      float alpha;
+      switch (fadeState) {
+      case FADE_OUT:
+        alpha = (float)fadeCount / FADE_STATE_DURATION;
+        break;
+      case FADE_IN:
+        alpha = 1 - (float)fadeCount / FADE_STATE_DURATION;
+        break;
+      default:
+        alpha = 1;
+        break;
+      }
+      Shared.drawOverlay(alpha);
+      fadeCount++;
+      if (fadeCount > FADE_STATE_DURATION) {
+        if (fadeState == FADE_DELAY) {
+          setScreen(nextScreen);
+        }
+        fadeCount = 0;
+        fadeState = (fadeState + 1) % NUM_FADE_STATES;
+      }
+    }
+  }
+
   @Override
   public void dispose() {
     for (String path : Shared.TEXTURE_PATHS.values()) {
@@ -119,14 +176,18 @@ public class GDXRoot extends Game implements ScreenListener {
 
   @Override
   public void exitScreen(Screen screen, int exitCode) {
+    SoundController soundController = SoundController.getInstance();
+    SaveController saveController = SaveController.getInstance();
     Array<LevelData> levels = Shared.CHAPTER_LEVELS.get(chapterIndex);
     if (screen == loadingMode) {
       if (exitCode == LoadingMode.EXIT_DONE) {
         for (String key : Shared.TEXTURE_PATHS.keys()) {
-          Shared.TEXTURE_MAP.put(key, manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class));
+          Texture texture = manager.get(Shared.TEXTURE_PATHS.get(key), Texture.class);
+          texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+          Shared.TEXTURE_MAP.put(key, texture);
         }
         for (String key : Shared.SOUND_PATHS.keys()) {
-          SoundController.getInstance().allocate(manager, Shared.SOUND_PATHS.get(key));
+          soundController.allocate(manager, Shared.getSoundPath(key));
         }
         for (String key : Shared.FONT_METADATA.keys()) {
           Shared.FONT_MAP.put(key, manager.get(key, BitmapFont.class));
@@ -139,7 +200,8 @@ public class GDXRoot extends Game implements ScreenListener {
         editorMode.initUI();
         settingsMode.initUI();
 
-        setScreen(mainMenu);
+        soundController.setVolume(saveController.getSoundVolume());
+        setNextScreen(mainMenu);
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,
                       new RuntimeException());
@@ -147,46 +209,53 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
-        SaveController save = SaveController.getInstance();
-        boolean newGame = save.getLevelsUnlocked(0) == 0;
+        boolean newGame = saveController.getLevelsUnlocked(0) == 0;
         if (newGame) {
           level = levels.get(levelIndex);
           if (levels.size > 0) {
-            save.setLevelsUnlocked(chapterIndex, 1);
+            saveController.setLevelsUnlocked(chapterIndex, 1);
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
-            save.setLevelsUnlocked(chapterIndex + 1, 1);
+            saveController.setLevelsUnlocked(chapterIndex + 1, 1);
           }
           cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(0) + "_cutscene");
-          setScreen(cutsceneMode);
+          setNextScreen(cutsceneMode);
         } else {
-          setScreen(selectMode);
+          setNextScreen(selectMode);
         }
       } else if (exitCode == MainMenu.EXIT_EDITOR) {
-        setScreen(editorMode);
+        setNextScreen(editorMode);
       } else if (exitCode == MainMenu.EXIT_SETTINGS) {
-        setScreen(settingsMode);
+        setNextScreen(settingsMode);
       } else if (exitCode == MainMenu.EXIT_QUIT) {
         Gdx.app.exit();
       }
     } else if (screen == selectMode) {
       if (exitCode == SelectMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == SelectMode.EXIT_PLAY) {
         chapterIndex = selectMode.getChapter();
         levelIndex = selectMode.getLevel();
         level = Shared.CHAPTER_LEVELS.get(chapterIndex).get(levelIndex);
-        gameMode.initLevel(level, manager, false);
-        setScreen(gameMode);
+        gameMode.setNextLevel(level, false, false);
+        setNextScreen(gameMode);
       }
     } else if (screen == gameMode) {
       if (exitCode == GameMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == GameMode.EXIT_LEVELS) {
-        setScreen(selectMode);
+        setNextScreen(selectMode);
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
-        long millis = gameMode.getLevelTime();
-        System.out.printf("completed in %d:%02d.%03d\n",
-                          millis / 1000 / 60, millis / 1000 % 60, millis % 1000);
+        int unlocked = saveController.getLevelsUnlocked(chapterIndex);
+        if (levelIndex == unlocked - 1) {
+          if (unlocked < levels.size) {
+            saveController.setLevelsUnlocked(chapterIndex, unlocked + 1);
+          } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
+            unlocked = saveController.getLevelsUnlocked(chapterIndex + 1);
+            if (unlocked < 1) {
+              saveController.setLevelsUnlocked(chapterIndex + 1, 1);
+            }
+          }
+        }
         levelIndex++;
         if (levelIndex >= levels.size) {
           if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
@@ -199,28 +268,18 @@ public class GDXRoot extends Game implements ScreenListener {
             level = null;
             cutsceneMode.setCutscene("end_cutscene");
           }
-          setScreen(cutsceneMode);
+          setNextScreen(cutsceneMode);
         } else {
           level = levels.get(levelIndex);
-          gameMode.initLevel(level, manager, false);
+          gameMode.setNextLevel(level, levelIndex == levels.size - 1, false);
+          setNextScreen(gameMode);
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
-        gameMode.initLevel(level, manager, gameMode.isEditable());
+        setNextScreen(gameMode);
       } else if (exitCode == GameMode.EXIT_EDIT) {
-        setScreen(editorMode);
+        setNextScreen(editorMode);
       } else if (exitCode == GameMode.EXIT_CHECKPOINT) {
-        SaveController save = SaveController.getInstance();
-        int unlocked = save.getLevelsUnlocked(chapterIndex);
-        if (levelIndex == unlocked - 1) {
-          if (unlocked < levels.size) {
-            save.setLevelsUnlocked(chapterIndex, unlocked + 1);
-          } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
-            unlocked = save.getLevelsUnlocked(chapterIndex + 1);
-            if (unlocked < 1) {
-              save.setLevelsUnlocked(chapterIndex + 1, 1);
-            }
-          }
-        }
+        // checkpoint logic
       } else {
         Gdx.app.error("GDXRoot", "Exited playing mode with error code " + exitCode,
                       new RuntimeException());
@@ -228,42 +287,42 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == cutsceneMode) {
       if (exitCode == CutsceneMode.EXIT_ESCAPE) {
-        setScreen(selectMode);
+        setNextScreen(selectMode);
       } else if (exitCode == CutsceneMode.EXIT_COMPLETE) {
         if (level != null) {
-          gameMode.initLevel(level, manager, false);
-          setScreen(gameMode);
+          gameMode.setNextLevel(level, false, false);
+          setNextScreen(gameMode);
         } else {
           // TODO credit screen?
-          setScreen(mainMenu);
+          setNextScreen(mainMenu);
         }
       } else {
         Gdx.app.exit();
       }
     } else if (screen == editorMode) {
       if (exitCode == EditorMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == EditorMode.EXIT_TEST) {
         level = editorMode.exportLevel();
-        gameMode.initLevel(level, manager, true);
-        setScreen(gameMode);
+        gameMode.setNextLevel(level, false, true);
+        setNextScreen(gameMode);
       } else {
         Gdx.app.exit();
       }
     } else if (screen == selectMode) {
       if (exitCode == SelectMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else if (exitCode == SelectMode.EXIT_PLAY) {
         // TODO: convert pillar index into level index
         // levelIndex = selectMode.getSelectedCheckpoint();
-        setScreen(gameMode);
+        setNextScreen(gameMode);
       } else {
         Gdx.app.exit();
       }
     }
     else if (screen == settingsMode) {
       if (exitCode == SelectMode.EXIT_MENU) {
-        setScreen(mainMenu);
+        setNextScreen(mainMenu);
       } else {
         Gdx.app.exit();
       }

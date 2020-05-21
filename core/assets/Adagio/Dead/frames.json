@@ -3,7 +3,6 @@
     "file": "Armature_death_00.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -12,7 +11,6 @@
     "file": "Armature_death_01.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -21,7 +19,6 @@
     "file": "Armature_death_02.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -30,7 +27,6 @@
     "file": "Armature_death_03.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -39,7 +35,6 @@
     "file": "Armature_death_04.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -48,7 +43,6 @@
     "file": "Armature_death_05.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -57,7 +51,6 @@
     "file": "Armature_death_06.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -66,7 +59,6 @@
     "file": "Armature_death_07.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -75,7 +67,6 @@
     "file": "Armature_death_08.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -84,7 +75,6 @@
     "file": "Armature_death_09.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -93,7 +83,6 @@
     "file": "Armature_death_10.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -102,7 +91,6 @@
     "file": "Armature_death_11.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -111,7 +99,6 @@
     "file": "Armature_death_12.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -120,7 +107,6 @@
     "file": "Armature_death_13.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -129,7 +115,6 @@
     "file": "Armature_death_14.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -138,7 +123,6 @@
     "file": "Armature_death_15.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -147,7 +131,6 @@
     "file": "Armature_death_16.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -156,7 +139,6 @@
     "file": "Armature_death_17.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -165,7 +147,6 @@
     "file": "Armature_death_18.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -174,7 +155,6 @@
     "file": "Armature_death_19.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -183,7 +163,6 @@
     "file": "Armature_death_20.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -192,7 +171,6 @@
     "file": "Armature_death_21.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -201,7 +179,6 @@
     "file": "Armature_death_22.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -210,7 +187,6 @@
     "file": "Armature_death_23.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -219,7 +195,6 @@
     "file": "Armature_death_24.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -228,7 +203,6 @@
     "file": "Armature_death_25.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -237,7 +211,6 @@
     "file": "Armature_death_26.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -246,7 +219,6 @@
     "file": "Armature_death_27.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -255,7 +227,6 @@
     "file": "Armature_death_28.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -264,7 +235,6 @@
     "file": "Armature_death_29.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -273,7 +243,6 @@
     "file": "Armature_death_30.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
@@ -282,7 +251,6 @@
     "file": "Armature_death_31.png",
     "sensors": {
       "ground": [0, -0.43, 0.28, 0.1, 0],
-      "wall": [0.15, -0.2, 0.15, 0.46, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],

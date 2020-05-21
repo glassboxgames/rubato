@@ -24,8 +24,6 @@ public class CutsceneMode implements Screen {
 
   /** Number of frames to pause at the beginning and end */
   private static final int PAUSE_TIME = 60;
-  /** Overlay fade rate */
-  private static final float FADE_RATE = 0.03f;
   /** Fraction of screen width to use */
   private static final float SCALE = 0.6f;
 
@@ -44,8 +42,6 @@ public class CutsceneMode implements Screen {
   /** Camera position */
   private Vector2 cameraPos;
 
-  /** Overlay fade (between 0 and 1) */
-  private float overlayFade;
   /** Current pause time */
   private int startPauseTime, endPauseTime;
   
@@ -66,7 +62,7 @@ public class CutsceneMode implements Screen {
     this.canvas = canvas;
     this.listener = listener;
 
-    cutscene = Shared.TEXTURE_MAP.get("ui_blank");
+    cutscene = null;
     scrollRate = 1;
     cameraPos = new Vector2();
   }
@@ -75,20 +71,11 @@ public class CutsceneMode implements Screen {
    * Sets the cutscene texture for this instance.
    */
   public void setCutscene(String key) {
-    this.cutscene = Shared.TEXTURE_MAP.get(key);
-    overlayFade = 1;
+    cutscene = Shared.getTexture(key);
     width = Gdx.graphics.getWidth() * SCALE;
     height = cutscene.getHeight() * Gdx.graphics.getWidth() / cutscene.getWidth() * SCALE;
     cameraPos.set(width / 2, height - Gdx.graphics.getHeight() / 2);
     startPauseTime = endPauseTime = PAUSE_TIME;
-  }
-
-  /**
-   * Exit with the given exit code, triggering a fade out.
-   */
-  private void startExit(int code) {
-    exiting = true;
-    exitCode = code;
   }
 
   /**
@@ -99,19 +86,7 @@ public class CutsceneMode implements Screen {
     InputController input = InputController.getInstance();
     input.readInput();
     if (input.pressedExit()) {
-      startExit(EXIT_ESCAPE);
-    }
-
-    if (exiting) {
-      if (overlayFade < 1) {
-        overlayFade = Math.min(overlayFade + FADE_RATE, 1);
-      } else {
-        listener.exitScreen(this, exitCode);
-        exiting = false;
-        return;
-      }
-    } else if (overlayFade > 0) {
-      overlayFade = Math.max(overlayFade - FADE_RATE, 0);
+      listener.exitScreen(this, EXIT_ESCAPE);
     }
 
     if (input.heldJump()) {
@@ -141,7 +116,7 @@ public class CutsceneMode implements Screen {
     } else if (endPauseTime > 0) {
       endPauseTime--;
     } else {
-      startExit(EXIT_COMPLETE);
+      listener.exitScreen(this, EXIT_COMPLETE);
     }
   }
 
@@ -150,19 +125,10 @@ public class CutsceneMode implements Screen {
    */
   private void draw() {
     canvas.clear();
-
     canvas.moveCamera(cameraPos);
     canvas.begin();
     canvas.drawBackground(cutscene, Color.WHITE, width, height);
     canvas.end();
-
-    if (overlayFade > 0) {
-      // TODO fix scaling
-      canvas.begin(Shared.PPM, Shared.PPM);
-      canvas.drawBackground(Shared.TEXTURE_MAP.get("blank"),
-        new Color(0, 0, 0, overlayFade), Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-      canvas.end();
-    }
   }
 
   @Override

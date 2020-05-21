@@ -97,4 +97,41 @@ public class SaveController {
     data.bindings.put(action, key);
     writeSave();
   }
+
+  /**
+   * Gets the total time spent on the given chapter in milliseconds.
+   */
+  public long getTimeSpent(String chapter) {
+    return data.times.get(chapter);
+  }
+
+  /**
+   * Sets the total time spent on the given chapter.
+   */
+  public void setTimeSpent(String chapter, long time) {
+    data.times.put(chapter, time);
+    writeSave();
+  }
+
+  /**
+   * Adds the given time to the total time spent on the given chapter.
+   */
+  public void addTimeSpent(String chapter, long time) {
+    setTimeSpent(chapter, getTimeSpent(chapter) + time);
+  }
+
+  /**
+   * Sets the sound volume.
+   */
+  public void setSoundVolume(float volume) {
+    data.sound = volume;
+    writeSave();
+  }
+
+  /**
+   * Returns the sound volume.
+   */
+  public float getSoundVolume() {
+    return data.sound;
+  }
 }

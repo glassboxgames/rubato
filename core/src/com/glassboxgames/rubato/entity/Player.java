@@ -15,7 +15,7 @@ public class Player extends Entity {
   public static final float MAX_X_SPEED = 4f;
   public static float maxXSpeed = MAX_X_SPEED;
   /** Max vertical speed */
-  public static final float MAX_Y_SPEED = 8f;
+  public static final float MAX_Y_SPEED = 9f;
   public static float maxYSpeed = MAX_Y_SPEED;
   /** Movement impulse */
   public static final float MOVE_IMPULSE = 1f;
@@ -37,18 +37,22 @@ public class Player extends Entity {
   public static final int ATTACK_IMPULSE_DURATION = 8;
   /** Attack impulse short duration, used for repeated air attacks */
   public static final int ATTACK_IMPULSE_SHORT_DURATION = 4;
-  /** Attack cooldown */
-  public static final int ATTACK_COOLDOWN = 0;
+  /** Jump buffer frames */
+  private static final int JUMP_BUFFER = 2;
+  /** Attack buffer frames */
+  private static final int ATTACK_BUFFER = 5;
+
   /** Drain particle lifespan */
   private static final int DRAIN_DURATION = 30;
 
   /** Player state constants */
   public static final int STATE_IDLE = 0;
   public static final int STATE_RUN = 1;
-  public static final int STATE_FALL = 2;
-  public static final int STATE_JUMP = 3;
-  public static final int STATE_ATTACK = 4;
-  public static final int STATE_DEAD = 5;
+  public static final int STATE_RISE = 2;
+  public static final int STATE_FALL = 3;
+  public static final int STATE_JUMP = 4;
+  public static final int STATE_ATTACK = 5;
+  public static final int STATE_DEAD = 6;
 
   /** Player states */
   public static Array<State> states = null;
@@ -65,10 +69,12 @@ public class Player extends Entity {
   private int attackTime;
   /** Duration of the attack impulse */
   private int attackDuration;
-  /** Remaining attack cooldown */
-  private int attackCooldown;
   /** Whether the player's attacks should be short */
-  private boolean attackShort;
+  private boolean shortAttack;
+  /** Whether the player is buffering an attack */
+  private boolean bufferingAttack;
+  /** Frames since grounded */
+  private int framesSinceGrounded;
 
   /** Whether the player is currently active */
   private boolean active;
@@ -76,8 +82,6 @@ public class Player extends Entity {
   private ObjectSet<Enemy> enemiesHit;
   /** Entities that the player is currently using as ground */
   private ObjectSet<Entity> entitiesUnderfoot;
-  /** Entities that the player is adjacent to */
-  private ObjectSet<Entity> entitiesAdjacent;
   /** Set of drain particle effects */
   private ObjectSet<DrainEffect> drainEffects;
 
@@ -93,7 +97,6 @@ public class Player extends Entity {
     jumpDuration = -1;
     enemiesHit = new ObjectSet<Enemy>();
     entitiesUnderfoot = new ObjectSet<Entity>();
-    entitiesAdjacent = new ObjectSet<Entity>();
     drainEffects = new ObjectSet<DrainEffect>();
     active = true;
   }
@@ -114,7 +117,7 @@ public class Player extends Entity {
    * Tries to start a jump.
    */
   public void tryJump() {
-    if ((stateIndex != STATE_DEAD) && !isJumping() && isGrounded()) {
+    if (stateIndex != STATE_DEAD && !isJumping() && (isGrounded() || framesSinceGrounded < JUMP_BUFFER)) {
       setState(STATE_JUMP);
     } 
   }
@@ -123,7 +126,7 @@ public class Player extends Entity {
    * Tries to extend an existing jump.
    */
   public void tryExtendJump() {
-    if ((stateIndex != STATE_DEAD) && isJumping()) {
+    if (stateIndex != STATE_DEAD && isJumping()) {
       if (jumpDuration < maxJumpDuration) {
         jumpDuration++;
       }
@@ -134,8 +137,12 @@ public class Player extends Entity {
    * Tries to start a player attack.
    */
   public void tryAttack() {
-    if ((stateIndex != STATE_DEAD) && !isAttacking() && attackCooldown < 0) {
-      setState(STATE_ATTACK);
+    if (stateIndex != STATE_DEAD) {
+      if (!isAttacking()) {
+        setState(STATE_ATTACK);
+      } else if (getCount() > getState().getLength() - ATTACK_BUFFER) {
+        bufferingAttack = true;
+      }
     }
   }
 
@@ -155,8 +162,8 @@ public class Player extends Entity {
         setState(STATE_IDLE);
       }
     } else if (stateIndex != STATE_DEAD) {
-      String sound = Shared.SOUND_PATHS.get("death");
-      // SoundController.getInstance().play(sound, sound, false, 0.25f);
+      String sound = Shared.getSoundPath("death");
+      // SoundController.getInstance().play(sound, sound, false);
       setState(STATE_DEAD);
     }
   }
@@ -204,20 +211,6 @@ public class Player extends Entity {
   }
 
   /**
-   * Adds an entity to the list of entities adjacent.
-   */
-  public void addAdjacent(Entity entity) {
-    entitiesAdjacent.add(entity);
-  }
-
-  /**
-   * Removes an entity to the list of entities adjacent.
-   */
-  public void removeAdjacent(Entity entity) {
-    entitiesAdjacent.remove(entity);
-  }
-
-  /**
    * Returns the set of enemies hit by the current attack.
    */
   public ObjectSet<Enemy> getEnemiesHit() {
@@ -260,15 +253,15 @@ public class Player extends Entity {
     super.enterState();
     switch (stateIndex) {
     case STATE_ATTACK:
-      String sound = Shared.SOUND_PATHS.get("attack_swing");
-      SoundController.getInstance().play(sound, sound, false, 0.1f);
+      String sound = Shared.getSoundPath("attack_swing");
+      SoundController.getInstance().play(sound, sound, false);
       attackTime = 0;
-      if (attackShort) {
+      if (shortAttack) {
         attackDuration = ATTACK_IMPULSE_SHORT_DURATION;
       } else {
         attackDuration = ATTACK_IMPULSE_DURATION;
-        if (!isGrounded()) {
-          attackShort = true;
+        if (!(isGrounded() || framesSinceGrounded < JUMP_BUFFER)) {
+          shortAttack = true;
         }
       }
       break;
@@ -288,7 +281,6 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_ATTACK:
       attackTime = -1;
-      attackCooldown = ATTACK_COOLDOWN;
       enemiesHit.clear();
       break;
     }
@@ -299,11 +291,22 @@ public class Player extends Entity {
     switch (stateIndex) {
     case STATE_ATTACK:
       if (getCount() > getState().getLength()) {
-        setState(STATE_FALL);
+        setState(STATE_RISE);
+        if (bufferingAttack) {
+          bufferingAttack = false;
+          setState(STATE_ATTACK);
+        }
       }
       break;
     case STATE_JUMP:
       if (jumpTime >= jumpDuration) {
+        setState(STATE_RISE);
+      }
+      break;
+    case STATE_RISE:
+      if (isGrounded()) {
+        setState(input != 0 ? STATE_RUN : STATE_IDLE);
+      } else if (getVelocity().y < 0) {
         setState(STATE_FALL);
       }
       break;
@@ -314,14 +317,14 @@ public class Player extends Entity {
       break;
     case STATE_RUN:
       if (!isGrounded()) {
-        setState(STATE_FALL);
+        setState(STATE_RISE);
       } else if (input == 0) {
         setState(STATE_IDLE);
       }
       break;
     case STATE_IDLE:
       if (!isGrounded()) {
-        setState(STATE_FALL);
+        setState(STATE_RISE);
       } else if (input != 0) {
         setState(STATE_RUN);
       }
@@ -375,12 +378,13 @@ public class Player extends Entity {
       if (attackTime < attackDuration) {
         body.applyLinearImpulse(ATTACK_IMPULSE, getPosition(), true);
       }
-    } else if (attackCooldown >= 0) {
-      attackCooldown--;
     }
 
     if (isGrounded()) {
-      attackShort = false;
+      shortAttack = false;
+      framesSinceGrounded = 0;
+    } else {
+      framesSinceGrounded++;
     }
 
     /* ------- all physics should be applied before this line! ------- */

@@ -80,7 +80,7 @@ public class SelectMode implements Screen {
   public void initUI() {
     final SaveController save = SaveController.getInstance();
 
-    ImageButton home = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("home_icon")));
+    ImageButton home = new ImageButton(Shared.getDrawable("home_icon"));
     home.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         exitToMenu();
@@ -89,16 +89,16 @@ public class SelectMode implements Screen {
     home.setX(20);
     home.setY(Gdx.graphics.getHeight() - home.getHeight() - 20);
     stage.addActor(home);
-    
+  
     for (int i = 0; i < Shared.CHAPTER_NAMES.size; i++) {
       String name = Shared.CHAPTER_NAMES.get(i);
       ImageButton.ImageButtonStyle unlockedStyle = new ImageButton.ImageButtonStyle();
-      unlockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_unlocked"));
-      unlockedStyle.imageOver = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_hovered"));
-      unlockedStyle.imageChecked = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_selected"));
+      unlockedStyle.imageUp = Shared.getDrawable(name + "_unlocked");
+      unlockedStyle.imageOver = Shared.getDrawable(name + "_hovered");
+      unlockedStyle.imageChecked = Shared.getDrawable(name + "_selected");
       unlockedChapterStyles.add(unlockedStyle);
       ImageButton.ImageButtonStyle lockedStyle = new ImageButton.ImageButtonStyle();
-      lockedStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get(name + "_locked"));
+      lockedStyle.imageUp = Shared.getDrawable(name + "_locked");
       lockedChapterStyles.add(lockedStyle);
       
       final ImageButton button =
@@ -121,7 +121,7 @@ public class SelectMode implements Screen {
     }
 
     Table table = new Table();
-    leftArrow = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("arrow_left")));
+    leftArrow = new ImageButton(Shared.getDrawable("arrow_left"));
     leftArrow.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         page--;
@@ -132,17 +132,17 @@ public class SelectMode implements Screen {
     
     levelChooser = new HorizontalGroup();
     lockedLevelStyle = new ImageTextButton.ImageTextButtonStyle();
-    lockedLevelStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_off"));
-    lockedLevelStyle.font = Shared.FONT_MAP.get("select.level_number.ttf");
+    lockedLevelStyle.imageUp = Shared.getDrawable("pillar_off");
+    lockedLevelStyle.font = Shared.getFont("select.level_number.ttf");
     lockedLevelStyle.fontColor = Color.WHITE;
     unlockedLevelStyle = new ImageTextButton.ImageTextButtonStyle();
-    unlockedLevelStyle.imageUp = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_on"));
-    unlockedLevelStyle.imageOver = new TextureRegionDrawable(Shared.TEXTURE_MAP.get("pillar_selected"));
-    unlockedLevelStyle.font = Shared.FONT_MAP.get("select.level_number.ttf");
+    unlockedLevelStyle.imageUp = Shared.getDrawable("pillar_on");
+    unlockedLevelStyle.imageOver = Shared.getDrawable("pillar_selected");
+    unlockedLevelStyle.font = Shared.getFont("select.level_number.ttf");
     unlockedLevelStyle.fontColor = Color.WHITE;
     for (int c = 0; c < Shared.CHAPTER_LEVELS.size; c++) {
       Array<ImageTextButton> buttons = new Array<ImageTextButton>();
-      for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size; l++) {
+      for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size - 1; l++) {
         final ImageTextButton button = new ImageTextButton(Integer.toString(l + 1), lockedLevelStyle);
         button.clearChildren();
         button.add(button.getLabel()).padBottom(40).row();
@@ -164,7 +164,7 @@ public class SelectMode implements Screen {
     levelChooser.space(60);
     table.add(levelChooser).center();
 
-    rightArrow = new ImageButton(new TextureRegionDrawable(Shared.TEXTURE_MAP.get("arrow_right")));
+    rightArrow = new ImageButton(Shared.getDrawable("arrow_right"));
     rightArrow.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         page++;

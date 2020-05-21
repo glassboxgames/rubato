@@ -10,23 +10,27 @@ import com.glassboxgames.rubato.*;
  * Abstract class to represent any enemy in Rubato.
  */
 public abstract class Enemy extends Entity {
+  /** Desaturation shader */
+  private static final ShaderProgram DESAT_SHADER =
+    new ShaderProgram(Gdx.files.internal("Shaders/desat.vsr"), Gdx.files.internal("Shaders/desat.fsr"));
+
   /** Represent the previous position of the enemy */
-  protected Vector2 prevPosition = new Vector2(0, 0);
+  private Vector2 prevPosition = new Vector2(0, 0);
   /** Represent the previous velocity of the enemy */
-  protected Vector2 prevVelocity = new Vector2(0, 0);
+  private Vector2 prevVelocity = new Vector2(0, 0);
   /** Cache for prevPosition calculation */
-  protected Vector2 prevPosCache = new Vector2(0, 0);
+  private Vector2 prevPosCache = new Vector2(0, 0);
   /** Cache for prevVelocity calculation */
-  protected Vector2 prevVelCache = new Vector2(0, 0);
+  private Vector2 prevVelCache = new Vector2(0, 0);
   /** Cache for targeting */
-  protected Vector2 targetCache = new Vector2(0, 0);
+  private Vector2 targetCache = new Vector2(0, 0);
 
   /** Flag for removing the enemy */
-  protected boolean remove;
+  private boolean remove;
   /** Current health */
-  protected float health;
+  private float health;
   /** Current target coordinates */
-  protected Vector2 target;
+  private Vector2 target;
 
   /**
    * Initializes an enemy with the specified parameters.
@@ -114,7 +118,7 @@ public abstract class Enemy extends Entity {
   public void draw(GameCanvas canvas) {
     if (isSuspended()) {
       ShaderProgram temp = canvas.getShader();
-      canvas.setShader(Shared.DESAT_SHADER);
+      canvas.setShader(DESAT_SHADER);
       super.draw(canvas);
       canvas.setShader(temp);
     } else {
