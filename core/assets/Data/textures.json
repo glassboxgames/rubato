@@ -1,6 +1,8 @@
 {
+  "logo": "User Interface/Main Menu/logo.png",
   "blank": "User Interface/blank.png",
-  
+  "menu_background": "Backgrounds/menu.png",
+
   "forest": "Backgrounds/forest.png",
   "plains": "Backgrounds/plains.png",
   "desert": "Backgrounds/desert.png",
@@ -126,6 +128,14 @@
   "highlight": "User Interface/Highlight/highlight.png",
   "no_highlight": "User Interface/Highlight/no_highlight.png",
   "adagio_head_icon": "User Interface/Main Menu/adagio_head_51x61.png",
+  "play_button_deselected": "User Interface/Buttons/play_button.png",
+  "play_button_selected": "User Interface/Buttons/play_teal_button.png",
+  "editor_button_deselected": "User Interface/Buttons/editor_button.png",
+  "editor_button_selected": "User Interface/Buttons/editor_teal_button.png",
+  "settings_button_deselected": "User Interface/Buttons/settings_button.png",
+  "settings_button_selected": "User Interface/Buttons/settings_teal_button.png",
+  "quit_button_deselected": "User Interface/Buttons/exit_button.png",
+  "quit_button_selected": "User Interface/Buttons/exit_teal_button.png",
 
   "pillar_selected": "User Interface/Level Selector/pillar_ui_selected.png",
   "pillar_on": "User Interface/Level Selector/pillar_ui_on.png",
@@ -180,6 +190,6 @@
   "crumbling_icon": "User Interface/Icons/crumbling_icon.png",
   "spikes_icon": "User Interface/Icons/spikes_icon.png",
 
-  "slider_track": "User Interface/Buttons/slider_track.png",
-  "slider_knob": "User Interface/Buttons/slider_knob.png",
+  "slider_track": "User Interface/Slider/slider_track.png",
+  "slider_knob": "User Interface/Slider/slider_knob.png",
 }

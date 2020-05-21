@@ -1,7 +1,6 @@
 {
   "main_menu.title.ttf": [1, 96, 8],
-  "main_menu.selected.ttf": [1, 48, 8],
-  "main_menu.deselected.ttf": [0, 48, 8],
+  "main_menu.deselected.ttf": [2, 24, 8],
 
   "editor.header.ttf": [2, 14, 6],
   "editor.item.ttf": [0, 18, 0],

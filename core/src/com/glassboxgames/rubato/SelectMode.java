@@ -49,7 +49,9 @@ public class SelectMode implements Screen {
   /** Chapter buttons */
   private Array<ImageButton> chapterButtons;
   /** Chapter backgrounds */
-  private Array<Image> backgrounds;
+  private Array<Drawable> backgroundDrawables;
+  /** Chapter background image */
+  private Image background;
   /** Level button arrays, ordered by chapter */
   private Array<Array<ImageTextButton>> levelButtonsByChapter;
   /** Current array of level buttons */
@@ -69,7 +71,7 @@ public class SelectMode implements Screen {
     chapterButtons = new Array<ImageButton>();
     levelButtonsByChapter = new Array<Array<ImageTextButton>>();
     levelButtons = new Array<ImageTextButton>();
-    backgrounds = new Array<Image>();
+    backgroundDrawables = new Array<Drawable>();
     lockedChapterStyles = new Array<ImageButton.ImageButtonStyle>();
     unlockedChapterStyles = new Array<ImageButton.ImageButtonStyle>();
   }
@@ -79,6 +81,14 @@ public class SelectMode implements Screen {
    */
   public void initUI() {
     final SaveController save = SaveController.getInstance();
+
+    background = new Image();
+    background.setColor(1, 1, 1, 0.75f);
+    background.setAlign(Align.bottomLeft);
+    background.setScaling(Scaling.fillY);
+    background.setWidth(Gdx.graphics.getWidth());
+    background.setHeight(Gdx.graphics.getHeight());
+    stage.addActor(background);
 
     ImageButton home = new ImageButton(Shared.getDrawable("home_icon"));
     home.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -92,6 +102,8 @@ public class SelectMode implements Screen {
   
     for (int i = 0; i < Shared.CHAPTER_NAMES.size; i++) {
       String name = Shared.CHAPTER_NAMES.get(i);
+      backgroundDrawables.add(Shared.getDrawable(name));
+
       ImageButton.ImageButtonStyle unlockedStyle = new ImageButton.ImageButtonStyle();
       unlockedStyle.imageUp = Shared.getDrawable(name + "_unlocked");
       unlockedStyle.imageOver = Shared.getDrawable(name + "_hovered");
@@ -254,6 +266,8 @@ public class SelectMode implements Screen {
         return;
       }
 
+      background.setDrawable(backgroundDrawables.get(chapter));
+      
       for (int i = 0; i < chapterButtons.size; i++) {
         String name = Shared.CHAPTER_NAMES.get(i);
         ImageButton button = chapterButtons.get(i);

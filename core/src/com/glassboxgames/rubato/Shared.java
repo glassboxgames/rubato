@@ -65,6 +65,8 @@ public final class Shared {
 
   /** Shape renderer for overlays */
   public static final ShapeRenderer OVERLAY_RENDERER = new ShapeRenderer();
+  /** Classic teal color */
+  public static final Color TEAL = new Color(0f, 1f, 0.82f, 1f);
 
   /** Sound files */
   public static final String GRASS_RUN_SOUND = "Sounds/Running/Grass.mp3";
