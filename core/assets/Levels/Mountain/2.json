@@ -1,0 +1,302 @@
+{
+"width": 29.8,
+"height": 20.393333,
+"chapter": "mountains",
+"player": {
+	"x": 0.62,
+	"y": 4.5066667
+},
+"enemies": [
+	{
+		"type": "wyrm",
+		"x": 7.3533335,
+		"y": 16.506666
+	},
+	{
+		"type": "blob",
+		"x": 9.8,
+		"y": 4.133333
+	},
+	{
+		"type": "blob",
+		"x": 3,
+		"y": 10.933333
+	},
+	{
+		"type": "blob",
+		"x": 5,
+		"y": 13.666667
+	},
+	{
+		"type": "blob",
+		"x": 10.8,
+		"y": 13.066667
+	},
+	{
+		"type": "blob",
+		"x": 22.666666,
+		"y": 9.866667
+	},
+	{
+		"type": "blob",
+		"x": 25.066668,
+		"y": 11.533334
+	},
+	{
+		"type": "blob",
+		"x": 23.066668,
+		"y": 13.2
+	},
+	{
+		"type": "wisp",
+		"x": 9.166667,
+		"y": 8.453333
+	},
+	{
+		"type": "wisp",
+		"x": 14.1,
+		"y": 12.92
+	},
+	{
+		"type": "spider",
+		"x": 19.466667,
+		"y": 10.1
+	}
+],
+"platforms": [
+	{
+		"type": "mountains_c_tb",
+		"x": 0.33333334,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6666666,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 2.3333333,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3.6666667,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 4.3333335,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 5,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 5.6666665,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 6.3333335,
+		"y": 3.7666667
+	},
+	{
+		"type": "crumbling",
+		"x": 11.933333,
+		"y": 5.4666667
+	},
+	{
+		"type": "crumbling",
+		"x": 12.6,
+		"y": 5.4666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 8.2,
+		"y": 7.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 8.866667,
+		"y": 7.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 9.533334,
+		"y": 7.3
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 7.5333333,
+		"y": 7.3
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 7.5333333,
+		"y": 7.9666667
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 7.5333333,
+		"y": 8.633333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 7.5333333,
+		"y": 9.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 17.666666,
+		"y": 9.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 18.333334,
+		"y": 9.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 19,
+		"y": 9.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 19.666666,
+		"y": 9.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 6.866667,
+		"y": 9.966666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 6.2,
+		"y": 9.966666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 5.5333333,
+		"y": 9.966666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 4.866667,
+		"y": 9.966666
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 7.5333333,
+		"y": 9.966666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 12.2,
+		"y": 11.766666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 12.866667,
+		"y": 11.766666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 13.533334,
+		"y": 11.766666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 14.2,
+		"y": 11.766666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 14.866667,
+		"y": 11.766666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 15.533334,
+		"y": 11.766666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 0.33333334,
+		"y": 12.833333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1,
+		"y": 12.833333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6666666,
+		"y": 12.833333
+	},
+	{
+		"type": "crumbling",
+		"x": 7.8,
+		"y": 13.666667
+	},
+	{
+		"type": "crumbling",
+		"x": 8.466666,
+		"y": 13.666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 25.8,
+		"y": 15.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 26.466667,
+		"y": 15.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 27.133333,
+		"y": 15.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 27.8,
+		"y": 15.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 28.466667,
+		"y": 15.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 29.133333,
+		"y": 15.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 29.8,
+		"y": 15.9
+	}
+],
+"checkpoint": {
+	"x": 0.92,
+	"y": 13.966666
+}
+}

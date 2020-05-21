@@ -45,7 +45,10 @@
   {
     "key": "mountains",
     "maps": [
-      "Levels/test.json",
+      "Levels/Mountain/1.json",
+      "Levels/Mountain/2.json",
+      "levels/Mountain/3.json",
+      "levels/Mountan/4.json",
       "Levels/Completion/mountains.json"
     ],
   },
