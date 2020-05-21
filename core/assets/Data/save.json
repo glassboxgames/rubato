@@ -10,7 +10,7 @@
 	  "attack": "F",
 	  "right": "Right",
 	  "jump": "Space",
-    "reset": "R"
+	  "reset": "R"
   },
   "times": {
 	  "mountains": 0,

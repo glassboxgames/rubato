@@ -23,6 +23,8 @@ public class LevelContainer {
     new ShaderProgram(Gdx.files.internal("Shaders/ripple.vsr"), Gdx.files.internal("Shaders/ripple.fsr"));
   /** Width of the wall fixture */
   private static final float WALL_WIDTH = 0.5f;
+  /** Distance between player and tooltip to trigger drawing */
+  private static final float TOOLTIP_DISTANCE = 3.5f;
 
   /** The dimensions of the level */
   private float width, height;
@@ -36,8 +38,10 @@ public class LevelContainer {
   private Array<Enemy> enemies;
   /** The platforms in this level */
   private Array<Platform> platforms;
-  /** The checkpoint in this level (optional) */
+  /** The checkpoint in this level */
   private Checkpoint checkpoint;
+  /** The tooltips in this level */
+  private Array<Tooltip> tooltips;
   /** The wall definition */
   private BodyDef wallDef;
   /** The walls in this level */
@@ -70,6 +74,12 @@ public class LevelContainer {
       platforms.add(createPlatform(platformData));
     }
     checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
+    tooltips = new Array<Tooltip>();
+    if (data.tooltips != null) {
+      for (TooltipData tooltipData : data.tooltips) {
+        tooltips.add(createTooltip(tooltipData));
+      }
+    }
     wallDef = new BodyDef();
     wallDef.type = BodyDef.BodyType.StaticBody;
     this.completion = completion;
@@ -112,6 +122,21 @@ public class LevelContainer {
   }
 
   /**
+   * Creates and returns a tooltip from a data object.
+   */
+  private static Tooltip createTooltip(TooltipData data) {
+    try {
+      String action = data.type;
+      int type = Tooltip.Type.valueOf(action.toUpperCase()).ordinal();
+      return new Tooltip(data.x, data.y, type, action);
+    } catch (Exception e) {
+      Gdx.app.error("LevelContainer", "Found unknown tooltip type " + data.type, new RuntimeException());
+      Gdx.app.exit();
+      return null;
+    }
+  }
+
+  /**
    * Activates physics for this level.
    */
   public void activatePhysics(World world) {
@@ -123,6 +148,9 @@ public class LevelContainer {
       platform.activatePhysics(world);
     }
     checkpoint.activatePhysics(world);
+    for (Tooltip tooltip : tooltips) {
+      tooltip.activatePhysics(world);
+    }
     FixtureDef def = new FixtureDef();
     def.friction = 0;
     PolygonShape shape = new PolygonShape();
@@ -148,6 +176,9 @@ public class LevelContainer {
       platform.deactivatePhysics(world);
     }
     checkpoint.deactivatePhysics(world);
+    for (Tooltip tooltip : tooltips) {
+      tooltip.deactivatePhysics(world);
+    }
     if (leftWall != null) {
       world.destroyBody(leftWall);
       leftWall = null;
@@ -201,10 +232,17 @@ public class LevelContainer {
   }
 
   /**
-   * Returns the checkpoint in this level, if there is one.
+   * Returns the checkpoint in this level.
    */
   public Checkpoint getCheckpoint() {
     return checkpoint;
+  }
+
+  /**
+   * Returns the tooltips in this level.
+   */
+  public Array<Tooltip> getTooltips() {
+    return tooltips;
   }
 
   /**
@@ -264,6 +302,12 @@ public class LevelContainer {
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
+    for (Tooltip tooltip : tooltips) {
+      SaveController save = SaveController.getInstance();
+      if (save.isDefaultBinding(tooltip.getAction())) {
+        tooltip.draw(canvas);
+      }
+    }
     player.draw(canvas);
     canvas.end();
   }
@@ -273,6 +317,9 @@ public class LevelContainer {
    */
   public void drawDebug(GameCanvas canvas) {
     canvas.beginDebug();
+    for (Tooltip tooltip : tooltips) {
+      tooltip.drawPhysics(canvas);
+    }
     for (Platform platform : platforms) {
       platform.drawPhysics(canvas);
     }

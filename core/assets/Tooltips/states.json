@@ -1,0 +1,14 @@
+[
+  {
+    "path": "Attack/",
+    "loop": false,
+  },
+  {
+    "path": "Jump/",
+    "loop": false,
+  },
+  {
+    "path": "Run/",
+    "loop": false,
+  },
+]

@@ -1,6 +1,7 @@
 package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.serialize.*;
 
 /**
@@ -12,8 +13,19 @@ public class SaveController {
   /** External path to savegame file */
   private static final String EXTERNAL_SAVE_FILE = Shared.EXTERNAL_PATH + "save.json";
 
+  /** Left action */
+  private static final String ACTION_LEFT = "left";
+  /** Right action */
+  private static final String ACTION_RIGHT = "right";
+  /** Jump action */
+  private static final String ACTION_JUMP = "jump";
+  /** Attack action */
+  private static final String ACTION_ATTACK = "attack";
+
   /** Save data cache */
   private SaveData data;
+  /** Save data internal */
+  private SaveData internalData;
 
   /** Singleton instance */
   private static SaveController controller = null;
@@ -38,6 +50,7 @@ public class SaveController {
     } catch (Exception e) {
       data = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(INTERNAL_SAVE_FILE));
     }
+    internalData = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(INTERNAL_SAVE_FILE));
   }
 
   /**
@@ -96,6 +109,15 @@ public class SaveController {
   public void bindKey(String action, String key) {
     data.bindings.put(action, key);
     writeSave();
+  }
+
+  /**
+   * Returns whether the bindings are the default bindings.
+   */
+  public boolean isDefaultBinding(String action) {
+    String defaultKey = internalData.bindings.get(action);
+    String savedKey = data.bindings.get(action);
+    return defaultKey.equals(savedKey);
   }
 
   /**

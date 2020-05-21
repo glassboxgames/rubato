@@ -52,6 +52,10 @@ public class CollisionController implements ContactListener {
         startCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
         startCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Tooltip) {
+        startCollision((Player)o1.entity, o1, (Tooltip)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Tooltip) {
+        startCollision((Player) o2.entity, o2, (Tooltip) o1.entity, o1);
       }
     }
   }
@@ -84,6 +88,10 @@ public class CollisionController implements ContactListener {
         endCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
         endCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Tooltip) {
+        endCollision((Player)o1.entity, o1, (Tooltip)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Tooltip) {
+        endCollision((Player)o2.entity, o2, (Tooltip)o1.entity, o1);
       }
     }
   }
@@ -316,4 +324,24 @@ public class CollisionController implements ContactListener {
    */
   private void endCollision(Player player, Entity.Collider playerCollider,
                             Checkpoint checkpoint, Entity.Collider checkpointCollider) {}
+
+  /**
+   * Handles a collision starting between a player and a tooltip.
+   */
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Tooltip tooltip, Entity.Collider tooltipCollider) {
+    if (playerCollider.isHurtbox() && tooltipCollider.isCenterSensor()) {
+      tooltip.appear();
+    }
+  }
+
+  /**
+   * Handles a collision ending between a player and a tooltip.
+   */
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Tooltip tooltip, Entity.Collider tooltipCollider) {
+    if (playerCollider.isHurtbox() && tooltipCollider.isCenterSensor()) {
+      tooltip.disappear();
+    }
+  }
 }
