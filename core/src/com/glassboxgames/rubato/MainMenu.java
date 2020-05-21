@@ -26,8 +26,6 @@ public class MainMenu implements Screen {
   /** Exit code to quit */
   public static final int EXIT_QUIT = 3;
 
-  /** Button styles */
-  TextButton.TextButtonStyle selectedStyle, deselectedStyle;
   /** Whether this mode is active */
   protected boolean active;
   /** Stage for the menu */
@@ -35,7 +33,7 @@ public class MainMenu implements Screen {
   /** Listener to call when exiting */
   protected ScreenListener listener;
   /** Array of menu buttons */
-  protected Array<TextButton> buttons;
+  protected Array<ImageTextButton> buttons;
   /** Current menu index */
   protected int index;
 
@@ -46,28 +44,30 @@ public class MainMenu implements Screen {
   public MainMenu(ScreenListener listener) {
     this.listener = listener;
     stage = new Stage();
-    buttons = new Array<TextButton>();
+    buttons = new Array<ImageTextButton>();
     index = -1;
   }
 
   /**
    * Adds a menu option at the given index.
    */
-  private void addMenuOption(final int i, String text) {
-    final TextButton button = new TextButton(text, deselectedStyle);
-    button.padRight(90);
-    button.getLabel().setAlignment(Align.right);
+  private void addMenuOption(final int i, String key) {
+    ImageTextButton.ImageTextButtonStyle style = new ImageTextButton.ImageTextButtonStyle();
+    style.imageUp = Shared.getDrawable(key + "_button_deselected");
+    style.imageOver = Shared.getDrawable(key + "_button_selected");
+    style.font = Shared.getFont("main_menu.deselected.ttf");
+    style.fontColor = Color.WHITE;
+    style.overFontColor = Shared.TEAL;
+    ImageTextButton button = new ImageTextButton(key.toUpperCase(), style);
+    button.clearChildren();
+    button.add(button.getImage());
+    button.add(button.getLabel());
+    button.row().align(Align.center + Align.left);
+    button.getImageCell().padRight(30);
+    button.padBottom(20);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
-        chooseOption();
-      }
-
-      public void enter(InputEvent e, float x, float y, int pointer, Actor from) {
-        index = i;
-      }
-
-      public void exit(InputEvent e, float x, float y, int pointer, Actor from) {
-        index = -1;
+        chooseOption(i);
       }
     });
     if (i >= buttons.size) {
@@ -80,42 +80,33 @@ public class MainMenu implements Screen {
    * Initializes the UI for the main menu.
    */
   public void initUI() {
+    Image background = new Image(Shared.getTexture("menu_background"));
+    background.setWidth(Gdx.graphics.getWidth());
+    background.setHeight(Gdx.graphics.getHeight());
+    stage.addActor(background);
+
     Table table = new Table();
     stage.addActor(table);
     table.setFillParent(true);
-    table.right().bottom().padBottom(90);
-
-    selectedStyle = new TextButton.TextButtonStyle();
-    selectedStyle.up = Shared.getDrawable("highlight");
-    selectedStyle.font = Shared.getFont("main_menu.selected.ttf");
-    selectedStyle.fontColor = Color.WHITE;
-    deselectedStyle = new TextButton.TextButtonStyle();
-    deselectedStyle.up = Shared.getDrawable("no_highlight");
-    deselectedStyle.font = Shared.getFont("main_menu.deselected.ttf");
-    deselectedStyle.fontColor = Color.WHITE;
+    table.left().bottom().padLeft(60).padBottom(50);
 
     addMenuOption(EXIT_PLAY, "play");
     addMenuOption(EXIT_EDITOR, "editor");
     addMenuOption(EXIT_SETTINGS, "settings");
     addMenuOption(EXIT_QUIT, "quit");
 
-    HorizontalGroup title = new HorizontalGroup();
-    title.addActor(new Label("rubat", new Label.LabelStyle(Shared.getFont("main_menu.title.ttf"),
-                                                           Color.WHITE)));
-    title.addActor(new Image(Shared.getTexture("adagio_head_icon")));
-    title.space(8).padRight(90).right();
-    table.add(title).right();
+    table.add(new Image(Shared.getTexture("logo"))).padBottom(40).left();
 
-    for (TextButton button : buttons) {
+    for (ImageTextButton button : buttons) {
       table.row();
-      table.add(button).right();
+      table.add(button).left();
     }
   }
 
   /**
-   * Chooses the current menu option.
+   * Chooses the given menu option.
    */
-  private void chooseOption() {
+  private void chooseOption(int index) {
     listener.exitScreen(this, index);
   }
 
@@ -128,10 +119,6 @@ public class MainMenu implements Screen {
       if (input.pressedExit()) {
         listener.exitScreen(this, EXIT_QUIT);
       }
-
-      for (int i = 0; i < buttons.size; i++) {
-        buttons.get(i).setStyle(index == i ? selectedStyle : deselectedStyle);
-      }          
 
       Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

@@ -71,6 +71,12 @@ public class SettingsMode implements Screen {
    * Initializes the settings UI.
    */
   public void initUI() {
+    Image background = new Image(Shared.getTexture("menu_background"));
+    background.setColor(1, 1, 1, 0.55f);
+    background.setWidth(Gdx.graphics.getWidth());
+    background.setHeight(Gdx.graphics.getHeight());
+    stage.addActor(background);
+
     Label.LabelStyle headerStyle = new Label.LabelStyle(Shared.getFont("settings.header.ttf"), Color.WHITE);
     selectedStyle = new TextButton.TextButtonStyle();
     selectedStyle.font = Shared.getFont("settings.selected.ttf");
@@ -99,27 +105,25 @@ public class SettingsMode implements Screen {
 
     Table music = new Table();
     music.add(new Label("music", labelStyle)).left().growX();
-    final Slider musicSlider = new Slider(0f, 1f, 0.01f, false,
+    final Slider musicSlider = new Slider(0f, 1f, 0.004f, false,
                                           new Slider.SliderStyle(Shared.getDrawable("slider_track"),
                                                                  Shared.getDrawable("slider_knob")));
-    musicSlider.setWidth(300);
     // musicSlider.addListener(new ChangeListener() {
     //   public void changed(ChangeEvent e, Actor actor) {
     //     SoundController.getInstance().setVolume(soundSlider.getValue());
     //     SaveController.getInstance()
     //   }
     // });
-    music.add(musicSlider).right();
+    music.add(musicSlider).width(300).right();
     table.add(music).growX().row();
 
     final SaveController saveController = SaveController.getInstance();
 
     Table sound = new Table();
     sound.add(new Label("sfx", labelStyle)).left().growX();
-    final Slider soundSlider = new Slider(0f, 1f, 0.01f, false,
+    final Slider soundSlider = new Slider(0f, 1f, 0.004f, false,
                                           new Slider.SliderStyle(Shared.getDrawable("slider_track"),
                                                                  Shared.getDrawable("slider_knob")));
-    soundSlider.setWidth(300);
     soundSlider.setValue(saveController.getSoundVolume());
     soundSlider.addListener(new ChangeListener() {
       public void changed(ChangeEvent e, Actor actor) {
@@ -127,7 +131,7 @@ public class SettingsMode implements Screen {
         saveController.setSoundVolume(soundSlider.getValue());
       }
     });
-    sound.add(soundSlider).right();
+    sound.add(soundSlider).width(300).right();
     table.add(sound).growX().row();
     
     table.add(new Label("CONTROLS", headerStyle)).padTop(40).left().row();
