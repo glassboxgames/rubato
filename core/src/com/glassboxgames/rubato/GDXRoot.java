@@ -209,8 +209,7 @@ public class GDXRoot extends Game implements ScreenListener {
       }
     } else if (screen == mainMenu) {
       if (exitCode == MainMenu.EXIT_PLAY) {
-        boolean newGame = saveController.getLevelsUnlocked(0) == 0;
-        if (newGame) {
+        if (saveController.getLevelsUnlocked(0) == 0) {
           level = levels.get(levelIndex);
           if (levels.size > 0) {
             saveController.setLevelsUnlocked(chapterIndex, 1);
@@ -313,8 +312,6 @@ public class GDXRoot extends Game implements ScreenListener {
       if (exitCode == SelectMode.EXIT_MENU) {
         setNextScreen(mainMenu);
       } else if (exitCode == SelectMode.EXIT_PLAY) {
-        // TODO: convert pillar index into level index
-        // levelIndex = selectMode.getSelectedCheckpoint();
         setNextScreen(gameMode);
       } else {
         Gdx.app.exit();

@@ -29,6 +29,8 @@ public class GameMode implements Screen {
     INTRO,
     /** While we are playing the game */
     PLAY,
+    /** In the final altar scene */
+    ALTAR,
   }
 
   /** Exit code for returning to the menu */
@@ -60,13 +62,14 @@ public class GameMode implements Screen {
   private static final float GRAVITY = -50f;
   /** Bottom boundary */
   private static final float Y_BOUND = 0.3f;
+
+  /** Array tracking all loaded assets (for unloading purposes) */
+  private Array<String> assets;
   
   /** Whether this screen is in the process of exiting */
   private boolean exiting;
   /** Exit code for when the screen exits */
   private int exitCode;
-  /** Array tracking all loaded assets (for unloading purposes) */
-  private Array<String> assets;
 
   /** Canvas on which to draw content */
   private GameCanvas canvas;
@@ -155,6 +158,7 @@ public class GameMode implements Screen {
     states.addAll(Wisp.initStates());
     states.addAll(Wyrm.initStates());
     states.addAll(Blob.initStates());
+    states.addAll(Altar.initStates());
   }
 
   /**
@@ -190,7 +194,7 @@ public class GameMode implements Screen {
       }
     });
     pauseButton.setX(20);
-    pauseButton.setY(Gdx.graphics.getHeight() - pauseButton.getHeight() - DEV_DRAW_OFFSET);
+    pauseButton.setY(Gdx.graphics.getHeight() - pauseButton.getHeight() - 20);
     gameStage.addActor(pauseButton);
 
     // pause menu
@@ -227,21 +231,22 @@ public class GameMode implements Screen {
     chapterTime = new Label("",
       new Label.LabelStyle(Shared.getFont("game.chapter_time.ttf"), Color.WHITE));
 
-    chapterTable.add(chapterInfo).pad(40,0,10,0).row();
+    chapterTable.add(chapterInfo).pad(40, 0, 10, 0).row();
     chapterTable.add(chapterIcon).row();
-    chapterTable.add(chapterComplete).pad(10,0,0,0).row();
-    chapterTable.add(chapterTime).pad(0,0,10,0).row();
+    chapterTable.add(chapterComplete).pad(10, 0, 0, 0).row();
+    chapterTable.add(chapterTime).pad(0, 0, 10, 0).row();
   }
 
   /**
    * Adds a button to the pause menu.
    */
   private void addPauseButton(final int index, String key) {
-    final ImageButton button =
-      new ImageButton(Shared.getDrawable(key + "_deselected"), null, Shared.getDrawable(key + "_selected"));
+    ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+    style.imageUp = Shared.getDrawable(key + "_deselected");
+    style.imageOver = Shared.getDrawable(key + "_selected");
+    final ImageButton button = new ImageButton(style);
     button.row();
-    button
-      .add(new Label(key, new Label.LabelStyle(Shared.getFont("game.pause_label.ttf"), Color.WHITE)))
+    button.add(new Label(key, new Label.LabelStyle(Shared.getFont("game.pause_label.ttf"), Color.WHITE)))
       .padTop(20);
     button.setWidth(100);
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -260,14 +265,6 @@ public class GameMode implements Screen {
           startExit(EXIT_MENU);
           break;
         }
-      }
-
-      public void enter(InputEvent e, float x, float y, int pointer, Actor from) {
-        button.setChecked(true);
-      }
-
-      public void exit(InputEvent e, float x, float y, int pointer, Actor to) {
-        button.setChecked(false);
       }
     });
     pauseButtonGroup.addActor(button);
@@ -372,7 +369,8 @@ public class GameMode implements Screen {
           soundController.stop(runSound);
         }
       }
-      if (level.getCheckpoint().wasJustActivated()) {
+      Checkpoint checkpoint = level.getCheckpoint();
+      if (checkpoint != null && checkpoint.wasJustActivated()) {
         String checkpointSound = Shared.getSoundPath("checkpoint");
         soundController.play(checkpointSound, checkpointSound, false);
       }
@@ -542,13 +540,22 @@ public class GameMode implements Screen {
         platforms.removeAll(removedPlatforms, true);
         
         Checkpoint checkpoint = level.getCheckpoint();
-        checkpoint.update(delta);
-        if (checkpoint.wasJustActivated()) {
-          if (completion) {
-            setChapterCompletion();
+        if (checkpoint != null) {
+          checkpoint.update(delta);
+          if (checkpoint.wasJustActivated()) {
+            if (completion) {
+              setChapterCompletion();
+            }
+            level.removeRightWall();
+            // listener.exitScreen(this, EXIT_CHECKPOINT);
           }
-          level.removeRightWall();
-          // listener.exitScreen(this, EXIT_CHECKPOINT);
+        }
+
+        Altar altar = level.getAltar();
+        if (altar != null) {
+          if (altar.isPlayerNearby()) {
+            gameState = GameState.ALTAR;
+          }
         }
 
         if (player.isActive()) {
@@ -560,12 +567,15 @@ public class GameMode implements Screen {
         for (Platform platform : level.getPlatforms()) {
           platform.sync();
         }
-        checkpoint.sync();
+        if (checkpoint != null) {
+          checkpoint.sync();
+        }
 
         world.step(delta, 8, 3);
-
         gameStage.act(delta);
       }
+    } else if (gameState == GameState.ALTAR) {
+      // game end logic
     }
 
     updateSound();
@@ -577,7 +587,7 @@ public class GameMode implements Screen {
   private void draw() {
     canvas.clear();
 
-    if (gameState == GameState.PLAY) {
+    if (gameState != GameState.INTRO) {
       level.drawBackground(canvas);
       if (completion) {
         Shared.drawOverlay(0.2f);
@@ -667,7 +677,6 @@ public class GameMode implements Screen {
   @Override
   public void render(float delta) {
     if (active) {
-      // if (Gdx.input.isKeyJustPressed(Input.Keys.D)) 
       update(delta);
       draw();
     }

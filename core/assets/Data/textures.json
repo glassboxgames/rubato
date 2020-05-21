@@ -45,6 +45,7 @@
 
   "player": "Adagio/Idle/0.png",
   "checkpoint": "Checkpoints/Inactive/pillar_off.png",
+  "altar": "Altar/Default/altar.png",
 
   "crumbling": "Platforms/Crumbling/0.png",
 

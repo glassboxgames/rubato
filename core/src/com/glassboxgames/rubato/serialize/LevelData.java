@@ -18,4 +18,6 @@ public class LevelData {
   public Array<PlatformData> platforms;
   /** Checkpoint data, optionally */
   public CheckpointData checkpoint;
+  /** Altar data, optionally */
+  public AltarData altar;
 }

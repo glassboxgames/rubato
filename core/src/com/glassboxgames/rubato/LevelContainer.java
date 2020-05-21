@@ -38,6 +38,9 @@ public class LevelContainer {
   private Array<Platform> platforms;
   /** The checkpoint in this level (optional) */
   private Checkpoint checkpoint;
+  /** The optional altar in this level */
+  private Altar altar;
+
   /** The wall definition */
   private BodyDef wallDef;
   /** The walls in this level */
@@ -69,7 +72,18 @@ public class LevelContainer {
     for (PlatformData platformData : data.platforms) {
       platforms.add(createPlatform(platformData));
     }
-    checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
+    checkpoint = data.checkpoint != null ? new Checkpoint(data.checkpoint.x, data.checkpoint.y) : null;
+    altar = data.altar != null ? new Altar(data.altar.x, data.altar.y) : null;
+    if (checkpoint == null && altar == null) {
+      Gdx.app.error("LevelContainer", "Expected exactly one of checkpoint and altar to be null; got both",
+                    new RuntimeException());
+      Gdx.app.exit();
+    }
+    if (checkpoint != null && altar != null) {
+      Gdx.app.error("LevelContainer", "Expected exactly one of checkpoint and altar to be null; got neither",
+                    new RuntimeException());
+      Gdx.app.exit();
+    }
     wallDef = new BodyDef();
     wallDef.type = BodyDef.BodyType.StaticBody;
     this.completion = completion;
@@ -122,7 +136,12 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.activatePhysics(world);
     }
-    checkpoint.activatePhysics(world);
+    if (checkpoint != null) {
+      checkpoint.activatePhysics(world);
+    }
+    if (altar != null) {
+      altar.activatePhysics(world);
+    }
     FixtureDef def = new FixtureDef();
     def.friction = 0;
     PolygonShape shape = new PolygonShape();
@@ -147,7 +166,12 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.deactivatePhysics(world);
     }
-    checkpoint.deactivatePhysics(world);
+    if (checkpoint != null) {
+      checkpoint.deactivatePhysics(world);
+    }
+    if (altar != null) {
+      altar.deactivatePhysics(world);
+    }
     if (leftWall != null) {
       world.destroyBody(leftWall);
       leftWall = null;
@@ -201,10 +225,17 @@ public class LevelContainer {
   }
 
   /**
-   * Returns the checkpoint in this level, if there is one.
+   * Returns the checkpoint in this level.
    */
   public Checkpoint getCheckpoint() {
     return checkpoint;
+  }
+
+  /**
+   * Returns the altar in this level.
+   */
+  public Altar getAltar() {
+    return altar;
   }
 
   /**
@@ -226,10 +257,11 @@ public class LevelContainer {
                                             - canvas.getCameraPos().x + canvas.getWidth() / 2,
                                             Shared.PPM * player.getPosition().y
                                             - canvas.getCameraPos().y + canvas.getHeight() / 2));
+      Vector2 pos = checkpoint != null ? checkpoint.getPosition() : altar.getPosition();
       RIPPLE_SHADER.setUniformf("u_checkpoint",
-                                new Vector2(Shared.PPM * checkpoint.getPosition().x
+                                new Vector2(Shared.PPM * pos.x
                                             - canvas.getCameraPos().x + canvas.getWidth() / 2,
-                                            Shared.PPM * checkpoint.getPosition().y
+                                            Shared.PPM * pos.y
                                             - canvas.getCameraPos().y + canvas.getHeight() / 2));
       RIPPLE_SHADER.setUniformf("u_frame", checkpoint.isActivated() ? checkpoint.getInternalCount() : 0);
       RIPPLE_SHADER.end();
@@ -260,7 +292,12 @@ public class LevelContainer {
       platform.draw(canvas);
     }
     canvas.removeShader();
-    checkpoint.draw(canvas);
+    if (checkpoint != null) {
+      checkpoint.draw(canvas);
+    }
+    if (altar != null) {
+      altar.draw(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
@@ -276,7 +313,12 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.drawPhysics(canvas);
     }
-    checkpoint.drawPhysics(canvas);
+    if (checkpoint != null) {
+      checkpoint.drawPhysics(canvas);
+    }
+    if (altar != null) {
+      altar.drawPhysics(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.drawPhysics(canvas);
     }
