@@ -13,14 +13,12 @@ public class SaveController {
   /** External path to savegame file */
   private static final String EXTERNAL_SAVE_FILE = Shared.EXTERNAL_PATH + "save.json";
 
-  /** Left action */
-  private static final String ACTION_LEFT = "left";
-  /** Right action */
-  private static final String ACTION_RIGHT = "right";
-  /** Jump action */
-  private static final String ACTION_JUMP = "jump";
-  /** Attack action */
-  private static final String ACTION_ATTACK = "attack";
+  /** Left key */
+  private static final String KEY_LEFT = "left";
+  /** Right key */
+  private static final String KEY_RIGHT = "right";
+  /** Run action */
+  private static final String ACTION_RUN = "run";
 
   /** Save data cache */
   private SaveData data;
@@ -115,9 +113,17 @@ public class SaveController {
    * Returns whether the bindings are the default bindings.
    */
   public boolean isDefaultBinding(String action) {
-    String defaultKey = internalData.bindings.get(action);
-    String savedKey = data.bindings.get(action);
-    return defaultKey.equals(savedKey);
+    if (action.equals(ACTION_RUN)) {
+      String defaultLeft = internalData.bindings.get(KEY_LEFT);
+      String defaultRight = internalData.bindings.get(KEY_RIGHT);
+      String savedLeft = data.bindings.get(KEY_LEFT);
+      String savedRight = data.bindings.get(KEY_RIGHT);
+      return defaultLeft.equals(savedLeft) && defaultRight.equals(savedRight);
+    } else {
+      String defaultKey = internalData.bindings.get(action);
+      String savedKey = data.bindings.get(action);
+      return defaultKey.equals(savedKey);
+    }
   }
 
   /**
