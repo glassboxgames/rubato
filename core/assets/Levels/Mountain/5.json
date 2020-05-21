@@ -1,0 +1,197 @@
+{
+"width": 24.4,
+"height": 12.293333,
+"chapter": "mountains",
+"player": {
+	"x": 0.82,
+	"y": 5.24
+},
+"enemies": [
+	{
+		"type": "blob",
+		"x": 6.266667,
+		"y": 5.6
+	},
+	{
+		"type": "blob",
+		"x": 4.3333335,
+		"y": 2.6
+	},
+	{
+		"type": "blob",
+		"x": 9,
+		"y": 1.2666667
+	},
+	{
+		"type": "blob",
+		"x": 9.066667,
+		"y": 8.2
+	},
+	{
+		"type": "blob",
+		"x": 15.2,
+		"y": 8.533334
+	},
+	{
+		"type": "blob",
+		"x": 13.533334,
+		"y": 2.5333333
+	},
+	{
+		"type": "blob",
+		"x": 15.6,
+		"y": 4.6666665
+	},
+	{
+		"type": "blob",
+		"x": 18.2,
+		"y": 3
+	},
+	{
+		"type": "spider",
+		"x": 6.3333335,
+		"y": 6.3
+	},
+	{
+		"type": "spider",
+		"x": 15.2,
+		"y": 9.166667
+	},
+	{
+		"type": "spider",
+		"x": 18.2,
+		"y": 3.7666667
+	},
+	{
+		"type": "wyrm",
+		"x": 9.02,
+		"y": 2.3066666
+	},
+	{
+		"type": "wyrm",
+		"x": 20.353333,
+		"y": 8.706667
+	},
+	{
+		"type": "wisp",
+		"x": 10.5,
+		"y": 6.2533336
+	}
+],
+"platforms": [
+	{
+		"type": "t_stone_spikes",
+		"x": 16.406666,
+		"y": 0.73333335
+	},
+	{
+		"type": "l_stone_spikes",
+		"x": 17.073334,
+		"y": 1.4666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 16.4,
+		"y": 1.5
+	},
+	{
+		"type": "r_stone_spikes",
+		"x": 15.74,
+		"y": 1.5333333
+	},
+	{
+		"type": "b_stone_spikes",
+		"x": 16.473333,
+		"y": 2.0666666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 21.733334,
+		"y": 3.6333334
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 22.4,
+		"y": 3.6333334
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 23.066668,
+		"y": 3.6333334
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 23.733334,
+		"y": 3.6333334
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 24.4,
+		"y": 3.6333334
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 10.406667,
+		"y": 4.3333335
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 0.33333334,
+		"y": 4.5666666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1,
+		"y": 4.5666666
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6666666,
+		"y": 4.5666666
+	},
+	{
+		"type": "r_stone_spikes",
+		"x": 9.74,
+		"y": 5
+	},
+	{
+		"type": "l_stone_spikes",
+		"x": 11.073334,
+		"y": 5
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 10.4,
+		"y": 5.0333333
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 18.073334,
+		"y": 6.4666667
+	},
+	{
+		"type": "r_stone_spikes",
+		"x": 17.406666,
+		"y": 7.133333
+	},
+	{
+		"type": "l_stone_spikes",
+		"x": 18.74,
+		"y": 7.2
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 18.066668,
+		"y": 7.233333
+	},
+	{
+		"type": "b_stone_spikes",
+		"x": 18.073334,
+		"y": 7.8
+	}
+],
+"checkpoint": {
+	"x": 22.52,
+	"y": 4.7
+}
+}
