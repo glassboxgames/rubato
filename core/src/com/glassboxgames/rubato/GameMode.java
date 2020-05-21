@@ -372,10 +372,6 @@ public class GameMode implements Screen {
           soundController.stop(runSound);
         }
       }
-      if (level.getCheckpoint().wasJustActivated()) {
-        String checkpointSound = Shared.getSoundPath("checkpoint");
-        soundController.play(checkpointSound, checkpointSound, false);
-      }
     }
     soundController.update();
   }

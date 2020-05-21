@@ -163,7 +163,7 @@ public class Player extends Entity {
       }
     } else if (stateIndex != STATE_DEAD) {
       String sound = Shared.getSoundPath("death");
-      // SoundController.getInstance().play(sound, sound, false);
+      SoundController.getInstance().play(sound, sound, false);
       setState(STATE_DEAD);
     }
   }
