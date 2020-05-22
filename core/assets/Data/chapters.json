@@ -25,7 +25,7 @@
       "Levels/Plain/5.json",
       "Levels/Plain/6.json",
       "Levels/Plain/7.json",
-	    "Levels/Plain/8.json",
+      "Levels/Plain/8.json",
       "Levels/Plain/9.json",
       "Levels/Completion/plains.json"
 	  ]
@@ -50,11 +50,11 @@
     "maps": [
       "Levels/Mountain/1.json",
       "Levels/Mountain/2.json",
-      "levels/Mountain/3.json",
-      "levels/Mountain/4.json",
-      "levels/Mountain/5.json",
-      "levels/Mountain/6.json",
-      "Levels/Completion/mountains.json"
+      "Levels/Mountain/3.json",
+      "Levels/Mountain/4.json",
+      "Levels/Mountain/5.json",
+      "Levels/Mountain/6.json",
+      "Levels/Completion/mountains.json",
       "Levels/end.json",
     ],
   },
