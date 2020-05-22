@@ -537,7 +537,7 @@ public class GameMode implements Screen {
       Altar altar = level.getAltar();
       if (altar != null) {
         altar.update(delta);
-        if (altar.isPlayerSeen()) {
+        if (altar.isPlayerSeen() && !editable) {
           gameState = GameState.ALTAR;
         }
       }
