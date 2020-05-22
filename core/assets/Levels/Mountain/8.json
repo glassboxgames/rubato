@@ -1,0 +1,158 @@
+{
+"width": 23.333334,
+"height": 11.726666,
+"chapter": "mountains",
+"player": {
+	"x": 1.1533333,
+	"y": 7.9733334
+},
+"enemies": [
+	{
+		"type": "blob",
+		"x": 9.4,
+		"y": 6
+	},
+	{
+		"type": "blob",
+		"x": 18,
+		"y": 5.866667
+	},
+	{
+		"type": "wisp",
+		"x": 1.9,
+		"y": 5.12
+	},
+	{
+		"type": "wisp",
+		"x": 7.7,
+		"y": 2.92
+	},
+	{
+		"type": "wisp",
+		"x": 14.033334,
+		"y": 5.4533334
+	},
+	{
+		"type": "wisp",
+		"x": 18.166666,
+		"y": 2.5866666
+	},
+	{
+		"type": "wyrm",
+		"x": 7.82,
+		"y": 9.973333
+	},
+	{
+		"type": "wyrm",
+		"x": 13.553333,
+		"y": 9.706667
+	}
+],
+"platforms": [
+	{
+		"type": "mountains_c_tb",
+		"x": 12.2,
+		"y": 1.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 12.866667,
+		"y": 1.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 17.8,
+		"y": 1.3666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 18.466667,
+		"y": 1.3666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 7.2,
+		"y": 1.7
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 7.866667,
+		"y": 1.7
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 2.2666667,
+		"y": 3.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6,
+		"y": 3.9
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 13.666667,
+		"y": 4.233333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 14.333333,
+		"y": 4.233333
+	},
+	{
+		"type": "crumbling",
+		"x": 4.866667,
+		"y": 5.9333334
+	},
+	{
+		"type": "crumbling",
+		"x": 5.5333333,
+		"y": 5.9333334
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 20.666666,
+		"y": 6.633333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 21.333334,
+		"y": 6.633333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 22,
+		"y": 6.633333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 22.666666,
+		"y": 6.633333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 23.333334,
+		"y": 6.633333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 0.33333334,
+		"y": 7.233333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1,
+		"y": 7.233333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6666666,
+		"y": 7.233333
+	}
+],
+"checkpoint": {
+	"x": 12.586667,
+	"y": 2.1666667
+},
+"tooltips": []
+}

@@ -481,7 +481,7 @@
 },
 "tooltips": [
 	{
-		"type": "pause",
+		"type": "pause_card",
 		"x": 6,
 		"y": 6.5
 	}

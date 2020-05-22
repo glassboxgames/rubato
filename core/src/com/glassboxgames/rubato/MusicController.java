@@ -46,6 +46,12 @@ public class MusicController {
     }
   }
 
+  public void stop(String key) {
+    if (key.equals(this.key)) {
+      music.stop();
+    }
+  }
+
   /**
    * Resets the current music volume from the save.
    */

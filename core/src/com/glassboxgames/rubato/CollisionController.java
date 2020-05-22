@@ -321,8 +321,6 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
       if (!checkpoint.isActivated()) {
         checkpoint.activate();
-        String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
-        SoundController.getInstance().play(checkpointSound, checkpointSound, false);
       }
     }
   }
