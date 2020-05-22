@@ -34,7 +34,7 @@ public class Platform extends Entity {
   }
 
   /** Number of frames for a crumbling block to crumble */
-  public static final int CRUMBLING_TIME = 60;
+  public static final int CRUMBLING_TIME = 90;
   
   /** Platform states (with one state per type) */
   public static Array<State> states = null;

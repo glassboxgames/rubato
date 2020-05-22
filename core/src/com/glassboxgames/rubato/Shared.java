@@ -104,7 +104,6 @@ public final class Shared {
       for (String mapPath : chapter.maps) {
         maps.add(JSON.fromJson(LevelData.class, Gdx.files.internal(mapPath)));
       }
-      System.out.println(chapter.maps + "\n" + maps);
       CHAPTER_NAMES.add(chapter.key);
       CHAPTER_LEVELS.add(maps);
     }

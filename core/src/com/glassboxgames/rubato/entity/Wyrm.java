@@ -20,11 +20,11 @@ public class Wyrm extends Enemy {
   /** Drift speed */
   private static final float DRIFT_SPEED = 1f;
   /** Attack cooldown */
-  private static final int ATTACK_COOLDOWN = 60;
+  private static final int ATTACK_COOLDOWN = 105;
   /** Dive speed */
   private static final float DIVE_SPEED = 7f;
   /** Dive duration */
-  private static final int DIVE_DURATION = 60;
+  private static final int DIVE_DURATION = 90;
   /** Max health */
   private static final float MAX_HEALTH = 1f;
 
@@ -62,7 +62,9 @@ public class Wyrm extends Enemy {
    * Stops this wyrm's attack.
    */
   public void cancelAttack() {
-    setState(STATE_IDLE);
+    if (stateIndex == STATE_ATTACK) {
+      setState(STATE_IDLE);
+    }
   }
 
   @Override
