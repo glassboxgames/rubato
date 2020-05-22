@@ -123,16 +123,20 @@ public class SaveController {
    * Returns whether the bindings are the default bindings.
    */
   public boolean isDefaultBinding(String action) {
-    if (action.equals(ACTION_RUN)) {
-      String defaultLeft = internalData.bindings.get(KEY_LEFT);
-      String defaultRight = internalData.bindings.get(KEY_RIGHT);
-      String savedLeft = data.bindings.get(KEY_LEFT);
-      String savedRight = data.bindings.get(KEY_RIGHT);
-      return defaultLeft.equals(savedLeft) && defaultRight.equals(savedRight);
-    } else {
-      String defaultKey = internalData.bindings.get(action);
-      String savedKey = data.bindings.get(action);
-      return defaultKey.equals(savedKey);
+    try {
+      if (action.equals(ACTION_RUN)) {
+        String defaultLeft = internalData.bindings.get(KEY_LEFT);
+        String defaultRight = internalData.bindings.get(KEY_RIGHT);
+        String savedLeft = data.bindings.get(KEY_LEFT);
+        String savedRight = data.bindings.get(KEY_RIGHT);
+        return defaultLeft.equals(savedLeft) && defaultRight.equals(savedRight);
+      } else {
+        String defaultKey = internalData.bindings.get(action);
+        String savedKey = data.bindings.get(action);
+        return defaultKey.equals(savedKey);
+      }
+    } catch (Exception e) { // action is not rebindable
+      return true;
     }
   }
 
