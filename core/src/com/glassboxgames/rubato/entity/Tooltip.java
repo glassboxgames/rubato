@@ -17,7 +17,9 @@ public class Tooltip extends Entity {
   public enum Type {
     ATTACK,
     JUMP,
-    RUN
+    RUN,
+    PAUSE,
+    RESET
   }
 
   /** Number of frames for tooltip to fully appear */

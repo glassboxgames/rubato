@@ -40,8 +40,11 @@ public class LevelContainer {
   private Array<Platform> platforms;
   /** The checkpoint in this level */
   private Checkpoint checkpoint;
+  /** The optional altar in this level */
+  private Altar altar;
   /** The tooltips in this level */
   private Array<Tooltip> tooltips;
+
   /** The wall definition */
   private BodyDef wallDef;
   /** The walls in this level */
@@ -52,12 +55,12 @@ public class LevelContainer {
   /**
    * Instantiates a LevelContainer from a LevelData object.
    * @param data the level data container
-   * @param completion whether this is a chapter completion level
    */
-  public LevelContainer(LevelData data, boolean completion) {
+  public LevelContainer(LevelData data) {
     width = data.width;
     height = data.height;
     chapter = data.chapter;
+    completion = data.completion;
     backgroundLayers = new Array<>();
     for (String key : Shared.TEXTURE_MAP.keys()) {
       if (key.startsWith(chapter + "_layer_")) {
@@ -73,7 +76,18 @@ public class LevelContainer {
     for (PlatformData platformData : data.platforms) {
       platforms.add(createPlatform(platformData));
     }
-    checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
+    checkpoint = data.checkpoint != null ? new Checkpoint(data.checkpoint.x, data.checkpoint.y) : null;
+    altar = data.altar != null ? new Altar(data.altar.x, data.altar.y) : null;
+    if (checkpoint == null && altar == null) {
+      Gdx.app.error("LevelContainer", "Expected exactly one of checkpoint and altar to be null; got both",
+                    new RuntimeException());
+      Gdx.app.exit();
+    }
+    if (checkpoint != null && altar != null) {
+      Gdx.app.error("LevelContainer", "Expected exactly one of checkpoint and altar to be null; got neither",
+                    new RuntimeException());
+      Gdx.app.exit();
+    }
     tooltips = new Array<Tooltip>();
     if (data.tooltips != null) {
       for (TooltipData tooltipData : data.tooltips) {
@@ -82,7 +96,6 @@ public class LevelContainer {
     }
     wallDef = new BodyDef();
     wallDef.type = BodyDef.BodyType.StaticBody;
-    this.completion = completion;
   }
 
   /**
@@ -147,7 +160,12 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.activatePhysics(world);
     }
-    checkpoint.activatePhysics(world);
+    if (checkpoint != null) {
+      checkpoint.activatePhysics(world);
+    }
+    if (altar != null) {
+      altar.activatePhysics(world);
+    }
     for (Tooltip tooltip : tooltips) {
       tooltip.activatePhysics(world);
     }
@@ -175,7 +193,12 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.deactivatePhysics(world);
     }
-    checkpoint.deactivatePhysics(world);
+    if (checkpoint != null) {
+      checkpoint.deactivatePhysics(world);
+    }
+    if (altar != null) {
+      altar.deactivatePhysics(world);
+    }
     for (Tooltip tooltip : tooltips) {
       tooltip.deactivatePhysics(world);
     }
@@ -239,7 +262,21 @@ public class LevelContainer {
   }
 
   /**
-   * Returns the tooltips in this level.
+   * Returns the altar in this level.
+   */
+  public Altar getAltar() {
+    return altar;
+  }
+
+  /**
+   * Returns whether this is a completion level.
+   */
+  public boolean isCompletion() {
+    return completion;
+  }
+
+  /**
+   ** Returns the tooltips in this level.
    */
   public Array<Tooltip> getTooltips() {
     return tooltips;
@@ -256,7 +293,7 @@ public class LevelContainer {
    * Activates the ripple shader for this level.
    */
   private void setRippleShader(GameCanvas canvas) {
-    if (!completion) {
+    if (!completion && altar == null) {
       RIPPLE_SHADER.begin();
       RIPPLE_SHADER.setUniformf("u_max_length", width * Shared.PPM);
       RIPPLE_SHADER.setUniformf("u_adagio",
@@ -298,7 +335,12 @@ public class LevelContainer {
       platform.draw(canvas);
     }
     canvas.removeShader();
-    checkpoint.draw(canvas);
+    if (checkpoint != null) {
+      checkpoint.draw(canvas);
+    }
+    if (altar != null) {
+      altar.draw(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
     }
@@ -323,7 +365,12 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.drawPhysics(canvas);
     }
-    checkpoint.drawPhysics(canvas);
+    if (checkpoint != null) {
+      checkpoint.drawPhysics(canvas);
+    }
+    if (altar != null) {
+      altar.drawPhysics(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.drawPhysics(canvas);
     }

@@ -26,5 +26,9 @@
   {
     "path": "Dead/",
     "loop": false,
+  },
+  {
+    "path": "End/",
+    "loop": false,
   }
 ]

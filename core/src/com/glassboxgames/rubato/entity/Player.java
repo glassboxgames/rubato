@@ -53,6 +53,7 @@ public class Player extends Entity {
   public static final int STATE_JUMP = 4;
   public static final int STATE_ATTACK = 5;
   public static final int STATE_DEAD = 6;
+  public static final int STATE_END = 7;
 
   /** Player states */
   public static Array<State> states = null;
@@ -190,6 +191,13 @@ public class Player extends Entity {
   }
 
   /**
+   * Returns whether the player is invincible from attacking.
+   */
+  public boolean isInvincible() {
+    return !hitboxes.isEmpty();
+  }
+
+  /**
    * Adds an entity to the list of entities underfoot.
    */
   public void addUnderfoot(Entity entity) {
@@ -228,6 +236,13 @@ public class Player extends Entity {
     effect.lifespan = DRAIN_DURATION;
     effect.start();
     drainEffects.add(effect);
+  }
+
+  /**
+   * Starts the player game end animation.
+   */
+  public void startEnd() {
+    setState(STATE_END);
   }
 
   /**

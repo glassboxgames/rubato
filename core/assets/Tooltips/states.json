@@ -11,4 +11,12 @@
     "path": "Run/",
     "loop": false,
   },
+  {
+    "path": "Pause/",
+    "loop": false,
+  },
+  {
+    "path": "Reset/",
+    "loop": false,
+  }
 ]

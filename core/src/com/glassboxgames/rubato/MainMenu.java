@@ -28,15 +28,17 @@ public class MainMenu implements Screen {
   public static final int EXIT_QUIT = 3;
 
   /** Whether this mode is active */
-  protected boolean active;
+  private boolean active;
   /** Stage for the menu */
-  protected Stage stage;
+  private Stage stage;
   /** Listener to call when exiting */
-  protected ScreenListener listener;
+  private ScreenListener listener;
   /** Array of menu buttons */
-  protected Array<ImageTextButton> buttons;
+  private Array<ImageTextButton> buttons;
   /** Current menu index */
-  protected int index;
+  private int index;
+  /** Whether we are exiting this mode */
+  private boolean exiting;
 
   /**
    * Instantiates the main menu controller.
@@ -53,7 +55,7 @@ public class MainMenu implements Screen {
    * Adds a menu option at the given index.
    */
   private void addMenuOption(final int i, String key) {
-    ImageTextButton.ImageTextButtonStyle style = new ImageTextButton.ImageTextButtonStyle();
+    final ImageTextButton.ImageTextButtonStyle style = new ImageTextButton.ImageTextButtonStyle();
     style.imageUp = Shared.getDrawable(key + "_button_deselected");
     style.imageOver = Shared.getDrawable(key + "_button_selected");
     style.font = Shared.getFont("main_menu.deselected.ttf");
@@ -65,22 +67,31 @@ public class MainMenu implements Screen {
     button.add(button.getLabel());
     button.row().align(Align.center + Align.left);
     button.getImageCell().padRight(30);
+    button.getLabel().setFontScale(5f / 6);
     button.padBottom(20);
 
-    final SoundController controller = SoundController.getInstance();
+    final SoundController soundController = SoundController.getInstance();
 
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         chooseOption(i);
         String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
-        controller.play(checkpointSound, checkpointSound, false);
-        controller.update();
+        soundController.play(checkpointSound, checkpointSound, false);
       }
+
       public void enter(InputEvent e, float x, float y, int pointer, Actor fromActor) {
-        if (fromActor != null && !fromActor.isDescendantOf(button)) {
-          String clickSound = Shared.SOUND_PATHS.get("click");
-          controller.play(Integer.toString(i), clickSound, false);
-          controller.update();
+        if (!exiting) {
+          if (fromActor != null && !fromActor.isDescendantOf(button)) {
+            String clickSound = Shared.SOUND_PATHS.get("click");
+            soundController.play(Integer.toString(i), clickSound, false);
+          }
+          button.getLabel().setFontScale(1);
+        }
+      }
+      
+      public void exit(InputEvent e, float x, float y, int pointer, Actor to) {
+        if (!exiting) {
+          button.getLabel().setFontScale(5f / 6);
         }
       }
     });
@@ -121,16 +132,19 @@ public class MainMenu implements Screen {
    * Chooses the given menu option.
    */
   private void chooseOption(int index) {
+    exiting = true;
     listener.exitScreen(this, index);
   }
 
   @Override
   public void render(float delta) {
     if (active) {
+      SoundController.getInstance().update();
       InputController input = InputController.getInstance();
       input.readInput();
       
       if (input.pressedExit()) {
+        exiting = true;
         listener.exitScreen(this, EXIT_QUIT);
       }
 
@@ -154,10 +168,14 @@ public class MainMenu implements Screen {
   public void show() {
     active = true;
     Gdx.input.setInputProcessor(stage);
+    for (ImageTextButton button : buttons) {
+      button.getLabel().setFontScale(5f / 6);
+    }
   }
 
   @Override
   public void hide() {
+    exiting = false;
     active = false;
     Gdx.input.setInputProcessor(null);
     index = -1;

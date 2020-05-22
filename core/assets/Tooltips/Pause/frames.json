@@ -1,0 +1,10 @@
+[
+  {
+    "file": "pause_card.png",
+    "sensors": {
+      "center": [0, 0, 6, 9, 0],
+    },
+    "hitboxes": [],
+    "hurtboxes": [],
+  },
+]
