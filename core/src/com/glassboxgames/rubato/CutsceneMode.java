@@ -83,7 +83,10 @@ public class CutsceneMode implements Screen {
     InputController input = InputController.getInstance();
     input.readInput();
     if (input.pressedExit()) {
-      listener.exitScreen(this, EXIT_COMPLETE);
+      if (!exiting) {
+        exiting = true;
+        listener.exitScreen(this, EXIT_COMPLETE);
+      }
     }
 
     int rate = scrollRate;
@@ -112,7 +115,10 @@ public class CutsceneMode implements Screen {
     } else if (endPauseTime > 0) {
       endPauseTime--;
     } else {
-      listener.exitScreen(this, EXIT_COMPLETE);
+      if (!exiting) {
+        exiting = true;
+        listener.exitScreen(this, EXIT_COMPLETE);
+      }
     }
   }
 
@@ -155,6 +161,7 @@ public class CutsceneMode implements Screen {
 
   @Override
   public void hide() {
+    exiting = false;
     active = false;
   }
 
