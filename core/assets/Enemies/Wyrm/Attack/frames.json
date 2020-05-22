@@ -2,7 +2,7 @@
   {
     "file": "Armature_swim_00.png",
     "sensors": {
-      "vision": [0, 0, 10, 10, 0]
+      "vision": [0, 0, 10, 6, 0]
     },
     "hitboxes": [
       [0.09, 0, 1.54, 0.13, 0]

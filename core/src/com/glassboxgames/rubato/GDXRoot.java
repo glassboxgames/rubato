@@ -255,7 +255,7 @@ public class GDXRoot extends Game implements ScreenListener {
       } else if (exitCode == GameMode.EXIT_COMPLETE) {
         int unlocked = saveController.getLevelsUnlocked(chapterIndex);
         if (levelIndex == unlocked - 1) {
-          if (unlocked < levels.size) {
+          if (unlocked < 10) {
             saveController.setLevelsUnlocked(chapterIndex, unlocked + 1);
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
             unlocked = saveController.getLevelsUnlocked(chapterIndex + 1);
