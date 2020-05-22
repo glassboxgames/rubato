@@ -265,6 +265,7 @@ public class GDXRoot extends Game implements ScreenListener {
             chapterIndex++;
             levels = Shared.CHAPTER_LEVELS.get(chapterIndex);
             level = levels.get(levelIndex);
+            System.out.println(levels + " " + chapterIndex + " " + levelIndex);
             cutsceneMode.setNextCutscene(Shared.CHAPTER_NAMES.get(chapterIndex) + "_cutscene", 60, 1);
           } else {
             level = null;

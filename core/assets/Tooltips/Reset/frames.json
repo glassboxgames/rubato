@@ -2,7 +2,7 @@
   {
     "file": "reset_card.png",
     "sensors": {
-      "center": [0, 0, 6, 9, 0],
+      "center": [0, 0, 6, 14, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],
