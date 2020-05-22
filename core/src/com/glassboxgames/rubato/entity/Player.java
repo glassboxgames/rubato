@@ -191,6 +191,13 @@ public class Player extends Entity {
   }
 
   /**
+   * Returns whether the player is invincible from attacking.
+   */
+  public boolean isInvincible() {
+    return isAttacking() && getCount() < 18;
+  }
+
+  /**
    * Adds an entity to the list of entities underfoot.
    */
   public void addUnderfoot(Entity entity) {
