@@ -157,7 +157,7 @@ public class SelectMode implements Screen {
 
     for (int c = 0; c < Shared.CHAPTER_LEVELS.size; c++) {
       Array<ImageTextButton> buttons = new Array<ImageTextButton>();
-      for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size; l++) {
+      for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size - 1; l++) {
         if (c == Shared.CHAPTER_LEVELS.size - 1 && l == Shared.CHAPTER_LEVELS.get(c).size - 2) {
           continue;
         }
