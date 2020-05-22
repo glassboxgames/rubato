@@ -46,8 +46,7 @@ public class Checkpoint extends Entity {
    * Initializes checkpoint states.
    */
   public static Array<State> initStates() {
-    states = State.readStates("Checkpoints/");
-    return states;
+    return states = State.readStates("Checkpoints/");
   }
 
   /**

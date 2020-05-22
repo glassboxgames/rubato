@@ -1,0 +1,147 @@
+{
+"width": 21.333334,
+"height": 8.986667,
+"chapter": "mountains",
+"player": {
+	"x": 0.35333332,
+	"y": 3.84
+},
+"enemies": [
+	{
+		"type": "wyrm",
+		"x": 14.286667,
+		"y": 6.44
+	}
+],
+"platforms": [
+	{
+		"type": "mountains_c_tb",
+		"x": 0.33333334,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6666666,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 2.3333333,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3.6666667,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 4.3333335,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 5,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 5.6666665,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 6.3333335,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 7,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 7.6666665,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 8.333333,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 9,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 9.666667,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 10.333333,
+		"y": 3.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 16,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 16.666666,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 17.333334,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 18,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 18.666666,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 19.333334,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 20,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 20.666666,
+		"y": 3.1666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 21.333334,
+		"y": 3.1666667
+	}
+],
+"checkpoint": {
+	"x": 21.186666,
+	"y": 4.233333
+}
+}

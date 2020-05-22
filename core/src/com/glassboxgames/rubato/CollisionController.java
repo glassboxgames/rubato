@@ -52,6 +52,14 @@ public class CollisionController implements ContactListener {
         startCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
         startCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Altar) {
+        startCollision((Player)o1.entity, o1, (Altar)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Altar) {
+        startCollision((Player)o2.entity, o2, (Altar)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Tooltip) {
+        startCollision((Player)o1.entity, o1, (Tooltip)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Tooltip) {
+        startCollision((Player) o2.entity, o2, (Tooltip) o1.entity, o1);
       }
     }
   }
@@ -84,6 +92,14 @@ public class CollisionController implements ContactListener {
         endCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
         endCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Altar) {
+        endCollision((Player)o1.entity, o1, (Altar)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Altar) {
+        endCollision((Player)o2.entity, o2, (Altar)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Tooltip) {
+        endCollision((Player)o1.entity, o1, (Tooltip)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Tooltip) {
+        endCollision((Player)o2.entity, o2, (Tooltip)o1.entity, o1);
       }
     }
   }
@@ -122,7 +138,7 @@ public class CollisionController implements ContactListener {
         attack(player, enemy);
       }
     } else if (playerCollider.isHurtbox() && enemyCollider.isHitbox()) {
-      if (!player.isAttacking() && !enemy.isSuspended()) {
+      if (!player.isInvincible() && !enemy.isSuspended()) {
         player.setAlive(false);
       }
     } else if (playerCollider.isGroundSensor() && enemyCollider.isHurtbox()) {
@@ -305,6 +321,8 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
       if (!checkpoint.isActivated()) {
         checkpoint.activate();
+        String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
+        SoundController.getInstance().play(checkpointSound, checkpointSound, false);
       }
     }
   }
@@ -314,4 +332,42 @@ public class CollisionController implements ContactListener {
    */
   private void endCollision(Player player, Entity.Collider playerCollider,
                             Checkpoint checkpoint, Entity.Collider checkpointCollider) {}
+  
+  /**
+   * Handles a collision starting between a player and a altar.
+   */
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Altar altar, Entity.Collider altarCollider) {
+    if (playerCollider.isHurtbox() && altarCollider.isCenterSensor()) {
+      altar.setPlayerClose(true);
+    } else if (playerCollider.isHurtbox() && altarCollider.isVisionSensor()) {
+      altar.setPlayerSeen(true);
+    }
+  }
+  
+  /**
+   * Handles a collision starting between a player and a tooltip.
+   */
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Tooltip tooltip, Entity.Collider tooltipCollider) {
+    if (playerCollider.isHurtbox() && tooltipCollider.isCenterSensor()) {
+      tooltip.appear();
+    }
+  }
+
+  /**
+   * Handles a collision ending between a player and a altar.
+   */
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Altar altar, Entity.Collider altarCollider) {}
+
+  /**
+   * Handles a collision ending between a player and a tooltip.
+   */
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Tooltip tooltip, Entity.Collider tooltipCollider) {
+    if (playerCollider.isHurtbox() && tooltipCollider.isCenterSensor()) {
+      tooltip.disappear();
+    }
+  }
 }

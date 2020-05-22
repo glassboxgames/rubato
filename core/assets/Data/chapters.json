@@ -17,7 +17,7 @@
   },
   {
     "key": "plains",
-	"maps": [
+	  "maps": [
       "Levels/Plain/1.json",
       "Levels/Plain/2.json",
       "Levels/Plain/3.json",
@@ -25,18 +25,21 @@
       "Levels/Plain/5.json",
       "Levels/Plain/6.json",
       "Levels/Plain/7.json",
-	  "Levels/Plain/8.json",
+      "Levels/Plain/8.json",
       "Levels/Plain/9.json",
 	  "Levels/Plain/10.json",
       "Levels/Completion/plains.json"
-	]
+	  ]
   },
   {
     "key": "desert",
     "maps": [
       "Levels/Desert/1.json",
+      "Levels/Desert/2.json",
       "Levels/Desert/3.json",
       "Levels/Desert/4.json",
+      "Levels/Desert/5.json",
+      "Levels/Desert/6.json",
       "Levels/Desert/7.json",
       "Levels/Desert/8.json",
       "Levels/Desert/9.json",
@@ -46,8 +49,14 @@
   {
     "key": "mountains",
     "maps": [
-      "Levels/test.json",
-      "Levels/Completion/mountains.json"
+      "Levels/Mountain/1.json",
+      "Levels/Mountain/2.json",
+      "Levels/Mountain/3.json",
+      "Levels/Mountain/4.json",
+      "Levels/Mountain/5.json",
+      "Levels/Mountain/6.json",
+      "Levels/Completion/mountains.json",
+      "Levels/end.json",
     ],
   },
 ]

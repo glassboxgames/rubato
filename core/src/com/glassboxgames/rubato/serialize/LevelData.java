@@ -16,6 +16,12 @@ public class LevelData {
   public Array<EnemyData> enemies;
   /** Platform data array */
   public Array<PlatformData> platforms;
-  /** Checkpoint data, optionally */
+  /** Checkpoint data */
   public CheckpointData checkpoint;
+  /** Altar data, optionally */
+  public AltarData altar;
+  /** Tooltips data array */
+  public Array<TooltipData> tooltips;
+  /** Whether this level is a completion level */
+  public boolean completion;
 }

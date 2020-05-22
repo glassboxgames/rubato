@@ -1,16 +1,16 @@
 {
   "unlocked": {
-	  "mountains": 10,
-	  "desert": 10,
-	  "forest": 10,
-	  "plains": 10
+	  "mountains": 0,
+	  "desert": 0,
+	  "forest": 0,
+	  "plains": 0
   },
   "bindings": {
 	  "left": "Left",
 	  "attack": "F",
 	  "right": "Right",
 	  "jump": "Space",
-    "reset": "R"
+	  "reset": "R"
   },
   "times": {
 	  "mountains": 0,

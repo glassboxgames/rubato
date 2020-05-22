@@ -2,6 +2,7 @@
 "width": 16,
 "height": 8.986667,
 "chapter": "mountains",
+"completion": true,
 "player": {
 	"x": 0.22,
 	"y": 3.84
@@ -527,5 +528,6 @@
 "checkpoint": {
 	"x": 8.053333,
 	"y": 2.2333333
-}
+},
+"tooltips": []
 }

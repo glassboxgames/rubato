@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.rubato.entity.Tooltip;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
@@ -314,6 +315,11 @@ public class EditorMode implements Screen {
                         data.checkpoint.x * Shared.PPM,
                         data.checkpoint.y * Shared.PPM);
     }
+    if (data.altar != null) {
+      createLevelButton("altar",
+                        data.altar.x * Shared.PPM,
+                        data.altar.y * Shared.PPM);
+    }
     levelStage.getCamera().position.set(Gdx.graphics.getWidth() / 2,
                                         Gdx.graphics.getHeight() / 2,
                                         levelStage.getCamera().position.z);
@@ -341,6 +347,7 @@ public class EditorMode implements Screen {
     data.chapter = chapterName;
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
+    data.tooltips = new Array<TooltipData>();
     for (String key : levelMap.keys()) {
       boolean isEnemy = false;
       for (Array<String> textures : editorGroups.get("Enemies").values()) {
@@ -384,6 +391,11 @@ public class EditorMode implements Screen {
           platform.y = getCenterY(button) / Shared.PPM;
           data.platforms.add(platform);
         }
+      } else if (key.equals("altar")) {
+        ImageButton button = levelMap.get(key).get(0);
+        data.altar = new AltarData();
+        data.altar.x = getCenterX(button) / Shared.PPM;
+        data.altar.y = getCenterY(button) / Shared.PPM;
       }
     }
     data.platforms.sort(new Comparator<PlatformData>() {
@@ -394,7 +406,7 @@ public class EditorMode implements Screen {
     });
 
 
-    float furthestX = data.checkpoint.x;
+    float furthestX = 0;
     float furthestY = Gdx.graphics.getHeight() / 2 / Shared.PPM;
     for (PlatformData platform : data.platforms) {
       furthestX = Math.max(furthestX, platform.x);
@@ -466,8 +478,7 @@ public class EditorMode implements Screen {
    */
   private void playtest() {
     Array<ImageButton> players = levelMap.get("player");
-    Array<ImageButton> checkpoints = levelMap.get("checkpoint");
-    if (players != null && !players.isEmpty() && checkpoints != null && !checkpoints.isEmpty()) {
+    if (players != null && !players.isEmpty()) {
       listener.exitScreen(this, EXIT_TEST);
     }
   }

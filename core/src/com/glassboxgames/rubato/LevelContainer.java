@@ -23,6 +23,8 @@ public class LevelContainer {
     new ShaderProgram(Gdx.files.internal("Shaders/ripple.vsr"), Gdx.files.internal("Shaders/ripple.fsr"));
   /** Width of the wall fixture */
   private static final float WALL_WIDTH = 0.5f;
+  /** Distance between player and tooltip to trigger drawing */
+  private static final float TOOLTIP_DISTANCE = 3.5f;
 
   /** The dimensions of the level */
   private float width, height;
@@ -36,8 +38,13 @@ public class LevelContainer {
   private Array<Enemy> enemies;
   /** The platforms in this level */
   private Array<Platform> platforms;
-  /** The checkpoint in this level (optional) */
+  /** The checkpoint in this level */
   private Checkpoint checkpoint;
+  /** The optional altar in this level */
+  private Altar altar;
+  /** The tooltips in this level */
+  private Array<Tooltip> tooltips;
+
   /** The wall definition */
   private BodyDef wallDef;
   /** The walls in this level */
@@ -48,12 +55,12 @@ public class LevelContainer {
   /**
    * Instantiates a LevelContainer from a LevelData object.
    * @param data the level data container
-   * @param completion whether this is a chapter completion level
    */
-  public LevelContainer(LevelData data, boolean completion) {
+  public LevelContainer(LevelData data) {
     width = data.width;
     height = data.height;
     chapter = data.chapter;
+    completion = data.completion;
     backgroundLayers = new Array<>();
     for (String key : Shared.TEXTURE_MAP.keys()) {
       if (key.startsWith(chapter + "_layer_")) {
@@ -69,10 +76,26 @@ public class LevelContainer {
     for (PlatformData platformData : data.platforms) {
       platforms.add(createPlatform(platformData));
     }
-    checkpoint = new Checkpoint(data.checkpoint.x, data.checkpoint.y);
+    checkpoint = data.checkpoint != null ? new Checkpoint(data.checkpoint.x, data.checkpoint.y) : null;
+    altar = data.altar != null ? new Altar(data.altar.x, data.altar.y) : null;
+    if (checkpoint == null && altar == null) {
+      Gdx.app.error("LevelContainer", "Expected exactly one of checkpoint and altar to be null; got both",
+                    new RuntimeException());
+      Gdx.app.exit();
+    }
+    if (checkpoint != null && altar != null) {
+      Gdx.app.error("LevelContainer", "Expected exactly one of checkpoint and altar to be null; got neither",
+                    new RuntimeException());
+      Gdx.app.exit();
+    }
+    tooltips = new Array<Tooltip>();
+    if (data.tooltips != null) {
+      for (TooltipData tooltipData : data.tooltips) {
+        tooltips.add(createTooltip(tooltipData));
+      }
+    }
     wallDef = new BodyDef();
     wallDef.type = BodyDef.BodyType.StaticBody;
-    this.completion = completion;
   }
 
   /**
@@ -112,6 +135,21 @@ public class LevelContainer {
   }
 
   /**
+   * Creates and returns a tooltip from a data object.
+   */
+  private static Tooltip createTooltip(TooltipData data) {
+    try {
+      String action = data.type;
+      int type = Tooltip.Type.valueOf(action.toUpperCase()).ordinal();
+      return new Tooltip(data.x, data.y, type, action);
+    } catch (Exception e) {
+      Gdx.app.error("LevelContainer", "Found unknown tooltip type " + data.type, new RuntimeException());
+      Gdx.app.exit();
+      return null;
+    }
+  }
+
+  /**
    * Activates physics for this level.
    */
   public void activatePhysics(World world) {
@@ -122,7 +160,15 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.activatePhysics(world);
     }
-    checkpoint.activatePhysics(world);
+    if (checkpoint != null) {
+      checkpoint.activatePhysics(world);
+    }
+    if (altar != null) {
+      altar.activatePhysics(world);
+    }
+    for (Tooltip tooltip : tooltips) {
+      tooltip.activatePhysics(world);
+    }
     FixtureDef def = new FixtureDef();
     def.friction = 0;
     PolygonShape shape = new PolygonShape();
@@ -147,7 +193,15 @@ public class LevelContainer {
     for (Platform platform : platforms) {
       platform.deactivatePhysics(world);
     }
-    checkpoint.deactivatePhysics(world);
+    if (checkpoint != null) {
+      checkpoint.deactivatePhysics(world);
+    }
+    if (altar != null) {
+      altar.deactivatePhysics(world);
+    }
+    for (Tooltip tooltip : tooltips) {
+      tooltip.deactivatePhysics(world);
+    }
     if (leftWall != null) {
       world.destroyBody(leftWall);
       leftWall = null;
@@ -201,10 +255,31 @@ public class LevelContainer {
   }
 
   /**
-   * Returns the checkpoint in this level, if there is one.
+   * Returns the checkpoint in this level.
    */
   public Checkpoint getCheckpoint() {
     return checkpoint;
+  }
+
+  /**
+   * Returns the altar in this level.
+   */
+  public Altar getAltar() {
+    return altar;
+  }
+
+  /**
+   * Returns whether this is a completion level.
+   */
+  public boolean isCompletion() {
+    return completion;
+  }
+
+  /**
+   ** Returns the tooltips in this level.
+   */
+  public Array<Tooltip> getTooltips() {
+    return tooltips;
   }
 
   /**
@@ -218,7 +293,7 @@ public class LevelContainer {
    * Activates the ripple shader for this level.
    */
   private void setRippleShader(GameCanvas canvas) {
-    if (!completion) {
+    if (!completion && altar == null) {
       RIPPLE_SHADER.begin();
       RIPPLE_SHADER.setUniformf("u_max_length", width * Shared.PPM);
       RIPPLE_SHADER.setUniformf("u_adagio",
@@ -260,9 +335,20 @@ public class LevelContainer {
       platform.draw(canvas);
     }
     canvas.removeShader();
-    checkpoint.draw(canvas);
+    if (checkpoint != null) {
+      checkpoint.draw(canvas);
+    }
+    if (altar != null) {
+      altar.draw(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.draw(canvas);
+    }
+    for (Tooltip tooltip : tooltips) {
+      SaveController save = SaveController.getInstance();
+      if (save.isDefaultBinding(tooltip.getAction())) {
+        tooltip.draw(canvas);
+      }
     }
     player.draw(canvas);
     canvas.end();
@@ -273,10 +359,18 @@ public class LevelContainer {
    */
   public void drawDebug(GameCanvas canvas) {
     canvas.beginDebug();
+    for (Tooltip tooltip : tooltips) {
+      tooltip.drawPhysics(canvas);
+    }
     for (Platform platform : platforms) {
       platform.drawPhysics(canvas);
     }
-    checkpoint.drawPhysics(canvas);
+    if (checkpoint != null) {
+      checkpoint.drawPhysics(canvas);
+    }
+    if (altar != null) {
+      altar.drawPhysics(canvas);
+    }
     for (Enemy enemy : enemies) {
       enemy.drawPhysics(canvas);
     }

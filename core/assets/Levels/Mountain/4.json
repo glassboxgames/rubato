@@ -1,0 +1,182 @@
+{
+"width": 28.8,
+"height": 12.926666,
+"chapter": "mountains",
+"player": {
+	"x": 1.1533333,
+	"y": 4.04
+},
+"enemies": [
+	{
+		"type": "wyrm",
+		"x": 13.42,
+		"y": 4.04
+	},
+	{
+		"type": "wyrm",
+		"x": 0.75333333,
+		"y": 12.506667
+	},
+	{
+		"type": "wyrm",
+		"x": 22.353333,
+		"y": 3.5733333
+	},
+	{
+		"type": "blob",
+		"x": 4.3333335,
+		"y": 8.2
+	},
+	{
+		"type": "blob",
+		"x": 7.4666667,
+		"y": 8.733334
+	},
+	{
+		"type": "blob",
+		"x": 11.266666,
+		"y": 9
+	},
+	{
+		"type": "wisp",
+		"x": 11.1,
+		"y": 6.32
+	},
+	{
+		"type": "wisp",
+		"x": 18.766666,
+		"y": 6.5866666
+	}
+],
+"platforms": [
+	{
+		"type": "mountains_c_tb",
+		"x": 0.33333334,
+		"y": 3.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1,
+		"y": 3.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.6666666,
+		"y": 3.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 2.3333333,
+		"y": 3.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3,
+		"y": 3.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3.6666667,
+		"y": 3.3
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 26.133333,
+		"y": 4.0333333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 26.8,
+		"y": 4.0333333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 27.466667,
+		"y": 4.0333333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 28.133333,
+		"y": 4.0333333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 28.8,
+		"y": 4.0333333
+	},
+	{
+		"type": "crumbling",
+		"x": 5.866667,
+		"y": 4.6
+	},
+	{
+		"type": "crumbling",
+		"x": 6.5333333,
+		"y": 4.6
+	},
+	{
+		"type": "crumbling",
+		"x": 7.2,
+		"y": 4.6
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 10.933333,
+		"y": 5.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 11.6,
+		"y": 5.1
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 18.333334,
+		"y": 5.366667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 19,
+		"y": 5.366667
+	},
+	{
+		"type": "crumbling",
+		"x": 13.133333,
+		"y": 7.4666667
+	},
+	{
+		"type": "crumbling",
+		"x": 13.8,
+		"y": 7.4666667
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 2.4666667,
+		"y": 8.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.1333333,
+		"y": 8.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 0.46666667,
+		"y": 8.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 1.8,
+		"y": 8.433333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 3.1333334,
+		"y": 8.433333
+	}
+],
+"checkpoint": {
+	"x": 1.52,
+	"y": 9.566667
+}
+}
