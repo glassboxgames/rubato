@@ -340,6 +340,31 @@
 		"y": 0.96666664
 	},
 	{
+		"type": "b_stone_spikes",
+		"x": 36.873333,
+		"y": 1.1333333
+	},
+	{
+		"type": "b_stone_spikes",
+		"x": 37.54,
+		"y": 1.1333333
+	},
+	{
+		"type": "b_stone_spikes",
+		"x": 38.206665,
+		"y": 1.1333333
+	},
+	{
+		"type": "b_stone_spikes",
+		"x": 38.873333,
+		"y": 1.1333333
+	},
+	{
+		"type": "b_stone_spikes",
+		"x": 39.273335,
+		"y": 1.1333333
+	},
+	{
 		"type": "desert_c_m",
 		"x": 36.066666,
 		"y": 1.2333333
@@ -378,6 +403,16 @@
 		"type": "crumbling",
 		"x": 32.133335,
 		"y": 1.5333333
+	},
+	{
+		"type": "l_stone_spikes",
+		"x": 36.873333,
+		"y": 1.6666666
+	},
+	{
+		"type": "r_stone_spikes",
+		"x": 39.273335,
+		"y": 1.7333333
 	},
 	{
 		"type": "desert_c_m",
@@ -422,6 +457,31 @@
 	{
 		"type": "crumbling",
 		"x": 32.8,
+		"y": 2.2
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 36.873333,
+		"y": 2.2
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 37.54,
+		"y": 2.2
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 38.206665,
+		"y": 2.2
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 38.873333,
+		"y": 2.2
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 39.273335,
 		"y": 2.2
 	},
 	{
