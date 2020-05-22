@@ -18,7 +18,7 @@ public class Spider extends Enemy {
   /** Max horizontal speed */
   private static final float MAX_X_SPEED = 1f;
   /** Max vertical speed */
-  private static final float MAX_Y_SPEED = 9f;
+  private static final float MAX_Y_SPEED = 8f;
   /** Max health */
   private static final float MAX_HEALTH = 1f;
   /** Attack launch impulse */

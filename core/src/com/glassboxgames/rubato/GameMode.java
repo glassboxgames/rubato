@@ -305,7 +305,8 @@ public class GameMode implements Screen {
     editable = nextEditable;
     level = new LevelContainer(nextData);
     chapterInfo.setVisible(false);
-    chapterIcon.setDrawable(Shared.getDrawable(level.getChapter() + "_plain"));
+    String chapter = level.getChapter();
+    chapterIcon.setDrawable(Shared.getDrawable(chapter + "_plain"));
     chapterComplete.setVisible(false);
     chapterTime.setVisible(false);
 
@@ -313,6 +314,8 @@ public class GameMode implements Screen {
     exiting = false;
     resumeGame();
     startTime = TimeUtils.millis();
+
+    MusicController.getInstance().play(chapter);
   }
 
   /**

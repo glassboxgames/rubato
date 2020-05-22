@@ -81,10 +81,6 @@ public class MainMenu implements Screen {
 
       public void enter(InputEvent e, float x, float y, int pointer, Actor fromActor) {
         if (!exiting) {
-          if (fromActor != null && !fromActor.isDescendantOf(button)) {
-            String clickSound = Shared.SOUND_PATHS.get("click");
-            soundController.play(Integer.toString(i), clickSound, false);
-          }
           button.getLabel().setFontScale(1);
         }
       }
@@ -171,6 +167,7 @@ public class MainMenu implements Screen {
     for (ImageTextButton button : buttons) {
       button.getLabel().setFontScale(5f / 6);
     }
+    MusicController.getInstance().play("adagio");
   }
 
   @Override

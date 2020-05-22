@@ -15,7 +15,7 @@ public class Player extends Entity {
   public static final float MAX_X_SPEED = 4f;
   public static float maxXSpeed = MAX_X_SPEED;
   /** Max vertical speed */
-  public static final float MAX_Y_SPEED = 9f;
+  public static final float MAX_Y_SPEED = 8f;
   public static float maxYSpeed = MAX_Y_SPEED;
   /** Movement impulse */
   public static final float MOVE_IMPULSE = 1f;
@@ -194,7 +194,7 @@ public class Player extends Entity {
    * Returns whether the player is invincible from attacking.
    */
   public boolean isInvincible() {
-    return isAttacking() && getCount() < 18;
+    return !hitboxes.isEmpty();
   }
 
   /**

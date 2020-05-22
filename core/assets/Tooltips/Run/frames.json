@@ -1,6 +1,6 @@
 [
   {
-    "file": "card.png",
+    "file": "run_card.png",
     "sensors": {
       "center": [0, 0, 6, 9, 0],
     },

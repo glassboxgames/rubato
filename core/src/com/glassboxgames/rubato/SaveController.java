@@ -172,4 +172,19 @@ public class SaveController {
   public float getSoundVolume() {
     return data.sound;
   }
+
+  /**
+   * Sets the music volume.
+   */
+  public void setMusicVolume(float volume) {
+    data.music = volume;
+    writeSave();
+  }
+
+  /**
+   * Returns the music volume.
+   */
+  public float getMusicVolume() {
+    return data.music;
+  }
 }
