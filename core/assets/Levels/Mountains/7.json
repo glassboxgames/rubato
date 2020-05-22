@@ -39,11 +39,6 @@
 	},
 	{
 		"type": "blob",
-		"x": 3,
-		"y": 4.6
-	},
-	{
-		"type": "blob",
 		"x": 19.466667,
 		"y": 4
 	},
@@ -51,6 +46,11 @@
 		"type": "blob",
 		"x": 21.866667,
 		"y": 3.8
+	},
+	{
+		"type": "blob",
+		"x": 3.1333334,
+		"y": 4.6666665
 	},
 	{
 		"type": "wisp",
@@ -64,6 +64,81 @@
 	}
 ],
 "platforms": [
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 0.23333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 0.23333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 0.23333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 0.23333333
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7333333,
+		"y": 0.23333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 0.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 0.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 0.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 0.9
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7333333,
+		"y": 0.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7333333,
+		"y": 1.5666667
+	},
 	{
 		"type": "mountains_c_tb",
 		"x": 16.4,
@@ -80,8 +155,103 @@
 		"y": 2.0333333
 	},
 	{
+		"type": "mountains_r_tb",
+		"x": 17.5,
+		"y": 2.0333333
+	},
+	{
+		"type": "mountains_l_tb",
+		"x": 15.3,
+		"y": 2.0333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 2.2333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 2.2333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 2.2333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 2.2333333
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7333333,
+		"y": 2.2333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 2.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 2.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 2.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 2.9
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7333333,
+		"y": 2.9
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 3.5666666
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 3.5666666
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 3.5666666
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 3.5666666
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7666667,
+		"y": 3.5666666
+	},
+	{
 		"type": "mountains_c_tb",
 		"x": 12.266666,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_r_tb",
+		"x": 12.7,
+		"y": 3.7666667
+	},
+	{
+		"type": "mountains_l_tb",
+		"x": 11.833333,
 		"y": 3.7666667
 	},
 	{
@@ -105,24 +275,64 @@
 		"y": 3.8333333
 	},
 	{
+		"type": "mountains_l_tb",
+		"x": 25.1,
+		"y": 3.8333333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 0.33333334,
+		"y": 4.233333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1,
+		"y": 4.233333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 1.6666666,
+		"y": 4.233333
+	},
+	{
+		"type": "mountains_c_m",
+		"x": 2.3333333,
+		"y": 4.233333
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 2.7333333,
+		"y": 4.233333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 11.533334,
+		"y": 4.4333334
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": 10.866667,
+		"y": 4.4333334
+	},
+	{
+		"type": "mountains_r_tb",
+		"x": 11.933333,
+		"y": 4.4333334
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 10.2,
+		"y": 4.4333334
+	},
+	{
+		"type": "mountains_l_b",
+		"x": 9.866667,
+		"y": 4.4333334
+	},
+	{
 		"type": "b_stone_spikes",
-		"x": 12.273334,
-		"y": 4.4
-	},
-	{
-		"type": "mountains_c_t",
-		"x": 10.266666,
-		"y": 4.4333334
-	},
-	{
-		"type": "mountains_c_t",
-		"x": 10.933333,
-		"y": 4.4333334
-	},
-	{
-		"type": "mountains_c_t",
-		"x": 11.6,
-		"y": 4.4333334
+		"x": 12.406667,
+		"y": 4.4666667
 	},
 	{
 		"type": "crumbling",
@@ -135,24 +345,34 @@
 		"y": 4.6
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 0.33333334,
+		"type": "mountains_c_t",
+		"x": 2.3333333,
 		"y": 4.9
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 1,
-		"y": 4.9
-	},
-	{
-		"type": "mountains_c_tb",
+		"type": "mountains_c_t",
 		"x": 1.6666666,
 		"y": 4.9
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 2.3333333,
+		"type": "mountains_c_t",
+		"x": 1,
 		"y": 4.9
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 0.33333334,
+		"y": 4.9
+	},
+	{
+		"type": "mountains_r_t",
+		"x": 2.7666667,
+		"y": 4.9
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 10.666667,
+		"y": 5.1
 	},
 	{
 		"type": "mountains_c_t",
@@ -160,13 +380,38 @@
 		"y": 5.1
 	},
 	{
-		"type": "mountains_c_t",
-		"x": 10.266666,
+		"type": "mountains_l_m",
+		"x": 9.866667,
+		"y": 5.1
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 10.666667,
 		"y": 5.766667
 	},
 	{
 		"type": "mountains_c_t",
 		"x": 10.266666,
+		"y": 5.766667
+	},
+	{
+		"type": "mountains_l_m",
+		"x": 9.866667,
+		"y": 5.766667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 10.266666,
+		"y": 6.4333334
+	},
+	{
+		"type": "mountains_r_t",
+		"x": 10.666667,
+		"y": 6.4333334
+	},
+	{
+		"type": "mountains_l_t",
+		"x": 9.866667,
 		"y": 6.4333334
 	},
 	{
@@ -190,24 +435,39 @@
 		"y": 6.5666666
 	},
 	{
+		"type": "mountains_r_tb",
+		"x": 18.233334,
+		"y": 6.5666666
+	},
+	{
+		"type": "t_stone_spikes",
+		"x": 12.273334,
+		"y": 7
+	},
+	{
 		"type": "t_stone_spikes",
 		"x": 11.606667,
 		"y": 7
 	},
 	{
-		"type": "t_stone_spikes",
-		"x": 12.206667,
-		"y": 7
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 7.1
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 11,
+		"y": 7.1
+	},
+	{
+		"type": "mountains_l_b",
+		"x": 10.566667,
+		"y": 7.1
 	},
 	{
 		"type": "b_stone_spikes",
-		"x": 10.273334,
-		"y": 7.0666666
-	},
-	{
-		"type": "mountains_c_t",
-		"x": 10.933333,
-		"y": 7.1
+		"x": 10.14,
+		"y": 7.133333
 	},
 	{
 		"type": "mountains_c_t",
@@ -215,9 +475,19 @@
 		"y": 7.233333
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 11.6,
-		"y": 7.766667
+		"type": "mountains_l_m",
+		"x": 16.1,
+		"y": 7.233333
+	},
+	{
+		"type": "mountains_l_t",
+		"x": 10.566667,
+		"y": 7.7
+	},
+	{
+		"type": "mountains_l_t",
+		"x": 10.566667,
+		"y": 7.7
 	},
 	{
 		"type": "mountains_c_tb",
@@ -225,14 +495,44 @@
 		"y": 7.766667
 	},
 	{
-		"type": "mountains_c_t",
-		"x": 10.933333,
+		"type": "mountains_c_tb",
+		"x": 11.6,
 		"y": 7.766667
+	},
+	{
+		"type": "mountains_r_tb",
+		"x": 12.7,
+		"y": 7.766667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 11,
+		"y": 7.766667
+	},
+	{
+		"type": "mountains_l_t",
+		"x": 10.566667,
+		"y": 7.766667
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 7.8333335
 	},
 	{
 		"type": "mountains_c_t",
 		"x": 16.466667,
 		"y": 7.9
+	},
+	{
+		"type": "mountains_l_m",
+		"x": 16.1,
+		"y": 7.9
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 8.366667
 	},
 	{
 		"type": "b_stone_spikes",
@@ -246,12 +546,17 @@
 	},
 	{
 		"type": "b_stone_spikes",
-		"x": 12.14,
+		"x": 12.206667,
 		"y": 8.4
 	},
 	{
 		"type": "mountains_c_t",
 		"x": 16.466667,
+		"y": 8.566667
+	},
+	{
+		"type": "mountains_l_m",
+		"x": 16.1,
 		"y": 8.566667
 	},
 	{
@@ -270,9 +575,24 @@
 		"y": 9.066667
 	},
 	{
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 9.1
+	},
+	{
+		"type": "mountains_l_m",
+		"x": 16.1,
+		"y": 9.1
+	},
+	{
 		"type": "mountains_c_t",
 		"x": 16.466667,
 		"y": 9.166667
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 9.633333
 	},
 	{
 		"type": "mountains_c_t",
@@ -280,13 +600,38 @@
 		"y": 9.833333
 	},
 	{
+		"type": "mountains_l_m",
+		"x": 16.1,
+		"y": 9.833333
+	},
+	{
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 10.433333
+	},
+	{
+		"type": "mountains_l_m",
+		"x": 16.1,
+		"y": 10.433333
+	},
+	{
 		"type": "mountains_c_t",
 		"x": 16.466667,
 		"y": 10.5
 	},
 	{
+		"type": "mountains_r_m",
+		"x": 16.833334,
+		"y": 11.033334
+	},
+	{
 		"type": "mountains_c_t",
 		"x": 16.466667,
+		"y": 11.166667
+	},
+	{
+		"type": "mountains_l_m",
+		"x": 16.1,
 		"y": 11.166667
 	},
 	{
@@ -401,11 +746,6 @@
 	},
 	{
 		"type": "mountains_c_tb",
-		"x": 0.46666667,
-		"y": 11.833333
-	},
-	{
-		"type": "mountains_c_tb",
 		"x": 15.8,
 		"y": 11.833333
 	},
@@ -445,14 +785,29 @@
 		"y": 11.833333
 	},
 	{
+		"type": "mountains_c_tb",
+		"x": 0.46666667,
+		"y": 11.833333
+	},
+	{
+		"type": "mountains_c_tb",
+		"x": -0.2,
+		"y": 11.833333
+	},
+	{
+		"type": "mountains_r_tb",
+		"x": 21.533333,
+		"y": 11.833333
+	},
+	{
 		"type": "mountains_c_t",
 		"x": 16.466667,
 		"y": 11.833333
 	}
 ],
 "checkpoint": {
-	"x": 10.986667,
-	"y": 5.5
+	"x": 11.32,
+	"y": 5.5666666
 },
 "tooltips": []
 }
