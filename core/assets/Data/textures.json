@@ -46,6 +46,12 @@
   "checkpoint": "Checkpoints/Inactive/pillar_off.png",
   "altar": "Altar/Default/altar.png",
 
+  "attack_card": "Tooltips/Attack/attack_card.png",
+  "jump_card": "Tooltips/Jump/jump_card.png",
+  "run_card": "Tooltips/Run/run_card.png",
+  "pause_card": "Tooltips/Pause/pause_card.png",
+  "reset_card": "Tooltips/Reset/reset_card.png",
+
   "crumbling": "Platforms/Crumbling/0.png",
 
   "forest_c_t": "Platforms/Forest/c/t/0.png",

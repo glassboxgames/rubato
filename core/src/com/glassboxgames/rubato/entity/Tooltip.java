@@ -15,11 +15,11 @@ public class Tooltip extends Entity {
    * Type enum
    */
   public enum Type {
-    ATTACK,
-    JUMP,
-    RUN,
-    PAUSE,
-    RESET
+    ATTACK_CARD,
+    JUMP_CARD,
+    RUN_CARD,
+    PAUSE_CARD,
+    RESET_CARD
   }
 
   /** Number of frames for tooltip to fully appear */

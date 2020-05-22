@@ -320,6 +320,13 @@ public class EditorMode implements Screen {
                         data.checkpoint.x * Shared.PPM,
                         data.checkpoint.y * Shared.PPM);
     }
+    if (data.tooltips != null) {
+      for (TooltipData tooltipData : data.tooltips) {
+        createLevelButton(tooltipData.type,
+                          tooltipData.x * Shared.PPM,
+                          tooltipData.y * Shared.PPM);
+      }
+    }
     if (data.altar != null) {
       createLevelButton("altar",
                         data.altar.x * Shared.PPM,
@@ -352,6 +359,7 @@ public class EditorMode implements Screen {
     data.chapter = chapterName;
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
+    data.tooltips = new Array<TooltipData>();
     for (String key : levelMap.keys()) {
       boolean isEnemy = false;
       for (Array<String> textures : editorGroups.get("Enemies").values()) {
@@ -394,6 +402,15 @@ public class EditorMode implements Screen {
           platform.x = getCenterX(button) / Shared.PPM;
           platform.y = getCenterY(button) / Shared.PPM;
           data.platforms.add(platform);
+        }
+      } else if (key.equals("attack_card") || key.equals("jump_card") || key.equals("run_card") ||
+                 key.equals("pause_card") || key.equals("reset_card")) {
+        for (ImageButton button : levelMap.get(key)) {
+          TooltipData tooltip = new TooltipData();
+          tooltip.type = key;
+          tooltip.x = getCenterX(button) / Shared.PPM;
+          tooltip.y = getCenterY(button) / Shared.PPM;
+          data.tooltips.add(tooltip);
         }
       } else if (key.equals("altar")) {
         ImageButton button = levelMap.get(key).get(0);
