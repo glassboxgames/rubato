@@ -1,6 +1,6 @@
 {
-"width": 24.4,
-"height": 12.293333,
+"width": 23.8,
+"height": 13.526667,
 "chapter": "mountains",
 "player": {
 	"x": 0.82,
@@ -8,69 +8,19 @@
 },
 "enemies": [
 	{
-		"type": "blob",
-		"x": 6.266667,
-		"y": 5.6
-	},
-	{
-		"type": "blob",
-		"x": 4.3333335,
-		"y": 2.6
-	},
-	{
-		"type": "blob",
-		"x": 9,
-		"y": 1.2666667
-	},
-	{
-		"type": "blob",
-		"x": 9.066667,
-		"y": 8.2
-	},
-	{
-		"type": "blob",
-		"x": 15.2,
-		"y": 8.533334
-	},
-	{
-		"type": "blob",
-		"x": 13.533334,
-		"y": 2.5333333
-	},
-	{
-		"type": "blob",
-		"x": 15.6,
-		"y": 4.6666665
-	},
-	{
-		"type": "blob",
-		"x": 18.2,
-		"y": 3
-	},
-	{
-		"type": "spider",
-		"x": 6.3333335,
-		"y": 6.3
-	},
-	{
-		"type": "spider",
-		"x": 15.2,
-		"y": 9.166667
-	},
-	{
-		"type": "spider",
-		"x": 18.2,
-		"y": 3.7666667
+		"type": "wyrm",
+		"x": 10.486667,
+		"y": 9.173333
 	},
 	{
 		"type": "wyrm",
-		"x": 9.02,
-		"y": 2.3066666
+		"x": 16.086666,
+		"y": 2.9733334
 	},
 	{
 		"type": "wyrm",
-		"x": 20.353333,
-		"y": 8.706667
+		"x": 20.82,
+		"y": 6.7066665
 	},
 	{
 		"type": "wisp",
@@ -105,29 +55,84 @@
 		"y": 2.0666666
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 21.733334,
+		"type": "mountains_c_b",
+		"x": 21.8,
+		"y": 2.9666667
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 22.466667,
+		"y": 2.9666667
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 23.133333,
+		"y": 2.9666667
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 23.8,
+		"y": 2.9666667
+	},
+	{
+		"type": "mountains_l_b",
+		"x": 21.4,
+		"y": 2.9666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 21.8,
 		"y": 3.6333334
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 22.4,
+		"type": "mountains_c_t",
+		"x": 22.466667,
 		"y": 3.6333334
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 23.066668,
+		"type": "mountains_c_t",
+		"x": 23.133333,
 		"y": 3.6333334
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 23.733334,
+		"type": "mountains_c_t",
+		"x": 23.8,
 		"y": 3.6333334
 	},
 	{
-		"type": "mountains_c_tb",
-		"x": 24.4,
+		"type": "mountains_l_t",
+		"x": 21.4,
 		"y": 3.6333334
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 0.33333334,
+		"y": 3.8333333
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 1,
+		"y": 3.8333333
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 1.6666666,
+		"y": 3.8333333
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 2.3333333,
+		"y": 3.8333333
+	},
+	{
+		"type": "mountains_c_b",
+		"x": 3,
+		"y": 3.8333333
+	},
+	{
+		"type": "mountains_r_b",
+		"x": 3.4333334,
+		"y": 3.8333333
 	},
 	{
 		"type": "t_stone_spikes",
@@ -135,28 +140,43 @@
 		"y": 4.3333335
 	},
 	{
-		"type": "mountains_c_tb",
+		"type": "mountains_c_t",
 		"x": 0.33333334,
-		"y": 4.5666666
+		"y": 4.5
 	},
 	{
-		"type": "mountains_c_tb",
+		"type": "mountains_c_t",
 		"x": 1,
-		"y": 4.5666666
+		"y": 4.5
 	},
 	{
-		"type": "mountains_c_tb",
+		"type": "mountains_c_t",
 		"x": 1.6666666,
-		"y": 4.5666666
+		"y": 4.5
 	},
 	{
-		"type": "r_stone_spikes",
-		"x": 9.74,
-		"y": 5
+		"type": "mountains_c_t",
+		"x": 2.3333333,
+		"y": 4.5
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 3,
+		"y": 4.5
+	},
+	{
+		"type": "mountains_r_t",
+		"x": 3.4333334,
+		"y": 4.5
 	},
 	{
 		"type": "l_stone_spikes",
 		"x": 11.073334,
+		"y": 5
+	},
+	{
+		"type": "r_stone_spikes",
+		"x": 9.74,
 		"y": 5
 	},
 	{
@@ -166,32 +186,28 @@
 	},
 	{
 		"type": "t_stone_spikes",
-		"x": 18.073334,
-		"y": 6.4666667
-	},
-	{
-		"type": "r_stone_spikes",
-		"x": 17.406666,
-		"y": 7.133333
+		"x": 16.406666,
+		"y": 8.333333
 	},
 	{
 		"type": "l_stone_spikes",
-		"x": 18.74,
-		"y": 7.2
+		"x": 17.066668,
+		"y": 8.94
+	},
+	{
+		"type": "r_stone_spikes",
+		"x": 15.733334,
+		"y": 8.94
 	},
 	{
 		"type": "mountains_c_tb",
-		"x": 18.066668,
-		"y": 7.233333
-	},
-	{
-		"type": "b_stone_spikes",
-		"x": 18.073334,
-		"y": 7.8
+		"x": 16.4,
+		"y": 9.033334
 	}
 ],
 "checkpoint": {
-	"x": 22.52,
-	"y": 4.7
-}
+	"x": 23.253334,
+	"y": 4.766667
+},
+"tooltips": []
 }
