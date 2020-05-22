@@ -253,11 +253,11 @@ public abstract class Entity {
     sensors.clear();
 
     State state = getState();
-    for (FixtureDef def : state.getHitboxDefs(getCount())) {
-      hitboxes.add(createCollider(def, Collider.Type.HITBOX));
-    }
     for (FixtureDef def : state.getHurtboxDefs(getCount())) {
       hurtboxes.add(createCollider(def, Collider.Type.HURTBOX));
+    }
+    for (FixtureDef def : state.getHitboxDefs(getCount())) {
+      hitboxes.add(createCollider(def, Collider.Type.HITBOX));
     }
     ObjectMap<String, FixtureDef> sensorDefs = state.getSensorDefs(getCount());
     for (String name : sensorDefs.keys()) {

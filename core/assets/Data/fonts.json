@@ -1,6 +1,6 @@
 {
   "main_menu.title.ttf": [1, 96, 8],
-  "main_menu.deselected.ttf": [2, 24, 8],
+  "main_menu.deselected.ttf": [2, 30, 8],
 
   "editor.header.ttf": [2, 14, 6],
   "editor.item.ttf": [0, 18, 0],
@@ -14,8 +14,12 @@
   "game.chapter_time.ttf": [0, 48, 2],
 
   "select.level_number.ttf": [2, 36, 8],
+  "select.chapter_name.ttf": [2, 36, 8],
+  "select.chapter_time.ttf": [0, 48, 8],
+  "select.chapter_millis.ttf": [0, 36, 8],
 
   "settings.header.ttf": [2, 24, 16],
+  "settings.label.ttf": [0, 36, 8],
   "settings.selected.ttf": [1, 36, 8],
-  "settings.deselected.ttf": [0, 36, 8],
+  "settings.deselected.ttf": [1, 36, 8],
 }

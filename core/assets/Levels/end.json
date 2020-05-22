@@ -1,0 +1,91 @@
+{
+"width": 16,
+"height": 8.986667,
+"chapter": "mountains",
+"player": {
+	"x": 0.28666666,
+	"y": 2.3733332
+},
+"enemies": [],
+"platforms": [
+	{
+		"type": "mountains_c_t",
+		"x": 0.33333334,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 1,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 1.6666666,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 2.3333333,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 3,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 3.6666667,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 4.3333335,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 5,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 5.6666665,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 6.3333335,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 7,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 7.6666665,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 8.333333,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 9,
+		"y": 1.5666667
+	},
+	{
+		"type": "mountains_c_t",
+		"x": 9.666667,
+		"y": 1.5666667
+	}
+],
+"altar": {
+  "x": 13,
+  "y": 4.5,
+}
+}

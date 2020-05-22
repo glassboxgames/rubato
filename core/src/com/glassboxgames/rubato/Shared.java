@@ -168,4 +168,16 @@ public final class Shared {
   public static void drawOverlay(float alpha) {
     drawOverlay(new Color(0, 0, 0, alpha));
   }
+
+  /**
+   * Formats milliseconds as a time string.
+   */
+  public static String formatTime(long millis) {
+    long secs = millis / 1000;
+    long mins = secs / 60;
+    long hrs = mins / 60;
+    return hrs == 0
+      ? String.format("%d:%02d.%03d", mins % 60, secs % 60, millis % 1000)
+      : String.format("%d:%02d:%02d.%03d", hrs, mins % 60, secs % 60, millis % 1000);
+  }
 }

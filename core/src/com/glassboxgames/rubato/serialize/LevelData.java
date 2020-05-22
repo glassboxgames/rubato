@@ -18,6 +18,10 @@ public class LevelData {
   public Array<PlatformData> platforms;
   /** Checkpoint data */
   public CheckpointData checkpoint;
+  /** Altar data, optionally */
+  public AltarData altar;
   /** Tooltips data array */
   public Array<TooltipData> tooltips;
+  /** Whether this level is a completion level */
+  public boolean completion;
 }

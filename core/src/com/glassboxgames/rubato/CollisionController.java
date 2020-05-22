@@ -52,6 +52,10 @@ public class CollisionController implements ContactListener {
         startCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
         startCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Altar) {
+        startCollision((Player)o1.entity, o1, (Altar)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Altar) {
+        startCollision((Player)o2.entity, o2, (Altar)o1.entity, o1);
       } else if (o1.entity instanceof Player && o2.entity instanceof Tooltip) {
         startCollision((Player)o1.entity, o1, (Tooltip)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Tooltip) {
@@ -88,6 +92,10 @@ public class CollisionController implements ContactListener {
         endCollision((Player)o1.entity, o1, (Checkpoint)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Checkpoint) {
         endCollision((Player)o2.entity, o2, (Checkpoint)o1.entity, o1);
+      } else if (o1.entity instanceof Player && o2.entity instanceof Altar) {
+        endCollision((Player)o1.entity, o1, (Altar)o2.entity, o2);
+      } else if (o2.entity instanceof Player && o1.entity instanceof Altar) {
+        endCollision((Player)o2.entity, o2, (Altar)o1.entity, o1);
       } else if (o1.entity instanceof Player && o2.entity instanceof Tooltip) {
         endCollision((Player)o1.entity, o1, (Tooltip)o2.entity, o2);
       } else if (o2.entity instanceof Player && o1.entity instanceof Tooltip) {
@@ -324,7 +332,19 @@ public class CollisionController implements ContactListener {
    */
   private void endCollision(Player player, Entity.Collider playerCollider,
                             Checkpoint checkpoint, Entity.Collider checkpointCollider) {}
-
+  
+  /**
+   * Handles a collision starting between a player and a altar.
+   */
+  private void startCollision(Player player, Entity.Collider playerCollider,
+                              Altar altar, Entity.Collider altarCollider) {
+    if (playerCollider.isHurtbox() && altarCollider.isCenterSensor()) {
+      altar.setPlayerClose(true);
+    } else if (playerCollider.isHurtbox() && altarCollider.isVisionSensor()) {
+      altar.setPlayerSeen(true);
+    }
+  }
+  
   /**
    * Handles a collision starting between a player and a tooltip.
    */
@@ -334,6 +354,12 @@ public class CollisionController implements ContactListener {
       tooltip.appear();
     }
   }
+
+  /**
+   * Handles a collision ending between a player and a altar.
+   */
+  private void endCollision(Player player, Entity.Collider playerCollider,
+                            Altar altar, Entity.Collider altarCollider) {}
 
   /**
    * Handles a collision ending between a player and a tooltip.
