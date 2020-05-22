@@ -46,8 +46,11 @@ public class MusicController {
     }
   }
 
-  public void stop(String key) {
-    if (key.equals(this.key)) {
+  /**
+   * Stops the music.
+   */
+  public void stop() {
+    if (music != null) {
       music.stop();
     }
   }

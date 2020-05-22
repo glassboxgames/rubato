@@ -359,9 +359,9 @@ public class GameMode implements Screen {
           soundController.stop(runSound);
         }
       }
-      if (level.getCheckpoint().wasJustActivated()) {
+      if (level.getCheckpoint() != null && level.getCheckpoint().wasJustActivated()) {
         if (level.isCompletion()) {
-          MusicController.getInstance().stop(level.getChapter());
+          MusicController.getInstance().stop();
           String chapterSound = Shared.SOUND_PATHS.get("chapter");
           SoundController.getInstance().play(chapterSound, chapterSound, false);
         } else {
