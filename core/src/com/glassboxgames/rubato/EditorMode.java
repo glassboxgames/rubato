@@ -410,8 +410,8 @@ public class EditorMode implements Screen {
     });
 
 
-    float furthestX = 0;
-    float furthestY = Gdx.graphics.getHeight() / 2 / Shared.PPM;
+    float furthestX = data.altar != null ? data.altar.x + (Gdx.graphics.getWidth() / 2 / Shared.PPM) : 0;
+    float furthestY = (data.altar != null ? data.altar.y : 0) + Gdx.graphics.getHeight() / 2 / Shared.PPM;
     for (PlatformData platform : data.platforms) {
       furthestX = Math.max(furthestX, platform.x);
       furthestY = Math.max(furthestY, platform.y);
