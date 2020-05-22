@@ -851,7 +851,7 @@
 },
 "tooltips": [
 	{
-		"type": "reset",
+		"type": "reset_card",
 		"x": 10.5,
 		"y": 8
 	}
