@@ -540,7 +540,7 @@
 },
 "tooltips": [
 	{
-		"type": "jump",
+		"type": "jump_card",
 		"x": 6,
 		"y": 7
 	}

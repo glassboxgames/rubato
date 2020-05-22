@@ -426,7 +426,7 @@
 },
 "tooltips": [
 	{
-		"type": "attack",
+		"type": "attack_card",
 		"x": 5,
 		"y": 7
 	}

@@ -315,6 +315,13 @@ public class EditorMode implements Screen {
                         data.checkpoint.x * Shared.PPM,
                         data.checkpoint.y * Shared.PPM);
     }
+    if (data.tooltips != null) {
+      for (TooltipData tooltipData : data.tooltips) {
+        createLevelButton(tooltipData.type,
+                          tooltipData.x * Shared.PPM,
+                          tooltipData.y * Shared.PPM);
+      }
+    }
     if (data.altar != null) {
       createLevelButton("altar",
                         data.altar.x * Shared.PPM,
