@@ -2,6 +2,7 @@ package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
@@ -68,13 +69,22 @@ public class MainMenu implements Screen {
     button.getImageCell().padRight(30);
     button.getLabel().setFontScale(5f / 6);
     button.padBottom(20);
+
+    final SoundController soundController = SoundController.getInstance();
+
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         chooseOption(i);
+        String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
+        soundController.play(checkpointSound, checkpointSound, false);
       }
-      
-      public void enter(InputEvent e, float x, float y, int pointer, Actor from) {
+
+      public void enter(InputEvent e, float x, float y, int pointer, Actor fromActor) {
         if (!exiting) {
+          if (fromActor != null && !fromActor.isDescendantOf(button)) {
+            String clickSound = Shared.SOUND_PATHS.get("click");
+            soundController.play(Integer.toString(i), clickSound, false);
+          }
           button.getLabel().setFontScale(1);
         }
       }
@@ -129,6 +139,7 @@ public class MainMenu implements Screen {
   @Override
   public void render(float delta) {
     if (active) {
+      SoundController.getInstance().update();
       InputController input = InputController.getInstance();
       input.readInput();
       

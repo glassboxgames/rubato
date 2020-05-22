@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.rubato.entity.Tooltip;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
@@ -147,14 +148,15 @@ public class GameMode implements Screen {
     // Initialize entity state machines
     states = new Array<State>();
     states.addAll(Player.initStates());
-    states.addAll(Platform.initStates());
     states.addAll(Checkpoint.initStates());
+    states.addAll(Platform.initStates());
     states.addAll(Projectile.initStates());
     states.addAll(Spider.initStates());
     states.addAll(Wisp.initStates());
     states.addAll(Wyrm.initStates());
     states.addAll(Blob.initStates());
     states.addAll(Altar.initStates());
+    states.addAll(Tooltip.initStates());
   }
 
   /**
@@ -537,6 +539,11 @@ public class GameMode implements Screen {
         }
       }
 
+      Array<Tooltip> tooltips = level.getTooltips();
+      for (Tooltip tooltip : tooltips) {
+        tooltip.update(delta);
+      }
+
       if (player.isActive()) {
         player.sync();
       }
@@ -551,6 +558,9 @@ public class GameMode implements Screen {
       }
       if (altar != null) {
         altar.sync();
+      }
+      for (Tooltip tooltip : tooltips) {
+        tooltip.sync();
       }
 
       world.step(1 / 60f, 8, 3);

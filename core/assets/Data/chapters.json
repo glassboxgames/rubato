@@ -34,8 +34,11 @@
     "key": "desert",
     "maps": [
       "Levels/Desert/1.json",
+      "Levels/Desert/2.json",
       "Levels/Desert/3.json",
       "Levels/Desert/4.json",
+      "Levels/Desert/5.json",
+      "Levels/Desert/6.json",
       "Levels/Desert/7.json",
       "Levels/Desert/8.json",
       "Levels/Desert/9.json",
@@ -47,9 +50,11 @@
     "maps": [
       "Levels/Mountain/1.json",
       "Levels/Mountain/2.json",
-      "Levels/Mountain/3.json",
-      "Levels/Mountain/4.json",
-      "Levels/Completion/mountains.json",
+      "levels/Mountain/3.json",
+      "levels/Mountain/4.json",
+      "levels/Mountain/5.json",
+      "levels/Mountain/6.json",
+      "Levels/Completion/mountains.json"
       "Levels/end.json",
     ],
   },

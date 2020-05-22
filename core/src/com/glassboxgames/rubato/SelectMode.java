@@ -152,6 +152,9 @@ public class SelectMode implements Screen {
     unlockedLevelStyle.imageOver = Shared.getDrawable("pillar_selected");
     unlockedLevelStyle.font = Shared.getFont("select.level_number.ttf");
     unlockedLevelStyle.fontColor = Color.WHITE;
+
+    final SoundController soundController = SoundController.getInstance();
+
     for (int c = 0; c < Shared.CHAPTER_LEVELS.size; c++) {
       Array<ImageTextButton> buttons = new Array<ImageTextButton>();
       for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size - 1; l++) {
@@ -166,8 +169,17 @@ public class SelectMode implements Screen {
         button.addListener(new ClickListener(Input.Buttons.LEFT) {
           public void clicked(InputEvent e, float x, float y) {
             if (newLevel < save.getLevelsUnlocked(chapter)) {
+              String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
               level = newLevel;
+              soundController.play(checkpointSound, checkpointSound, false);
               play();
+            }
+          }
+
+          public void enter(InputEvent e, float x, float y, int pointer, Actor fromActor) {
+            if (fromActor != null && !fromActor.isDescendantOf(button)) {
+              String clickSound = Shared.SOUND_PATHS.get("click");
+              soundController.play("level" + Integer.toString(newLevel), clickSound, false);
             }
           }
         });
@@ -274,6 +286,7 @@ public class SelectMode implements Screen {
   @Override
   public void render(float delta) {
     if (active) {
+      SoundController.getInstance().update();
       InputController input = InputController.getInstance();
       SaveController save = SaveController.getInstance();
       input.readInput();

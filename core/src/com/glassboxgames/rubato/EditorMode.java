@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.*;
 import com.glassboxgames.rubato.entity.*;
+import com.glassboxgames.rubato.entity.Tooltip;
 import com.glassboxgames.rubato.serialize.*;
 import com.glassboxgames.util.*;
 
@@ -346,6 +347,7 @@ public class EditorMode implements Screen {
     data.chapter = chapterName;
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
+    data.tooltips = new Array<TooltipData>();
     for (String key : levelMap.keys()) {
       boolean isEnemy = false;
       for (Array<String> textures : editorGroups.get("Enemies").values()) {
