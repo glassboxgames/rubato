@@ -378,7 +378,7 @@ public class GameMode implements Screen {
    */
   private void startExit(int code) {
     if (!exiting) {
-      if (!paused) {
+      if (!paused && level.getAltar() == null) {
         SaveController.getInstance().addTimeSpent(level.getChapter(),
                                                   TimeUtils.timeSinceMillis(startTime));
       }
@@ -712,7 +712,7 @@ public class GameMode implements Screen {
    * Pauses the game.
    */
   private void pauseGame() {
-    if (!editable) {
+    if (!editable && level.getAltar() == null) {
       SaveController.getInstance().addTimeSpent(level.getChapter(), TimeUtils.timeSinceMillis(startTime));
     }
     Gdx.input.setInputProcessor(pauseStage);
