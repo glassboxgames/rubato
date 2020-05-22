@@ -20,4 +20,6 @@ public class LevelData {
   public CheckpointData checkpoint;
   /** Altar data, optionally */
   public AltarData altar;
+  /** Whether this level is a completion level */
+  public boolean completion;
 }

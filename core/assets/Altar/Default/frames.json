@@ -2,7 +2,8 @@
   {
     "file": "altar.png",
     "sensors": {
-      "center": [0, 0, 5],
+      "vision": [0, 0, 22.5, 8, 0],
+      "center": [0, 0, 6.75, 8, 0],
     },
     "hitboxes": [],
     "hurtboxes": [],

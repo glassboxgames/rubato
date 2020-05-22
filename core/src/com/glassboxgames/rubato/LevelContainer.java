@@ -51,12 +51,12 @@ public class LevelContainer {
   /**
    * Instantiates a LevelContainer from a LevelData object.
    * @param data the level data container
-   * @param completion whether this is a chapter completion level
    */
-  public LevelContainer(LevelData data, boolean completion) {
+  public LevelContainer(LevelData data) {
     width = data.width;
     height = data.height;
     chapter = data.chapter;
+    completion = data.completion;
     backgroundLayers = new Array<>();
     for (String key : Shared.TEXTURE_MAP.keys()) {
       if (key.startsWith(chapter + "_layer_")) {
@@ -86,7 +86,6 @@ public class LevelContainer {
     }
     wallDef = new BodyDef();
     wallDef.type = BodyDef.BodyType.StaticBody;
-    this.completion = completion;
   }
 
   /**
@@ -239,6 +238,13 @@ public class LevelContainer {
   }
 
   /**
+   * Returns whether this is a completion level.
+   */
+  public boolean isCompletion() {
+    return completion;
+  }
+
+  /**
    * Removes the right wall in this level.
    */
   public void removeRightWall() {
@@ -249,7 +255,7 @@ public class LevelContainer {
    * Activates the ripple shader for this level.
    */
   private void setRippleShader(GameCanvas canvas) {
-    if (!completion) {
+    if (!completion && altar == null) {
       RIPPLE_SHADER.begin();
       RIPPLE_SHADER.setUniformf("u_max_length", width * Shared.PPM);
       RIPPLE_SHADER.setUniformf("u_adagio",
@@ -257,11 +263,10 @@ public class LevelContainer {
                                             - canvas.getCameraPos().x + canvas.getWidth() / 2,
                                             Shared.PPM * player.getPosition().y
                                             - canvas.getCameraPos().y + canvas.getHeight() / 2));
-      Vector2 pos = checkpoint != null ? checkpoint.getPosition() : altar.getPosition();
       RIPPLE_SHADER.setUniformf("u_checkpoint",
-                                new Vector2(Shared.PPM * pos.x
+                                new Vector2(Shared.PPM * checkpoint.getPosition().x
                                             - canvas.getCameraPos().x + canvas.getWidth() / 2,
-                                            Shared.PPM * pos.y
+                                            Shared.PPM * checkpoint.getPosition().y
                                             - canvas.getCameraPos().y + canvas.getHeight() / 2));
       RIPPLE_SHADER.setUniformf("u_frame", checkpoint.isActivated() ? checkpoint.getInternalCount() : 0);
       RIPPLE_SHADER.end();

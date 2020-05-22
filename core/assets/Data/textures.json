@@ -41,7 +41,6 @@
   "mountains_layer_2": "Backgrounds/Mountains/2.png",
   "mountains_layer_3": "Backgrounds/Mountains/3.png",
   "mountains_layer_4": "Backgrounds/Mountains/4.png",
-  "mountains_layer_5": "Backgrounds/Mountains/5.png",
 
   "player": "Adagio/Idle/0.png",
   "checkpoint": "Checkpoints/Inactive/pillar_off.png",
@@ -193,4 +192,6 @@
 
   "slider_track": "User Interface/Slider/slider_track.png",
   "slider_knob": "User Interface/Slider/slider_knob.png",
+
+  "credits": "Cutscenes/credits.png",
 }

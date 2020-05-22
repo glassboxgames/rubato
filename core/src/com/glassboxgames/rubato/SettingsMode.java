@@ -84,7 +84,8 @@ public class SettingsMode implements Screen {
     deselectedStyle = new TextButton.TextButtonStyle();
     deselectedStyle.font = Shared.getFont("settings.deselected.ttf");
     deselectedStyle.fontColor = Color.WHITE;
-    labelStyle = new Label.LabelStyle(Shared.getFont("settings.deselected.ttf"), Color.WHITE);
+    deselectedStyle.overFontColor = Shared.TEAL;
+    labelStyle = new Label.LabelStyle(Shared.getFont("settings.label.ttf"), Color.WHITE);
 
     ImageButton home = new ImageButton(Shared.getDrawable("home_icon"));
     home.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -188,6 +189,7 @@ public class SettingsMode implements Screen {
    * Returns to the main menu.
    */
   private void exitToMenu() {
+    cancelRebinding();
     listener.exitScreen(this, EXIT_MENU);
   }
 

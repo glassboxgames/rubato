@@ -56,8 +56,8 @@ public class SelectMode implements Screen {
   private Array<Array<ImageTextButton>> levelButtonsByChapter;
   /** Current array of level buttons */
   private Array<ImageTextButton> levelButtons;
-  /** Current level label */
-  private Label currLevelLabel;
+  /** Chapter labels */
+  private Label chapterName, chapterTime, chapterMillis;
   /** Arrow buttons */
   private ImageButton leftArrow, rightArrow;
 
@@ -155,6 +155,9 @@ public class SelectMode implements Screen {
     for (int c = 0; c < Shared.CHAPTER_LEVELS.size; c++) {
       Array<ImageTextButton> buttons = new Array<ImageTextButton>();
       for (int l = 0; l < Shared.CHAPTER_LEVELS.get(c).size - 1; l++) {
+        if (c == Shared.CHAPTER_LEVELS.size - 1 && l == Shared.CHAPTER_LEVELS.get(c).size - 2) {
+          continue;
+        }
         final ImageTextButton button = new ImageTextButton(Integer.toString(l + 1), lockedLevelStyle);
         button.clearChildren();
         button.add(button.getLabel()).padBottom(40).row();
@@ -187,6 +190,20 @@ public class SelectMode implements Screen {
     
     table.setFillParent(true);
     table.center().bottom().pad(0, 40, 100, 40);
+    stage.addActor(table);
+
+    table = new Table();
+    table.setFillParent(true);
+    table.top().right().pad(30);
+    Table group = new Table();
+    chapterName = new Label("", new Label.LabelStyle(Shared.getFont("select.chapter_name.ttf"), Color.WHITE));
+    table.add(chapterName).right().row();
+    chapterTime = new Label("", new Label.LabelStyle(Shared.getFont("select.chapter_time.ttf"), Color.WHITE));
+    group.add(chapterTime).bottom().padRight(12);
+    chapterMillis = new Label("",
+                              new Label.LabelStyle(Shared.getFont("select.chapter_millis.ttf"), Color.WHITE));
+    group.add(chapterMillis).bottom().padBottom(4);
+    table.add(group).right().row();
     stage.addActor(table);
   }
 
@@ -267,7 +284,14 @@ public class SelectMode implements Screen {
       }
 
       background.setDrawable(backgroundDrawables.get(chapter));
-      
+
+      String curName = Shared.CHAPTER_NAMES.get(chapter);
+      chapterName.setText(curName);
+      String time = Shared.formatTime(SaveController.getInstance().getTimeSpent(curName));
+      int index = time.indexOf(".");
+      chapterTime.setText(time.substring(0, index));
+      chapterMillis.setText(time.substring(index));
+
       for (int i = 0; i < chapterButtons.size; i++) {
         String name = Shared.CHAPTER_NAMES.get(i);
         ImageButton button = chapterButtons.get(i);

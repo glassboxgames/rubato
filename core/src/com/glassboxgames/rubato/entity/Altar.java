@@ -13,8 +13,10 @@ public class Altar extends Entity {
   /** Altar states */
   public static Array<State> states = null;
 
-  /** Whether the player is nearby */
-  private boolean nearby;
+  /** Whether the player is seen */
+  private boolean seen;
+  /** Whether the player is close */
+  private boolean close;
 
   /**
    * Instantiates the altar with the specified parameters.
@@ -37,17 +39,30 @@ public class Altar extends Entity {
   }
 
   /**
-   * Sets the player nearby state.
+   * Sets the player seen state.
    */
-  public void setPlayerNearby(boolean value) {
-    nearby = value;
+  public void setPlayerSeen(boolean value) {
+    seen = value;
   }
 
   /**
-   * Returns the nearby state.
+   * Returns the seen state.
    */
-  public boolean isPlayerNearby() {
-    return nearby;
+  public boolean isPlayerSeen() {
+    return seen;
+  }
+
+  /**
+   * Sets the player close state.
+   */
+  public void setPlayerClose(boolean value) {
+    close = value;
+  }
+
+  /**
+   * Returns the close state.
+   */
+  public boolean isPlayerClose() {
+    return close;
   }
 }
-

@@ -56,6 +56,8 @@ public class GDXRoot extends Game implements ScreenListener {
   private int fadeState;
   /** Current fade state counter */
   private int fadeCount;
+  /** Whether the credits have been shown */
+  private boolean credits;
 
   public GDXRoot() {
     manager = new AssetManager();
@@ -235,7 +237,7 @@ public class GDXRoot extends Game implements ScreenListener {
         chapterIndex = selectMode.getChapter();
         levelIndex = selectMode.getLevel();
         level = Shared.CHAPTER_LEVELS.get(chapterIndex).get(levelIndex);
-        gameMode.setNextLevel(level, false, false);
+        gameMode.setNextLevel(level, false);
         setNextScreen(gameMode);
       }
     } else if (screen == gameMode) {
@@ -270,7 +272,7 @@ public class GDXRoot extends Game implements ScreenListener {
           setNextScreen(cutsceneMode);
         } else {
           level = levels.get(levelIndex);
-          gameMode.setNextLevel(level, levelIndex == levels.size - 1, false);
+          gameMode.setNextLevel(level, false);
           setNextScreen(gameMode);
         }
       } else if (exitCode == GameMode.EXIT_RESET) {
@@ -289,10 +291,14 @@ public class GDXRoot extends Game implements ScreenListener {
         setNextScreen(selectMode);
       } else if (exitCode == CutsceneMode.EXIT_COMPLETE) {
         if (level != null) {
-          gameMode.setNextLevel(level, false, false);
+          gameMode.setNextLevel(level, false);
           setNextScreen(gameMode);
+        } else if (!credits) {
+          credits = true;
+          cutsceneMode.setCutscene("credits");
+          setNextScreen(cutsceneMode);
         } else {
-          // TODO credit screen?
+          credits = false;
           setNextScreen(mainMenu);
         }
       } else {
@@ -303,7 +309,7 @@ public class GDXRoot extends Game implements ScreenListener {
         setNextScreen(mainMenu);
       } else if (exitCode == EditorMode.EXIT_TEST) {
         level = editorMode.exportLevel();
-        gameMode.setNextLevel(level, false, true);
+        gameMode.setNextLevel(level, true);
         setNextScreen(gameMode);
       } else {
         Gdx.app.exit();

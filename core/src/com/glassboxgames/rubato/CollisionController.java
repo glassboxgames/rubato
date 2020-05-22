@@ -313,6 +313,8 @@ public class CollisionController implements ContactListener {
     if (playerCollider.isHurtbox() && checkpointCollider.isCenterSensor()) {
       if (!checkpoint.isActivated()) {
         checkpoint.activate();
+        String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
+        SoundController.getInstance().play(checkpointSound, checkpointSound, false);
       }
     }
   }
@@ -329,7 +331,9 @@ public class CollisionController implements ContactListener {
   private void startCollision(Player player, Entity.Collider playerCollider,
                               Altar altar, Entity.Collider altarCollider) {
     if (playerCollider.isHurtbox() && altarCollider.isCenterSensor()) {
-      altar.setPlayerNearby(true);
+      altar.setPlayerClose(true);
+    } else if (playerCollider.isHurtbox() && altarCollider.isVisionSensor()) {
+      altar.setPlayerSeen(true);
     }
   }
 

@@ -118,8 +118,6 @@ public class GameMode implements Screen {
   private boolean devMode;
   /** Numerical selector for dev mode */
   private int devSelect;
-  /** Whether the current level is the chapter completion level */
-  private boolean completion;
   /** Whether the current level is editable */
   private boolean editable;
   /** When the player timer started (in ms); resets on resume */
@@ -127,8 +125,6 @@ public class GameMode implements Screen {
 
   /** Data for the next level */
   private LevelData nextData;
-  /** Completion status for the next level */
-  private boolean nextCompletion;
   /** Editable status for the next level */
   private boolean nextEditable;
   
@@ -289,12 +285,10 @@ public class GameMode implements Screen {
   /**
    * Sets the level data and parameters for the next level.
    * @param data the serialized level data
-   * @param completion whether the level is the last level of the chapter
    * @param editable whether the level is editable
    */
-  public void setNextLevel(LevelData data, boolean completion, boolean editable) {
+  public void setNextLevel(LevelData data, boolean editable) {
     nextData = data;
-    nextCompletion = completion;
     nextEditable = editable;
   }
 
@@ -306,10 +300,8 @@ public class GameMode implements Screen {
       level.deactivatePhysics(world);
     }
 
-    completion = nextCompletion;
     editable = nextEditable;
-    
-    level = new LevelContainer(nextData, nextCompletion);
+    level = new LevelContainer(nextData);
     chapterInfo.setVisible(false);
     chapterIcon.setDrawable(Shared.getDrawable(level.getChapter() + "_plain"));
     chapterComplete.setVisible(false);
@@ -332,15 +324,8 @@ public class GameMode implements Screen {
     chapterIcon.setDrawable(Shared.getDrawable(chapter + "_complete"));
     chapterIcon.setVisible(true);
     chapterComplete.setVisible(true);
-    long millis = SaveController.getInstance().getTimeSpent(level.getChapter());
-    long secs = millis / 1000;
-    long mins = secs / 60;
-    long hrs = mins / 60;
-    String time =
-      hrs == 0
-      ? String.format("%d:%02d.%03d", mins % 60, secs % 60, millis % 1000)
-      : String.format("%d:%02d:%02d.%03d", hrs, mins % 60, secs % 60, millis % 1000);
-    chapterTime.setText(time);
+    long time = SaveController.getInstance().getTimeSpent(level.getChapter());
+    chapterTime.setText(Shared.formatTime(time));
     chapterTime.setVisible(true);
   }
 
@@ -357,7 +342,7 @@ public class GameMode implements Screen {
    */
   private void updateSound() {
     SoundController soundController = SoundController.getInstance();
-    if (gameState == GameState.PLAY) {
+    if (gameState != GameState.INTRO) {
       Player player = level.getPlayer();
       String runSound = Shared.getSoundPath("run_grass");
       if (player.isRunning() && !paused) {
@@ -368,11 +353,6 @@ public class GameMode implements Screen {
         if (soundController.isActive(runSound)) {
           soundController.stop(runSound);
         }
-      }
-      Checkpoint checkpoint = level.getCheckpoint();
-      if (checkpoint != null && checkpoint.wasJustActivated()) {
-        String checkpointSound = Shared.getSoundPath("checkpoint");
-        soundController.play(checkpointSound, checkpointSound, false);
       }
     }
     soundController.update();
@@ -397,185 +377,208 @@ public class GameMode implements Screen {
    * @param delta time in seconds since last frame
    */
   private void update(float delta) {
-    if (gameState == GameState.INTRO) {
+    InputController input = InputController.getInstance();
+    input.readInput();
+    
+    if (paused) {
+      if (input.pressedExit()) {
+        resumeGame();
+      }
+      pauseStage.act(delta);
+    } else if (gameState == GameState.INTRO) {
       if (level != null) {
         level.activatePhysics(world);
         gameState = GameState.PLAY;
       }
     } else if (gameState == GameState.PLAY) {
-      if (completion) {
+      if (level.isCompletion()) {
         chapterStage.act(delta);
       }
-
-      InputController input = InputController.getInstance();
-      input.readInput();
-
-      if (paused) {
-        if (input.pressedExit()) {
-          resumeGame();
-        }
-
-        pauseStage.act(delta);
-      } else {
-        if (input.pressedExit()) {
-          if (editable) {
-            startExit(EXIT_EDIT);
-          } else {
-            pauseGame();
-          }          
-          return;
-        }
-        if (input.pressedDebug()) {
-          debug = !debug;
-        }
-        if (input.pressedDevMode()) {
-          devMode = !devMode;
-          devSelect = -1;
-        }
-        if (input.pressedReset()) {
-          startExit(EXIT_RESET);
-        }
-        if (devMode) {
-          if (input.getDevSelect() != -1) {
-            devSelect = input.getDevSelect();
-          }
-          int devChange = input.getDevChange();
-          if (devChange != 0) {
-            switch (devSelect) {
-            case -1:
-              break;
-            case 1:
-              // Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
-              break;
-            case 2:
-              Player.maxXSpeed += devChange * 0.5;
-              break;
-            case 3:
-              Player.maxYSpeed += devChange * 0.5;
-              break;
-            case 4:
-              Player.minJumpDuration += devChange * 1;
-              break;
-            case 5:
-              Player.maxJumpDuration += devChange * 1;
-              break;
-            }
-          }
-        }
-
-        Player player = level.getPlayer();
-        if (player.isActive()) {
-          Vector2 pos = player.getPosition();
-
-          if (pos.x >= level.getWidth()) {
-            if (editable) {
-              startExit(EXIT_RESET);
-            } else {
-              startExit(EXIT_COMPLETE);
-            }
-          }
-
-          if (pos.y < Y_BOUND) {
-            player.setAlive(false);
-          }
-
-          int horizontal = 0;
-          if (input.heldLeft()) {
-            horizontal -= 1;
-          }
-          if (input.heldRight()) {
-            horizontal += 1;
-          }
-          
-          player.setInput(horizontal);
-          player.tryFace();
-
-          if (input.pressedJump()) {
-            player.tryJump();
-          } else if (input.heldJump()) {
-            player.tryExtendJump();
-          }
-
-          if (input.pressedAttack()) {
-            player.tryAttack();
-          }
-
-          player.update(delta);
+      
+      if (input.pressedExit()) {
+        if (editable) {
+          startExit(EXIT_EDIT);
         } else {
-          startExit(EXIT_RESET);
-        }
-
-        Array<Enemy> enemies = level.getEnemies();
-        Array<Enemy> removedEnemies = new Array<Enemy>();
-        Array<Enemy> addedEnemies = new Array<Enemy>();
-        for (Enemy enemy : enemies) {
-          if (enemy.shouldRemove()) {
-            enemy.deactivatePhysics(world);
-            removedEnemies.add(enemy);
-          } else {
-            enemy.update(delta);
-            if (enemy instanceof Wisp) {
-              Array<Enemy> spawned = ((Wisp) enemy).getSpawned();
-              for (Enemy spawn : spawned) {
-                spawn.activatePhysics(world);
-                addedEnemies.add(spawn);
-              }
-              spawned.clear();
-            }
-          }
-        }
-        enemies.removeAll(removedEnemies, true);
-        enemies.addAll(addedEnemies);
-
-        Array<Platform> platforms = level.getPlatforms();
-        Array<Platform> removedPlatforms = new Array<Platform>();
-        for (Platform platform : platforms) {
-          if (platform.shouldRemove()) {
-            platform.deactivatePhysics(world);
-            removedPlatforms.add(platform);
-          } else {
-            platform.update(delta);
-          }
-        }
-        platforms.removeAll(removedPlatforms, true);
-        
-        Checkpoint checkpoint = level.getCheckpoint();
-        if (checkpoint != null) {
-          checkpoint.update(delta);
-          if (checkpoint.wasJustActivated()) {
-            if (completion) {
-              setChapterCompletion();
-            }
-            level.removeRightWall();
-            // listener.exitScreen(this, EXIT_CHECKPOINT);
-          }
-        }
-
-        Altar altar = level.getAltar();
-        if (altar != null) {
-          if (altar.isPlayerNearby()) {
-            gameState = GameState.ALTAR;
-          }
-        }
-
-        if (player.isActive()) {
-          player.sync();
-        }
-        for (Enemy enemy : level.getEnemies()) {
-          enemy.sync();
-        }
-        for (Platform platform : level.getPlatforms()) {
-          platform.sync();
-        }
-        if (checkpoint != null) {
-          checkpoint.sync();
-        }
-
-        world.step(delta, 8, 3);
-        gameStage.act(delta);
+          pauseGame();
+        }          
+        return;
       }
+      if (input.pressedDebug()) {
+        debug = !debug;
+      }
+      if (input.pressedDevMode()) {
+        devMode = !devMode;
+        devSelect = -1;
+      }
+      if (input.pressedReset()) {
+        level.getPlayer().setAlive(false);
+      }
+      if (devMode) {
+        if (input.getDevSelect() != -1) {
+          devSelect = input.getDevSelect();
+        }
+        int devChange = input.getDevChange();
+        if (devChange != 0) {
+          switch (devSelect) {
+          case -1:
+            break;
+          case 1:
+            // Player.jumpImpulse = (float) (Math.round((Player.jumpImpulse + devChange * 0.05) * 100.0) / 100.0); // handle precision error
+            break;
+          case 2:
+            Player.maxXSpeed += devChange * 0.5;
+            break;
+          case 3:
+            Player.maxYSpeed += devChange * 0.5;
+            break;
+          case 4:
+            Player.minJumpDuration += devChange * 1;
+            break;
+          case 5:
+            Player.maxJumpDuration += devChange * 1;
+            break;
+          }
+        }
+      }
+
+      Player player = level.getPlayer();
+      if (player.isActive()) {
+        Vector2 pos = player.getPosition();
+
+        if (pos.x >= level.getWidth()) {
+          if (editable) {
+            startExit(EXIT_RESET);
+          } else {
+            startExit(EXIT_COMPLETE);
+          }
+        }
+
+        if (pos.y < Y_BOUND) {
+          player.setAlive(false);
+        }
+
+        int horizontal = 0;
+        if (input.heldLeft()) {
+          horizontal -= 1;
+        }
+        if (input.heldRight()) {
+          horizontal += 1;
+        }
+          
+        player.setInput(horizontal);
+        player.tryFace();
+
+        if (input.pressedJump()) {
+          player.tryJump();
+        } else if (input.heldJump()) {
+          player.tryExtendJump();
+        }
+
+        if (input.pressedAttack()) {
+          player.tryAttack();
+        }
+
+        player.update(delta);
+      } else {
+        startExit(EXIT_RESET);
+      }
+
+      Array<Enemy> enemies = level.getEnemies();
+      Array<Enemy> removedEnemies = new Array<Enemy>();
+      Array<Enemy> addedEnemies = new Array<Enemy>();
+      for (Enemy enemy : enemies) {
+        if (enemy.shouldRemove()) {
+          enemy.deactivatePhysics(world);
+          removedEnemies.add(enemy);
+        } else {
+          enemy.update(delta);
+          if (enemy instanceof Wisp) {
+            Array<Enemy> spawned = ((Wisp) enemy).getSpawned();
+            for (Enemy spawn : spawned) {
+              spawn.activatePhysics(world);
+              addedEnemies.add(spawn);
+            }
+            spawned.clear();
+          }
+        }
+      }
+      enemies.removeAll(removedEnemies, true);
+      enemies.addAll(addedEnemies);
+
+      Array<Platform> platforms = level.getPlatforms();
+      Array<Platform> removedPlatforms = new Array<Platform>();
+      for (Platform platform : platforms) {
+        if (platform.shouldRemove()) {
+          platform.deactivatePhysics(world);
+          removedPlatforms.add(platform);
+        } else {
+          platform.update(delta);
+        }
+      }
+      platforms.removeAll(removedPlatforms, true);
+        
+      Checkpoint checkpoint = level.getCheckpoint();
+      if (checkpoint != null) {
+        checkpoint.update(delta);
+        if (checkpoint.wasJustActivated()) {
+          if (level.isCompletion()) {
+            setChapterCompletion();
+          }
+          level.removeRightWall();
+          // listener.exitScreen(this, EXIT_CHECKPOINT);
+        }
+      }
+
+      Altar altar = level.getAltar();
+      if (altar != null) {
+        altar.update(delta);
+        if (altar.isPlayerSeen()) {
+          gameState = GameState.ALTAR;
+        }
+      }
+
+      if (player.isActive()) {
+        player.sync();
+      }
+      for (Enemy enemy : level.getEnemies()) {
+        enemy.sync();
+      }
+      for (Platform platform : level.getPlatforms()) {
+        platform.sync();
+      }
+      if (checkpoint != null) {
+        checkpoint.sync();
+      }
+      if (altar != null) {
+        altar.sync();
+      }
+
+      world.step(1 / 60f, 8, 3);
+      gameStage.act(delta);
     } else if (gameState == GameState.ALTAR) {
-      // game end logic
+      if (input.pressedExit()) {
+        if (editable) {
+          startExit(EXIT_EDIT);
+        } else {
+          pauseGame();
+        }          
+        return;
+      }
+      Player player = level.getPlayer();
+      if (level.getAltar().isPlayerClose()) {
+        player.setInput(0);
+        player.startEnd();
+        if (player.getCount() > player.getState().getLength()) {
+          startExit(EXIT_COMPLETE);
+        }
+      } else {
+        player.setInput(1);
+      }
+      player.update(delta);
+      player.sync();
+
+      world.step(1 / 60f, 8, 3);
+      gameStage.act(delta);
     }
 
     updateSound();
@@ -589,7 +592,7 @@ public class GameMode implements Screen {
 
     if (gameState != GameState.INTRO) {
       level.drawBackground(canvas);
-      if (completion) {
+      if (level.isCompletion()) {
         Shared.drawOverlay(0.2f);
         chapterStage.draw();
       }
