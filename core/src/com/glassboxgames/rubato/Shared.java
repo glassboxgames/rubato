@@ -107,6 +107,8 @@ public final class Shared {
       CHAPTER_NAMES.add(chapter.key);
       CHAPTER_LEVELS.add(maps);
     }
+
+    ShaderProgram.pedantic = false;
   }
 
   /**
