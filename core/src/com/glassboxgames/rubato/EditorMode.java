@@ -347,7 +347,6 @@ public class EditorMode implements Screen {
     data.chapter = chapterName;
     data.enemies = new Array<EnemyData>();
     data.platforms = new Array<PlatformData>();
-    data.tooltips = new Array<TooltipData>();
     for (String key : levelMap.keys()) {
       boolean isEnemy = false;
       for (Array<String> textures : editorGroups.get("Enemies").values()) {
