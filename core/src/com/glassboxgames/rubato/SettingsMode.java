@@ -71,6 +71,8 @@ public class SettingsMode implements Screen {
    * Initializes the settings UI.
    */
   public void initUI() {
+    final SaveController saveController = SaveController.getInstance();
+
     Image background = new Image(Shared.getTexture("menu_background"));
     background.setColor(1, 1, 1, 0.55f);
     background.setWidth(Gdx.graphics.getWidth());
@@ -109,16 +111,15 @@ public class SettingsMode implements Screen {
     final Slider musicSlider = new Slider(0f, 1f, 0.004f, false,
                                           new Slider.SliderStyle(Shared.getDrawable("slider_track"),
                                                                  Shared.getDrawable("slider_knob")));
-    // musicSlider.addListener(new ChangeListener() {
-    //   public void changed(ChangeEvent e, Actor actor) {
-    //     SoundController.getInstance().setVolume(soundSlider.getValue());
-    //     SaveController.getInstance()
-    //   }
-    // });
+    musicSlider.setValue(saveController.getMusicVolume());
+    musicSlider.addListener(new ChangeListener() {
+      public void changed(ChangeEvent e, Actor actor) {
+        saveController.setMusicVolume(musicSlider.getValue());
+        MusicController.getInstance().resetVolume();
+      }
+    });
     music.add(musicSlider).width(300).right();
     table.add(music).growX().row();
-
-    final SaveController saveController = SaveController.getInstance();
 
     Table sound = new Table();
     sound.add(new Label("sfx", labelStyle)).left().growX();
@@ -128,8 +129,8 @@ public class SettingsMode implements Screen {
     soundSlider.setValue(saveController.getSoundVolume());
     soundSlider.addListener(new ChangeListener() {
       public void changed(ChangeEvent e, Actor actor) {
-        SoundController.getInstance().setVolume(soundSlider.getValue());
         saveController.setSoundVolume(soundSlider.getValue());
+        SoundController.getInstance().setVolume(soundSlider.getValue());
       }
     });
     sound.add(soundSlider).width(300).right();
@@ -246,6 +247,7 @@ public class SettingsMode implements Screen {
   public void show() {
     active = true;
     Gdx.input.setInputProcessor(stage);
+    MusicController.getInstance().play("adagio");
   }
 
   @Override

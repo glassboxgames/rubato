@@ -175,13 +175,6 @@ public class SelectMode implements Screen {
               play();
             }
           }
-
-          public void enter(InputEvent e, float x, float y, int pointer, Actor fromActor) {
-            if (fromActor != null && !fromActor.isDescendantOf(button)) {
-              String clickSound = Shared.SOUND_PATHS.get("click");
-              soundController.play("level" + Integer.toString(newLevel), clickSound, false);
-            }
-          }
         });
         buttons.add(button);
       }
@@ -341,6 +334,7 @@ public class SelectMode implements Screen {
   public void show() {
     active = true;
     Gdx.input.setInputProcessor(stage);
+    MusicController.getInstance().play("adagio");
   }
 
   @Override

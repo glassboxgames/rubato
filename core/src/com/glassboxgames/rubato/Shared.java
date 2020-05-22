@@ -38,6 +38,8 @@ public final class Shared {
   public static final String FONT_MAP_FILE = "Data/fonts.json";
   /** File containing the sound shortname map */
   public static final String SOUND_MAP_FILE = "Data/sounds.json";
+  /** File containing the music shortname map */
+  public static final String MUSIC_MAP_FILE = "Data/music.json";
 
   /** JSON serializer/deserializer */
   public static final Json JSON = new Json();
@@ -51,6 +53,9 @@ public final class Shared {
   /** Map of sound shortnames to sound file paths */
   public static final OrderedMap<String, String> SOUND_PATHS =
     JSON.fromJson(OrderedMap.class, Gdx.files.internal(SOUND_MAP_FILE));
+  /** Map of music shortnames to music file paths */
+  public static final OrderedMap<String, String> MUSIC_PATHS =
+    JSON.fromJson(OrderedMap.class, Gdx.files.internal(MUSIC_MAP_FILE));
 
   /** Font files, by weight */
   public static final Array<String> FONT_FILES = new Array<String>();
@@ -146,6 +151,13 @@ public final class Shared {
    */
   public static String getSoundPath(String key) {
     return SOUND_PATHS.get(key);
+  }
+
+  /**
+   * Returns the music path for the given key.
+   */
+  public static String getMusicPath(String key) {
+    return MUSIC_PATHS.get(key);
   }
 
   /**

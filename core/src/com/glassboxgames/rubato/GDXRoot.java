@@ -161,6 +161,7 @@ public class GDXRoot extends Game implements ScreenListener {
         manager.unload(key);
       }
     }
+    MusicController.getInstance().dispose();
     gameMode.unloadContent(manager);
     mainMenu.dispose();
     gameMode.dispose();

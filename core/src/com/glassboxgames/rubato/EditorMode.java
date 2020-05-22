@@ -584,6 +584,7 @@ public class EditorMode implements Screen {
   public void show() {
     active = true;
     Gdx.input.setInputProcessor(inputProcessor);
+    MusicController.getInstance().play("adagio");
   }
 
   @Override
