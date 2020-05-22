@@ -43,12 +43,22 @@ public class SaveController {
    * Only used for instantiating the singleton.
    */
   private SaveController() {
+    internalData = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(INTERNAL_SAVE_FILE));
     try {
       data = Shared.JSON.fromJson(SaveData.class, Gdx.files.external(EXTERNAL_SAVE_FILE));
+      if (data.unlocked == null) {
+        data.unlocked = new ObjectMap<>(internalData.unlocked);
+      }
+      if (data.bindings == null) {
+        data.bindings = new ObjectMap<>(internalData.bindings);
+      }
+      if (data.times == null) {
+        data.times = new ObjectMap<>(internalData.times);
+      }
+      writeSave();
     } catch (Exception e) {
       data = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(INTERNAL_SAVE_FILE));
     }
-    internalData = Shared.JSON.fromJson(SaveData.class, Gdx.files.internal(INTERNAL_SAVE_FILE));
   }
 
   /**
