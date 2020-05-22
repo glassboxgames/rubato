@@ -34,6 +34,7 @@
   {
     "key": "desert",
     "maps": [
+      "Levels/Desert/0.json",
       "Levels/Desert/1.json",
       "Levels/Desert/2.json",
       "Levels/Desert/3.json",
