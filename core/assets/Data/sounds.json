@@ -4,4 +4,5 @@
   "attack_swing": "Sounds/Attacking/AttackSwing.mp3",
   "attack_hit": "Sounds/Attacking/AttackHit.mp3",
   "death": "Sounds/Death/Death.mp3",
+  "chapter": "Sounds/Environment/ChapterComplete.mp3"
 }
