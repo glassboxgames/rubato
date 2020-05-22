@@ -218,7 +218,7 @@ public class GDXRoot extends Game implements ScreenListener {
           } else if (chapterIndex < Shared.CHAPTER_NAMES.size - 1) {
             saveController.setLevelsUnlocked(chapterIndex + 1, 1);
           }
-          cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(0) + "_cutscene");
+          cutsceneMode.setNextCutscene(Shared.CHAPTER_NAMES.get(0) + "_cutscene", 60, 1);
           setNextScreen(cutsceneMode);
         } else {
           setNextScreen(selectMode);
@@ -264,10 +264,10 @@ public class GDXRoot extends Game implements ScreenListener {
             chapterIndex++;
             levels = Shared.CHAPTER_LEVELS.get(chapterIndex);
             level = levels.get(levelIndex);
-            cutsceneMode.setCutscene(Shared.CHAPTER_NAMES.get(chapterIndex) + "_cutscene");
+            cutsceneMode.setNextCutscene(Shared.CHAPTER_NAMES.get(chapterIndex) + "_cutscene", 60, 1);
           } else {
             level = null;
-            cutsceneMode.setCutscene("end_cutscene");
+            cutsceneMode.setNextCutscene("end_cutscene", 60, 1);
           }
           setNextScreen(cutsceneMode);
         } else {
@@ -295,7 +295,7 @@ public class GDXRoot extends Game implements ScreenListener {
           setNextScreen(gameMode);
         } else if (!credits) {
           credits = true;
-          cutsceneMode.setCutscene("credits");
+          cutsceneMode.setNextCutscene("credits", 240, 1);
           setNextScreen(cutsceneMode);
         } else {
           credits = false;
