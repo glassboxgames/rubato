@@ -586,6 +586,7 @@ public class EditorMode implements Screen {
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
       
       levelStage.act(delta);
+
       levelStage.draw();
       uiStage.act(delta);
       uiStage.draw();
