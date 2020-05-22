@@ -24,6 +24,9 @@ public class GDXRoot extends Game implements ScreenListener {
   /** Fade state duration */
   private static final int FADE_STATE_DURATION = 15;
 
+  /** Cursor path */
+  private static final String CURSOR_FILE = "User Interface/cursor.png";
+
   /** Drawing context to display graphics */
   private GameCanvas canvas;
   /** Manager for loading assets */
@@ -205,6 +208,12 @@ public class GDXRoot extends Game implements ScreenListener {
 
         soundController.setVolume(saveController.getSoundVolume());
         setNextScreen(mainMenu);
+
+        Pixmap pixmap = new Pixmap(Gdx.files.internal(CURSOR_FILE));
+        int xHotspot = pixmap.getWidth() / 2;
+        int yHotspot = pixmap.getHeight() / 2;
+        Gdx.graphics.setCursor(Gdx.graphics.newCursor(pixmap, xHotspot, yHotspot));
+        pixmap.dispose();
       } else {
         Gdx.app.error("GDXRoot", "Exited loading mode with error code " + exitCode,
                       new RuntimeException());
