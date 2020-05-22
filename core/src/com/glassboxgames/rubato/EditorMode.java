@@ -257,6 +257,11 @@ public class EditorMode implements Screen {
             break;
           }
         }
+        if (options == null) {
+          options = new Array<String>();
+          options.add(key);
+          index = 0;
+        }
         ghost = new Ghost(options, index);
         levelMap.get(key).removeValue(button, true);
         button.remove();
@@ -540,8 +545,7 @@ public class EditorMode implements Screen {
       }
 
       for (String name : chapterButtonMap.keys()) {
-        // TODO fix weird bug where checked doesn't work after loading level
-        chapterButtonMap.get(name).setChecked(name == chapterName);
+        chapterButtonMap.get(name).setChecked(name.equals(chapterName));
       }
       background.setDrawable(backgroundMap.get(chapterName));
 
