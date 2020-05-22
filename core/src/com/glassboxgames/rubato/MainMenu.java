@@ -2,6 +2,7 @@ package com.glassboxgames.rubato;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.*;
@@ -58,16 +59,29 @@ public class MainMenu implements Screen {
     style.font = Shared.getFont("main_menu.deselected.ttf");
     style.fontColor = Color.WHITE;
     style.overFontColor = Shared.TEAL;
-    ImageTextButton button = new ImageTextButton(key.toUpperCase(), style);
+    final ImageTextButton button = new ImageTextButton(key.toUpperCase(), style);
     button.clearChildren();
     button.add(button.getImage());
     button.add(button.getLabel());
     button.row().align(Align.center + Align.left);
     button.getImageCell().padRight(30);
     button.padBottom(20);
+
+    final SoundController controller = SoundController.getInstance();
+
     button.addListener(new ClickListener(Input.Buttons.LEFT) {
       public void clicked(InputEvent e, float x, float y) {
         chooseOption(i);
+        String checkpointSound = Shared.SOUND_PATHS.get("checkpoint");
+        controller.play(checkpointSound, checkpointSound, false);
+        controller.update();
+      }
+      public void enter(InputEvent e, float x, float y, int pointer, Actor fromActor) {
+        if (fromActor != null && !fromActor.isDescendantOf(button)) {
+          String clickSound = Shared.SOUND_PATHS.get("click");
+          controller.play(Integer.toString(i), clickSound, false);
+          controller.update();
+        }
       }
     });
     if (i >= buttons.size) {
