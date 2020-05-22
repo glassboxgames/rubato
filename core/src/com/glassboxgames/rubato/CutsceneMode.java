@@ -22,8 +22,6 @@ public class CutsceneMode implements Screen {
   /** Exit code for completing the cutscene */
   public static final int EXIT_COMPLETE = 1;
 
-  /** Number of frames to pause at the beginning and end */
-  private static final int PAUSE_TIME = 60;
   /** Fraction of screen width to use */
   private static final float SCALE = 0.6f;
 
@@ -47,6 +45,8 @@ public class CutsceneMode implements Screen {
   
   /** Cutscene texture */
   private Texture cutscene;
+  /** Next cutscene texture */
+  private Texture nextCutscene;
   /** Cutscene width */
   private float width;
   /** Cutscene height */
@@ -63,19 +63,16 @@ public class CutsceneMode implements Screen {
     this.listener = listener;
 
     cutscene = null;
-    scrollRate = 1;
     cameraPos = new Vector2();
   }
 
   /**
-   * Sets the cutscene texture for this instance.
+   * Sets the next cutscene texture for this instance.
    */
-  public void setCutscene(String key) {
-    cutscene = Shared.getTexture(key);
-    width = Gdx.graphics.getWidth() * SCALE;
-    height = cutscene.getHeight() * Gdx.graphics.getWidth() / cutscene.getWidth() * SCALE;
-    cameraPos.set(width / 2, height - Gdx.graphics.getHeight() / 2);
-    startPauseTime = endPauseTime = PAUSE_TIME;
+  public void setNextCutscene(String key, int pauseTime, int rate) {
+    nextCutscene = Shared.getTexture(key);
+    startPauseTime = endPauseTime = pauseTime;
+    scrollRate = rate;
   }
 
   /**
@@ -86,11 +83,12 @@ public class CutsceneMode implements Screen {
     InputController input = InputController.getInstance();
     input.readInput();
     if (input.pressedExit()) {
-      listener.exitScreen(this, EXIT_ESCAPE);
+      listener.exitScreen(this, EXIT_COMPLETE);
     }
 
+    int rate = scrollRate;
     if (input.heldJump()) {
-      scrollRate = 0;
+      rate = 0;
     } else {
       int horizontal = 0;
       if (input.heldLeft()) {
@@ -100,18 +98,16 @@ public class CutsceneMode implements Screen {
         horizontal += 1;
       }
       if (horizontal < 0) {
-        scrollRate = -5;
+        rate = -5;
       } else if (horizontal > 0) {
-        scrollRate = 5;
-      } else {
-        scrollRate = 1;
+        rate = 5;
       }
     }
 
     if (startPauseTime > 0) {
       startPauseTime--;
     } else if (cameraPos.y > Gdx.graphics.getHeight() / 2) {
-      cameraPos.y = MathUtils.clamp(cameraPos.y - scrollRate,
+      cameraPos.y = MathUtils.clamp(cameraPos.y - rate,
         Gdx.graphics.getHeight() / 2, height - Gdx.graphics.getHeight() / 2);
     } else if (endPauseTime > 0) {
       endPauseTime--;
@@ -150,6 +146,10 @@ public class CutsceneMode implements Screen {
 
   @Override
   public void show() {
+    cutscene = nextCutscene;
+    width = Gdx.graphics.getWidth() * SCALE;
+    height = cutscene.getHeight() * Gdx.graphics.getWidth() / cutscene.getWidth() * SCALE;
+    cameraPos.set(width / 2, height - Gdx.graphics.getHeight() / 2);
     active = true;
   }
 
