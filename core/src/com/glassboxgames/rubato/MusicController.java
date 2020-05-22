@@ -34,7 +34,6 @@ public class MusicController {
    * Plays the music from the given key.
    */
   public void play(String key) {
-    System.out.println(key + " " + this.key);
     if (!key.equals(this.key)) {
       if (music != null) {
         music.dispose();

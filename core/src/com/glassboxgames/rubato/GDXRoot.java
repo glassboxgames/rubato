@@ -295,6 +295,7 @@ public class GDXRoot extends Game implements ScreenListener {
           gameMode.setNextLevel(level, false);
           setNextScreen(gameMode);
         } else if (!credits) {
+          MusicController.getInstance().play("adagio");
           credits = true;
           cutsceneMode.setNextCutscene("credits", 240, 1);
           setNextScreen(cutsceneMode);

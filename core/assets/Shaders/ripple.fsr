@@ -12,13 +12,13 @@ uniform vec2 u_checkpoint;
 uniform vec2 u_adagio;
 uniform float u_max_length;
 uniform float u_frame; 
- 
+
 void main() {
 	vec4 color = v_color * texture2D(u_texture, v_texCoords);
 	vec3 grey = vec3(color.r * 0.3 + color.g * 0.59 + color.b * 0.11);
-  float adagio = 1 - smoothstep(0.0, 0.2, length(gl_FragCoord.xy - u_adagio) / u_max_length - 0.1);
+  float adagio = 1.0 - smoothstep(0.0, 0.2, length(gl_FragCoord.xy - u_adagio) / u_max_length - 0.1);
   float checkpoint =
-    1 - smoothstep(0.0, 0.2, length(gl_FragCoord.xy - u_checkpoint) / u_max_length - 0.1 - u_frame / 60.0);
+    1.0 - smoothstep(0.0, 0.2, length(gl_FragCoord.xy - u_checkpoint) / u_max_length - 0.1 - u_frame / 60.0);
   float ripple = max(adagio, checkpoint);
 	color.rgb = color.rgb * ripple + grey * (1.0 - ripple);
 	gl_FragColor = color;

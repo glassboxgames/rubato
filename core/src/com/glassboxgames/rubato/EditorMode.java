@@ -257,6 +257,11 @@ public class EditorMode implements Screen {
             break;
           }
         }
+        if (options == null) {
+          options = new Array<String>();
+          options.add(key);
+          index = 0;
+        }
         ghost = new Ghost(options, index);
         levelMap.get(key).removeValue(button, true);
         button.remove();
@@ -314,6 +319,13 @@ public class EditorMode implements Screen {
       createLevelButton("checkpoint",
                         data.checkpoint.x * Shared.PPM,
                         data.checkpoint.y * Shared.PPM);
+    }
+    if (data.tooltips != null) {
+      for (TooltipData tooltipData : data.tooltips) {
+        createLevelButton(tooltipData.type,
+                          tooltipData.x * Shared.PPM,
+                          tooltipData.y * Shared.PPM);
+      }
     }
     if (data.altar != null) {
       createLevelButton("altar",
@@ -390,6 +402,15 @@ public class EditorMode implements Screen {
           platform.x = getCenterX(button) / Shared.PPM;
           platform.y = getCenterY(button) / Shared.PPM;
           data.platforms.add(platform);
+        }
+      } else if (key.equals("attack_card") || key.equals("jump_card") || key.equals("run_card") ||
+                 key.equals("pause_card") || key.equals("reset_card")) {
+        for (ImageButton button : levelMap.get(key)) {
+          TooltipData tooltip = new TooltipData();
+          tooltip.type = key;
+          tooltip.x = getCenterX(button) / Shared.PPM;
+          tooltip.y = getCenterY(button) / Shared.PPM;
+          data.tooltips.add(tooltip);
         }
       } else if (key.equals("altar")) {
         ImageButton button = levelMap.get(key).get(0);
@@ -541,8 +562,7 @@ public class EditorMode implements Screen {
       }
 
       for (String name : chapterButtonMap.keys()) {
-        // TODO fix weird bug where checked doesn't work after loading level
-        chapterButtonMap.get(name).setChecked(name == chapterName);
+        chapterButtonMap.get(name).setChecked(name.equals(chapterName));
       }
       background.setDrawable(backgroundMap.get(chapterName));
 
